@@ -8,6 +8,12 @@ export type CaseStudy = {
   year: string;
   url: string;
   accent: "green" | "orange" | "coral";
+  category: "corporate" | "commerce";
+  catalogTask: string;
+  status: "published" | "draft";
+  featured: boolean;
+  createdAt: string;
+  updatedAt: string;
   verified: string[];
   draft: {
     challenge: string;
@@ -29,6 +35,12 @@ export const cases: CaseStudy[] = [
     year: "2025",
     url: "https://alts-ural.ru/",
     accent: "green",
+    category: "corporate",
+    catalogTask: "Объяснить сложную промышленную услугу и собрать убедительную презентацию компании.",
+    status: "published",
+    featured: true,
+    createdAt: "2025-01-01T00:00:00.000Z",
+    updatedAt: "2025-01-01T00:00:00.000Z",
     verified: [
       "Полный дизайн сайта разработан с нуля",
       "Спроектирована подача сложной промышленной услуги",
@@ -68,6 +80,12 @@ export const cases: CaseStudy[] = [
     year: "2025",
     url: "https://ashaindia.ru/",
     accent: "orange",
+    category: "commerce",
+    catalogTask: "Организовать каталог из тысяч товаров и сделать путь к покупке понятным.",
+    status: "published",
+    featured: true,
+    createdAt: "2025-01-01T00:00:00.000Z",
+    updatedAt: "2025-01-01T00:00:00.000Z",
     verified: [
       "Полный дизайн интернет-магазина разработан с нуля",
       "Спроектирована работа с каталогом из тысяч товаров",
@@ -107,6 +125,12 @@ export const cases: CaseStudy[] = [
     year: "2025",
     url: "https://urkov-seo.ru/",
     accent: "coral",
+    category: "corporate",
+    catalogTask: "Перевести сложную B2B-услугу в последовательный коммерческий сценарий.",
+    status: "published",
+    featured: true,
+    createdAt: "2025-01-01T00:00:00.000Z",
+    updatedAt: "2025-01-01T00:00:00.000Z",
     verified: [
       "Полный дизайн сайта разработан с нуля",
       "Сложная услуга переведена в последовательный коммерческий сценарий",

@@ -12,7 +12,8 @@ export function Footer() {
           <p>Личная дизайн-практика Дениса Закусилова.</p>
         </div>
         <div className="footer-links">
-          <Link href="/#work">Работы</Link>
+          <Link href="/projects">Проекты</Link>
+          <Link href="/style-check">Тест стиля</Link>
           <Link href="/#services">Услуги</Link>
           <Link href="/reviews">Отзывы</Link>
           <Link href="/privacy">Политика</Link>

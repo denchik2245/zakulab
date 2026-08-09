@@ -1,6 +1,7 @@
 .next
 node_modules
 .netlify
+.data
 .DS_Store
 *.log
 .env*

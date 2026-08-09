@@ -1,7 +1,8 @@
 import Link from "next/link";
 
 const links = [
-  ["Работы", "/#work"],
+  ["Проекты", "/projects"],
+  ["Тест стиля", "/style-check"],
   ["Услуги", "/#services"],
   ["Процесс", "/#process"],
   ["Отзывы", "/reviews"],

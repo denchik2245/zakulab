@@ -2,13 +2,9 @@ export function ReviewForm() {
   return (
     <form
       className="review-form"
-      name="client-review"
       method="POST"
-      action="/success?form=review"
-      data-netlify="true"
-      data-netlify-honeypot="bot-field"
+      action="/api/reviews"
     >
-      <input type="hidden" name="form-name" value="client-review" />
       <p className="hidden-field">
         <label>Не заполняйте: <input name="bot-field" /></label>
       </p>
@@ -17,24 +13,47 @@ export function ReviewForm() {
         <input name="name" required autoComplete="name" />
       </label>
       <label>
-        <span>Компания и должность *</span>
-        <input name="company" required autoComplete="organization-title" />
+        <span>Компания *</span>
+        <input name="company" required autoComplete="organization" />
+      </label>
+      <label>
+        <span>Ваша должность или роль *</span>
+        <input name="role" required autoComplete="organization-title" />
+      </label>
+      <label>
+        <span>Название проекта *</span>
+        <input name="project-name" required placeholder="Например, сайт компании" />
       </label>
       <label>
         <span>Ссылка на сайт проекта *</span>
         <input name="project-url" required type="url" placeholder="https://" />
       </label>
       <label>
-        <span>Приватный контакт для проверки *</span>
-        <input name="contact" required placeholder="Телефон или ник в мессенджере" />
+        <span>Соцсеть или мессенджер *</span>
+        <select name="profile-network" required defaultValue="">
+          <option value="" disabled>Выберите площадку</option>
+          <option>Telegram</option>
+          <option>MAX</option>
+          <option>VK</option>
+          <option>LinkedIn</option>
+          <option>Другая сеть</option>
+        </select>
+      </label>
+      <label>
+        <span>Ссылка на ваш публичный профиль *</span>
+        <input name="public-profile" required placeholder="https:// или @username" />
       </label>
       <label className="field-wide">
         <span>Ваш отзыв *</span>
         <textarea name="review" required rows={6} placeholder="Что было важно в работе и что получилось в результате?" />
       </label>
       <label className="consent field-wide">
-        <input type="checkbox" name="publish-consent" required />
-        <span>Разрешаю опубликовать имя, компанию, должность и текст отзыва после проверки</span>
+        <input type="checkbox" name="publication-consent" required />
+        <span>Разрешаю опубликовать имя, компанию, роль, текст отзыва, ссылку на проект и указанный публичный профиль</span>
+      </label>
+      <label className="consent field-wide">
+        <input type="checkbox" name="public-contact-awareness" required />
+        <span>Понимаю, что ссылка на профиль будет видна посетителям сайта и они смогут перейти в него или написать мне</span>
       </label>
       <label className="consent field-wide">
         <input type="checkbox" name="privacy-consent" required />

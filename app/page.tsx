@@ -2,7 +2,9 @@ import Link from "next/link";
 import { Arrow, LabMark } from "@/components/marks";
 import { CaseVisual } from "@/components/case-visual";
 import { ProjectForm } from "@/components/project-form";
-import { cases } from "@/lib/cases";
+import { readContent } from "@/lib/content-store";
+
+export const dynamic = "force-dynamic";
 
 const process = [
   ["01", "Разбираю задачу", "Знакомимся, обсуждаем бизнес, аудиторию, ограничения и критерии результата."],
@@ -12,31 +14,10 @@ const process = [
   ["05", "Довожу до запуска", "Собираю на Tilda сам или подключаю партнёров и контролирую соответствие макетам."],
 ];
 
-const services = [
-  {
-    number: "01",
-    title: "Лендинг",
-    text: "Сфокусированная страница для запуска продукта, услуги или рекламной кампании.",
-    price: "от 40 000 ₽",
-    time: "от 7 рабочих дней",
-  },
-  {
-    number: "02",
-    title: "Многостраничный сайт",
-    text: "Понятная система для компании со сложными услугами, направлениями и разными аудиториями.",
-    price: "после оценки",
-    time: "от 15 рабочих дней",
-  },
-  {
-    number: "03",
-    title: "Интернет-магазин",
-    text: "Каталог и сценарии покупки, которые помогают выбирать, сравнивать и возвращаться.",
-    price: "индивидуально",
-    time: "от 25 рабочих дней",
-  },
-];
-
-export default function Home() {
+export default async function Home() {
+  const content = await readContent();
+  const cases = content.cases.filter((item) => item.status === "published" && item.featured);
+  const { site } = content;
   return (
     <>
       <section className="hero shell">
@@ -46,16 +27,16 @@ export default function Home() {
         </div>
         <div className="hero-title-wrap">
           <span className="hero-coordinate">56.8389° N<br />60.6057° E</span>
-          <h1>Сайты, в которых<br /><em>бизнес понятен</em></h1>
+          <h1>{site.heroTitle}<br /><em>{site.heroAccent}</em></h1>
           <div className="orbit-mark" aria-hidden="true"><span>ZK</span></div>
         </div>
         <div className="hero-grid hero-bottom">
           <p className="hero-lead">
-            Разбираюсь в задаче, проектирую ясную структуру и довожу сайт до запуска — сам или с проверенной командой.
+            {site.heroLead}
           </p>
           <div className="hero-actions">
             <Link className="button" href="#contact">Обсудить проект <Arrow diagonal /></Link>
-            <Link className="text-link" href="#work">Посмотреть работы <Arrow /></Link>
+            <Link className="text-link" href="/projects">Посмотреть проекты <Arrow /></Link>
           </div>
         </div>
         <div className="hero-ticker" aria-hidden="true">
@@ -103,6 +84,9 @@ export default function Home() {
               </Link>
             ))}
           </div>
+          <div className="all-projects-link">
+            <Link className="button button-light" href="/projects">Открыть каталог проектов <Arrow diagonal /></Link>
+          </div>
         </div>
       </section>
 
@@ -113,9 +97,9 @@ export default function Home() {
           <p>Технология — не отправная точка. Я подбираю решение по содержанию, срокам и реальной пользе для бизнеса.</p>
         </div>
         <div className="service-list">
-          {services.map((service) => (
-            <article key={service.number} className="service-row">
-              <span className="service-number">{service.number}</span>
+          {site.services.map((service, index) => (
+            <article key={service.id} className="service-row">
+              <span className="service-number">{String(index + 1).padStart(2, "0")}</span>
               <div><h3>{service.title}</h3><p>{service.text}</p></div>
               <div className="service-terms"><strong>{service.price}</strong><span>{service.time}</span></div>
             </article>
@@ -124,10 +108,25 @@ export default function Home() {
         <p className="service-footnote">Сроки указаны при готовых материалах и своевременном согласовании. Точная оценка — после короткого знакомства с задачей.</p>
       </section>
 
+      <section className="style-test-teaser section shell">
+        <div className="style-teaser-copy">
+          <div className="section-kicker"><LabMark>VISUAL / TEST</LabMark><span>04 — Найти направление</span></div>
+          <h2>Не знаете, какой стиль<br /><em>вам нравится?</em></h2>
+          <p>Это нормально. Я собрал восемь контрастных направлений в короткий тест. Вы оцените примеры, а сайт соберёт понятный профиль — что использовать и чего избегать в будущей концепции.</p>
+          <Link className="button" href="/style-check">Пройти визуальный тест <Arrow diagonal /></Link>
+          <span className="style-teaser-time">3–4 минуты · без регистрации</span>
+        </div>
+        <div className="style-teaser-visual" aria-hidden="true">
+          <div className="teaser-card teaser-card-a"><span>LIKE / 01</span><strong>Aa</strong><i /></div>
+          <div className="teaser-card teaser-card-b"><span>AVOID / 02</span><strong>LOUD</strong><i /></div>
+          <div className="teaser-profile"><span>YOUR / PROFILE</span><div><i style={{ left: "24%" }} /></div><div><i style={{ left: "72%" }} /></div><div><i style={{ left: "44%" }} /></div></div>
+        </div>
+      </section>
+
       <section className="process-section section" id="process">
         <div className="shell">
           <div className="section-heading process-heading">
-            <div className="section-kicker"><LabMark>METHOD / 05</LabMark><span>04 — Как строится работа</span></div>
+            <div className="section-kicker"><LabMark>METHOD / 05</LabMark><span>05 — Как строится работа</span></div>
             <h2>От вопроса<br /><em>до работающего сайта</em></h2>
           </div>
           <div className="process-list">
@@ -149,10 +148,10 @@ export default function Home() {
           <p>Фотография<br />будет добавлена</p>
         </div>
         <div className="about-copy">
-          <div className="section-kicker"><LabMark>DENIS / ZAKUSILOV</LabMark><span>05 — Личная практика</span></div>
+          <div className="section-kicker"><LabMark>DENIS / ZAKUSILOV</LabMark><span>06 — Личная практика</span></div>
           <h2>Погружаюсь лично.<br /><em>Отвечаю за целое.</em></h2>
-          <p className="about-lead">Я не начинаю с цвета кнопки. Сначала выясняю, что должен понять человек и какое действие важно бизнесу.</p>
-          <p>Проектирую структуру и дизайн сам. Сайты на Tilda собираю под ключ, а для кастомной разработки подключаю проверенных специалистов и контролирую результат.</p>
+          <p className="about-lead">{site.aboutLead}</p>
+          <p>{site.aboutText}</p>
           <div className="stats-grid">
             <div><strong>4</strong><span>года коммерческого опыта</span></div>
             <div><strong>120+</strong><span>выполненных клиентских задач</span></div>
@@ -165,7 +164,7 @@ export default function Home() {
       <section className="reviews-teaser section shell">
         <div className="review-quote-mark">“</div>
         <div>
-          <div className="section-kicker"><LabMark>CLIENT / NOTES</LabMark><span>06 — Отзывы</span></div>
+          <div className="section-kicker"><LabMark>CLIENT / NOTES</LabMark><span>07 — Отзывы</span></div>
           <blockquote>«Здесь появится проверенный отзыв клиента с конкретикой о процессе и результате работы».</blockquote>
           <p className="draft-note">[УТОЧНИТЬ] Отзыв проходит ручную проверку перед публикацией.</p>
           <Link className="text-link" href="/reviews">Все отзывы и форма <Arrow /></Link>
@@ -174,7 +173,7 @@ export default function Home() {
 
       <section className="faq-section section shell">
         <div className="section-heading split-heading">
-          <div className="section-kicker"><LabMark>FAQ / TERMS</LabMark><span>07 — До старта</span></div>
+          <div className="section-kicker"><LabMark>FAQ / TERMS</LabMark><span>08 — До старта</span></div>
           <h2>Коротко<br /><em>о важном</em></h2>
         </div>
         <div className="faq-list">
@@ -189,9 +188,9 @@ export default function Home() {
         <div className="shell contact-grid">
           <div className="contact-copy">
             <LabMark>NEW / PROJECT</LabMark>
-            <h2>Давайте разберём<br /><em>вашу задачу</em></h2>
-            <p>Расскажите о проекте — я изучу вводные и свяжусь с вами выбранным способом в течение одного рабочего дня.</p>
-            <div className="contact-aside"><span>Старт проекта</span><strong>от 40 000 ₽</strong></div>
+            <h2>{site.contactTitle}<br /><em>{site.contactAccent}</em></h2>
+            <p>{site.contactText}</p>
+            <div className="contact-aside"><span>Старт проекта</span><strong>{site.contactPrice}</strong></div>
           </div>
           <ProjectForm />
         </div>

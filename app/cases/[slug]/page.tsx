@@ -3,15 +3,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CaseVisual } from "@/components/case-visual";
 import { LabMark, Arrow } from "@/components/marks";
-import { cases, getCase } from "@/lib/cases";
+import { getPublishedCase, getPublishedCases } from "@/lib/content-store";
 
-export function generateStaticParams() {
-  return cases.map((item) => ({ slug: item.slug }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const item = getCase(slug);
+  const item = await getPublishedCase(slug);
   if (!item) return {};
   return {
     title: `Кейс ${item.title}`,
@@ -22,14 +20,15 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function CasePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const item = getCase(slug);
+  const item = await getPublishedCase(slug);
   if (!item) notFound();
+  const cases = await getPublishedCases();
   const next = cases[(cases.findIndex((entry) => entry.slug === slug) + 1) % cases.length];
 
   return (
     <article className="case-page">
       <section className="case-hero shell">
-        <div className="case-breadcrumb"><Link href="/#work">Работы</Link><span>/</span><span>{item.index}</span></div>
+        <div className="case-breadcrumb"><Link href="/projects">Все проекты</Link><span>/</span><span>{item.index}</span></div>
         <div className="case-title-row">
           <div><LabMark>{item.eyebrow.toUpperCase()}</LabMark><h1>{item.title}</h1></div>
           <p>{item.summary}</p>

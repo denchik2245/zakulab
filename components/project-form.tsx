@@ -1,4 +1,19 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
 export function ProjectForm() {
+  const [styleBrief, setStyleBrief] = useState("");
+
+  useEffect(() => {
+    setStyleBrief(localStorage.getItem("zakulab-style-brief") ?? "");
+  }, []);
+
+  function clearStyleBrief() {
+    localStorage.removeItem("zakulab-style-brief");
+    setStyleBrief("");
+  }
+
   return (
     <form
       className="project-form"
@@ -9,11 +24,18 @@ export function ProjectForm() {
       data-netlify-honeypot="bot-field"
     >
       <input type="hidden" name="form-name" value="project-request" />
+      <input type="hidden" name="visual-profile" value={styleBrief} />
       <p className="hidden-field">
         <label>
           Не заполняйте это поле: <input name="bot-field" />
         </label>
       </p>
+      {styleBrief && (
+        <div className="attached-style-brief field-wide" aria-live="polite">
+          <div><span>VISUAL / PROFILE</span><strong>Визуальный тест прикреплён к заявке</strong></div>
+          <button type="button" onClick={clearStyleBrief}>Удалить</button>
+        </div>
+      )}
       <label>
         <span>Как вас зовут *</span>
         <input name="name" autoComplete="name" required placeholder="Александр" />
