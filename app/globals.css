@@ -409,9 +409,9 @@ body:has(.admin-studio) .site-header, body:has(.admin-studio) .site-footer, body
 .admin-fields label, .admin-editor-section label { display: grid; align-content: start; gap: 8px; }
 .admin-fields label.is-wide { grid-column: 1 / -1; }
 .admin-fields label > span, .admin-editor-section label > span { color: #6f736c; font-size: 9px; text-transform: uppercase; }
-.admin-editor input, .admin-editor textarea, .admin-editor select, .admin-site-editor input, .admin-site-editor textarea { width: 100%; padding: 11px 12px; color: var(--ink); background: #fff; border: 1px solid #bec1b9; border-radius: 0; outline: 0; font-size: 12px; }
+.admin-editor input, .admin-editor textarea, .admin-editor select, .admin-site-editor input, .admin-site-editor textarea, .admin-site-editor select { width: 100%; padding: 11px 12px; color: var(--ink); background: #fff; border: 1px solid #bec1b9; border-radius: 0; outline: 0; font-size: 12px; }
 .admin-editor textarea, .admin-site-editor textarea { resize: vertical; line-height: 1.5; }
-.admin-editor input:focus, .admin-editor textarea:focus, .admin-editor select:focus, .admin-site-editor input:focus, .admin-site-editor textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 1px var(--blue); }
+.admin-editor input:focus, .admin-editor textarea:focus, .admin-editor select:focus, .admin-site-editor input:focus, .admin-site-editor textarea:focus, .admin-site-editor select:focus { border-color: var(--blue); box-shadow: 0 0 0 1px var(--blue); }
 .admin-editor-section { display: grid; grid-template-columns: 155px 1fr; gap: 25px; padding: 32px 0; border-top: 1px solid #c4c6bf; }
 .admin-editor-section > div:first-child { display: grid; align-content: start; gap: 12px; }
 .admin-editor-section > div:first-child span { color: var(--blue); font: 400 8px/1 "IBM Plex Mono", monospace; }

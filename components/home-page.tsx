@@ -25,6 +25,26 @@ function ArrowIcon({ light = false }: { light?: boolean }) {
   );
 }
 
+function ProjectPlatform({ platform }: { platform: string }) {
+  const normalized = platform.trim().toLowerCase();
+  if (!normalized) return <span className={styles.platformIcon} aria-hidden="true" />;
+
+  const isWordPress = normalized === "wordpress" || normalized === "word press" || normalized === "wp";
+  const isTilda = normalized === "tilda";
+  if (!isWordPress && !isTilda) return <span className={styles.platformIcon} aria-hidden="true" />;
+
+  return (
+    <span className={styles.platformIcon}>
+      <Image
+        src={isWordPress ? "/assets/figma/property1-wordpress.svg" : "/assets/figma/property1-tilda.svg"}
+        width={isWordPress ? 32 : 36}
+        height={isWordPress ? 32 : 36}
+        alt={`Логотип ${isWordPress ? "WordPress" : "Tilda"}`}
+      />
+    </span>
+  );
+}
+
 function SectionTitle({ eyebrow, children }: { eyebrow: string; children: React.ReactNode }) {
   return (
     <div className={styles.sectionTitle}>
@@ -116,25 +136,54 @@ export function HomePage({ site, reviews }: { site: SiteSettings; reviews: Verif
         <h2 id="about-title">{typographic(site.aboutTitle)}</h2>
         <p>{typographic(site.aboutText)}</p>
         <div className={styles.stats}>
-          {site.stats.map((item) => <article key={item.id}><strong>{item.value}</strong><span>{typographic(item.label)}</span><i aria-hidden="true"><span>✱</span><span>✱</span><span>✱</span></i></article>)}
+          {site.stats.map((item, statIndex) => (
+            <article key={item.id}>
+              <strong>{item.value}</strong>
+              <span>{typographic(item.label)}</span>
+              <i aria-hidden="true">
+                {[0, 1, 2].map((starIndex) => (
+                  <Image
+                    key={starIndex}
+                    src={starIndex <= statIndex ? "/assets/figma/logo2.svg" : "/assets/figma/logo3.svg"}
+                    alt=""
+                    width={20}
+                    height={20}
+                  />
+                ))}
+              </i>
+            </article>
+          ))}
         </div>
       </section>
 
       <section className={styles.portfolio} id="portfolio" aria-labelledby="portfolio-title">
         <div className={styles.greenTexture} aria-hidden="true" />
         <div className={styles.portfolioInner}>
-          <SectionTitle eyebrow="Портфолио"><span id="portfolio-title">{typographic(site.portfolioTitle)}</span></SectionTitle>
+          <SectionTitle eyebrow="Лучшие проекты"><span id="portfolio-title">{typographic(site.portfolioTitle)}</span></SectionTitle>
           <div className={styles.portfolioGallery}>
-            {site.portfolioImages.slice(0, 4).map((src, index) => (
-              <div key={`${src}-${index}`}><Image src={src} alt="Превью проекта" fill sizes="(max-width: 900px) 50vw, 540px" quality={90} /></div>
-            ))}
+            {site.portfolioImages.slice(0, 4).map((src, index) => {
+              const project = site.projects[index];
+              const label = index === 1 ? "Курсы ЕГЭ и ОГЭ" : project?.title ?? "Проект";
+              const tags = index === 1
+                ? ["UX-исследование", "15 страниц"]
+                : [project?.description, project?.platform].filter((tag): tag is string => Boolean(tag));
+
+              return (
+                <div key={`${src}-${index}`}>
+                  <Image src={src} alt="Превью проекта" fill sizes="(max-width: 900px) 50vw, 540px" quality={90} />
+                  <span className={styles.featuredLabel}>{typographic(label)}</span>
+                  <span className={styles.featuredTags}>{tags.map((tag) => <small key={tag}>{typographic(tag)}</small>)}</span>
+                  <span className={styles.featuredArrow}><ArrowIcon /></span>
+                </div>
+              );
+            })}
           </div>
           <div className={styles.projectRows}>
             {site.projects.map((project) => (
               <a href={project.url} key={project.id} target={project.url.startsWith("http") ? "_blank" : undefined} rel={project.url.startsWith("http") ? "noreferrer" : undefined}>
-                <strong>{typographic(project.title)}<ArrowIcon light /></strong>
-                <span>{typographic(project.description)}</span>
-                <Image src="/assets/figma/property1-tilda.svg" width={36} height={36} alt={project.platform} title={project.platform} />
+                <strong>{typographic(project.title)}<ArrowIcon /></strong>
+                <span className={styles.projectDescription}>{typographic(project.description)}</span>
+                <ProjectPlatform platform={project.platform} />
               </a>
             ))}
           </div>

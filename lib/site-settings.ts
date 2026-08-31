@@ -102,10 +102,10 @@ export const defaultSiteSettings: SiteSettings = {
   ],
   projects: [
     { id: "siding-moldova", title: "Siding-Moldova", description: "Виниловый сайдинг для дома под ключ", url: "#", platform: "Tilda" },
-    { id: "tck-levit", title: "TCK Levit", description: "Закупка строительных материалов", url: "#", platform: "Tilda" },
-    { id: "estet-apart", title: "Estet-Apart", description: "Управление посуточной и долгосрочной арендой", url: "#", platform: "Tilda" },
+    { id: "tck-levit", title: "TCK Levit", description: "Закупка строительных материалов", url: "#", platform: "" },
+    { id: "estet-apart", title: "Estet-Apart", description: "Управление посуточной и долгосрочной арендой", url: "#", platform: "WordPress" },
     { id: "smol-aqua-pro", title: "SmolAquaPro", description: "Системы водоочистки", url: "#", platform: "Tilda" },
-    { id: "flat-design", title: "Flat Design", description: "Студия дизайна интерьеров", url: "#", platform: "Tilda" },
+    { id: "flat-design", title: "Flat Design", description: "Студия дизайна интерьеров", url: "#", platform: "" },
   ],
   processTitle: "Как проходит работа над проектом",
   process: [

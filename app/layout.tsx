@@ -4,6 +4,7 @@ import "@fontsource/ibm-plex-mono/400.css";
 import "./globals.css";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
+import { SmoothScroll } from "@/components/smooth-scroll";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://zakulab.ru"),
@@ -37,6 +38,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="ru" data-scroll-behavior="smooth">
       <body>
+        <SmoothScroll />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
         <Header />
         <main>{children}</main>
