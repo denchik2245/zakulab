@@ -34,16 +34,46 @@ function isNetlifyRuntime() {
 
 function mergeWithDefaults(value: Partial<AdminContent>): AdminContent {
   const seed = seedContent();
+  const incomingSite = value.site as Partial<SiteSettings> | undefined;
+  const isLegacySite = Boolean(
+    incomingSite &&
+      (!("heroName" in incomingSite) ||
+        !Array.isArray(incomingSite.portfolioImages)),
+  );
+  const site = isLegacySite
+    ? seed.site
+    : {
+        ...seed.site,
+        ...(incomingSite ?? {}),
+        heroGallery: Array.isArray(incomingSite?.heroGallery)
+          ? incomingSite.heroGallery
+          : seed.site.heroGallery,
+        stats: Array.isArray(incomingSite?.stats)
+          ? incomingSite.stats
+          : seed.site.stats,
+        portfolioImages: Array.isArray(incomingSite?.portfolioImages)
+          ? incomingSite.portfolioImages
+          : seed.site.portfolioImages,
+        projects: Array.isArray(incomingSite?.projects)
+          ? incomingSite.projects
+          : seed.site.projects,
+        process: Array.isArray(incomingSite?.process)
+          ? incomingSite.process
+          : seed.site.process,
+        services: Array.isArray(incomingSite?.services)
+          ? incomingSite.services
+          : seed.site.services,
+        smallTasks: Array.isArray(incomingSite?.smallTasks)
+          ? incomingSite.smallTasks
+          : seed.site.smallTasks,
+      };
+
   return {
     version: 1,
     updatedAt: typeof value.updatedAt === "string" ? value.updatedAt : seed.updatedAt,
     cases: Array.isArray(value.cases) ? value.cases : seed.cases,
     reviews: Array.isArray(value.reviews) ? value.reviews : seed.reviews,
-    site: {
-      ...seed.site,
-      ...(value.site ?? {}),
-      services: Array.isArray(value.site?.services) ? value.site.services : seed.site.services,
-    },
+    site,
   };
 }
 

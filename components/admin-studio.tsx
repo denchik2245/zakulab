@@ -1,10 +1,11 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { ChangeEvent, FormEvent, useMemo, useState } from "react";
 import Link from "next/link";
 import type { AdminContent } from "@/lib/content-store";
 import type { CaseStudy } from "@/lib/cases";
 import type { VerifiedReview } from "@/lib/reviews";
+import type { SiteSettings } from "@/lib/site-settings";
 
 type Tab = "overview" | "cases" | "reviews" | "site";
 
@@ -157,6 +158,18 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
     setContent({ ...content, reviews: content.reviews.map((item) => item.id === id ? { ...item, ...patch } : item) });
   }
 
+  function patchSite(patch: Partial<SiteSettings>) {
+    if (!content) return;
+    setContent({ ...content, site: { ...content.site, ...patch } });
+  }
+
+  function patchMediaArray(key: "heroGallery" | "portfolioImages", index: number, value: string) {
+    if (!content) return;
+    const values = [...content.site[key]];
+    values[index] = value;
+    patchSite({ [key]: values });
+  }
+
   if (!isAuthenticated || !content) {
     return (
       <section className="admin-login shell">
@@ -289,22 +302,44 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
           <div className="admin-view admin-site-editor">
             <div className="admin-list-head"><div><span>PUBLIC / COPY</span><h1>Сайт</h1></div><Link href="/" target="_blank">Открыть сайт ↗</Link></div>
             <EditorSection title="Первый экран" code="HOME / HERO">
-              <Field label="Первая строка"><input value={content.site.heroTitle} onChange={(e) => setContent({ ...content, site: { ...content.site, heroTitle: e.target.value } })} /></Field>
-              <Field label="Акцентная строка"><input value={content.site.heroAccent} onChange={(e) => setContent({ ...content, site: { ...content.site, heroAccent: e.target.value } })} /></Field>
-              <Field label="Вводный текст"><textarea rows={4} value={content.site.heroLead} onChange={(e) => setContent({ ...content, site: { ...content.site, heroLead: e.target.value } })} /></Field>
+              <Field label="Главный заголовок"><textarea rows={4} value={content.site.heroTitle} onChange={(e) => patchSite({ heroTitle: e.target.value })} /></Field>
+              <div className="admin-inline-fields"><Field label="Имя"><input value={content.site.heroName} onChange={(e) => patchSite({ heroName: e.target.value })} /></Field><Field label="Роль"><input value={content.site.heroRole} onChange={(e) => patchSite({ heroRole: e.target.value })} /></Field></div>
+              <MediaField label="Портрет" value={content.site.heroPortrait} onChange={(value) => patchSite({ heroPortrait: value })} />
+              <div className="admin-media-grid">{content.site.heroGallery.map((image, index) => <MediaField label={`Работа ${index + 1}`} value={image} onChange={(value) => patchMediaArray("heroGallery", index, value)} key={index} />)}</div>
             </EditorSection>
             <EditorSection title="Обо мне" code="HOME / ABOUT">
-              <Field label="Главная мысль"><textarea rows={4} value={content.site.aboutLead} onChange={(e) => setContent({ ...content, site: { ...content.site, aboutLead: e.target.value } })} /></Field>
-              <Field label="Описание"><textarea rows={5} value={content.site.aboutText} onChange={(e) => setContent({ ...content, site: { ...content.site, aboutText: e.target.value } })} /></Field>
+              <Field label="Заголовок"><textarea rows={3} value={content.site.aboutTitle} onChange={(e) => patchSite({ aboutTitle: e.target.value })} /></Field>
+              <Field label="Описание"><textarea rows={5} value={content.site.aboutText} onChange={(e) => patchSite({ aboutText: e.target.value })} /></Field>
+              <div className="admin-media-grid">{content.site.stats.map((stat, index) => <div className="admin-array-card" key={stat.id}><input value={stat.value} onChange={(e) => patchSite({ stats: content.site.stats.map((item, itemIndex) => itemIndex === index ? { ...item, value: e.target.value } : item) })} /><input value={stat.label} onChange={(e) => patchSite({ stats: content.site.stats.map((item, itemIndex) => itemIndex === index ? { ...item, label: e.target.value } : item) })} /></div>)}</div>
             </EditorSection>
-            <EditorSection title="Форматы работы" code="HOME / SERVICES">
-              {content.site.services.map((service, index) => <div className="admin-service-fields" key={service.id}><input value={service.title} onChange={(e) => setContent({ ...content, site: { ...content.site, services: content.site.services.map((item, itemIndex) => itemIndex === index ? { ...item, title: e.target.value } : item) } })} /><textarea rows={3} value={service.text} onChange={(e) => setContent({ ...content, site: { ...content.site, services: content.site.services.map((item, itemIndex) => itemIndex === index ? { ...item, text: e.target.value } : item) } })} /><input value={service.price} onChange={(e) => setContent({ ...content, site: { ...content.site, services: content.site.services.map((item, itemIndex) => itemIndex === index ? { ...item, price: e.target.value } : item) } })} /><input value={service.time} onChange={(e) => setContent({ ...content, site: { ...content.site, services: content.site.services.map((item, itemIndex) => itemIndex === index ? { ...item, time: e.target.value } : item) } })} /></div>)}
+            <EditorSection title="Портфолио" code="HOME / PORTFOLIO">
+              <div className="admin-inline-fields"><Field label="Заголовок"><input value={content.site.portfolioTitle} onChange={(e) => patchSite({ portfolioTitle: e.target.value })} /></Field><Field label="Всего проектов"><input value={content.site.portfolioCount} onChange={(e) => patchSite({ portfolioCount: e.target.value })} /></Field></div>
+              <div className="admin-media-grid">{content.site.portfolioImages.map((image, index) => <MediaField label={`Изображение ${index + 1}`} value={image} onChange={(value) => patchMediaArray("portfolioImages", index, value)} key={index} />)}</div>
+              {content.site.projects.map((project, index) => <div className="admin-array-card admin-project-fields" key={project.id}><input value={project.title} onChange={(e) => patchSite({ projects: content.site.projects.map((item, itemIndex) => itemIndex === index ? { ...item, title: e.target.value } : item) })} /><input value={project.description} onChange={(e) => patchSite({ projects: content.site.projects.map((item, itemIndex) => itemIndex === index ? { ...item, description: e.target.value } : item) })} /><input value={project.url} onChange={(e) => patchSite({ projects: content.site.projects.map((item, itemIndex) => itemIndex === index ? { ...item, url: e.target.value } : item) })} /><input value={project.platform} onChange={(e) => patchSite({ projects: content.site.projects.map((item, itemIndex) => itemIndex === index ? { ...item, platform: e.target.value } : item) })} /></div>)}
             </EditorSection>
-            <EditorSection title="Форма заявки" code="HOME / CONTACT">
-              <Field label="Первая строка"><input value={content.site.contactTitle} onChange={(e) => setContent({ ...content, site: { ...content.site, contactTitle: e.target.value } })} /></Field>
-              <Field label="Акцентная строка"><input value={content.site.contactAccent} onChange={(e) => setContent({ ...content, site: { ...content.site, contactAccent: e.target.value } })} /></Field>
-              <Field label="Описание"><textarea rows={4} value={content.site.contactText} onChange={(e) => setContent({ ...content, site: { ...content.site, contactText: e.target.value } })} /></Field>
-              <Field label="Стоимость от"><input value={content.site.contactPrice} onChange={(e) => setContent({ ...content, site: { ...content.site, contactPrice: e.target.value } })} /></Field>
+            <EditorSection title="Процесс" code="HOME / PROCESS">
+              <Field label="Заголовок"><input value={content.site.processTitle} onChange={(e) => patchSite({ processTitle: e.target.value })} /></Field>
+              {content.site.process.map((step, index) => <div className="admin-array-card admin-process-fields" key={step.id}><input value={step.title} onChange={(e) => patchSite({ process: content.site.process.map((item, itemIndex) => itemIndex === index ? { ...item, title: e.target.value } : item) })} /><textarea rows={4} value={step.text} onChange={(e) => patchSite({ process: content.site.process.map((item, itemIndex) => itemIndex === index ? { ...item, text: e.target.value } : item) })} /><MediaField label={`Изображение этапа ${index + 1}`} value={step.image} onChange={(value) => patchSite({ process: content.site.process.map((item, itemIndex) => itemIndex === index ? { ...item, image: value } : item) })} />{step.secondaryTitle !== undefined && <><input value={step.secondaryTitle} onChange={(e) => patchSite({ process: content.site.process.map((item, itemIndex) => itemIndex === index ? { ...item, secondaryTitle: e.target.value } : item) })} /><textarea rows={3} value={step.secondaryText} onChange={(e) => patchSite({ process: content.site.process.map((item, itemIndex) => itemIndex === index ? { ...item, secondaryText: e.target.value } : item) })} />{step.secondaryImage && <MediaField label="Второе изображение" value={step.secondaryImage} onChange={(value) => patchSite({ process: content.site.process.map((item, itemIndex) => itemIndex === index ? { ...item, secondaryImage: value } : item) })} />}</>}</div>)}
+            </EditorSection>
+            <EditorSection title="Отзывы" code="HOME / REVIEWS">
+              <Field label="Заголовок"><textarea rows={3} value={content.site.reviewsTitle} onChange={(e) => patchSite({ reviewsTitle: e.target.value })} /></Field>
+              <Field label="Пояснение"><textarea rows={4} value={content.site.reviewsText} onChange={(e) => patchSite({ reviewsText: e.target.value })} /></Field>
+              <MediaField label="Фоновое изображение отзыва" value={content.site.reviewImage} onChange={(value) => patchSite({ reviewImage: value })} />
+            </EditorSection>
+            <EditorSection title="Услуги и стоимость" code="HOME / SERVICES">
+              <Field label="Заголовок"><input value={content.site.servicesTitle} onChange={(e) => patchSite({ servicesTitle: e.target.value })} /></Field>
+              <Field label="Пояснение"><textarea rows={4} value={content.site.servicesText} onChange={(e) => patchSite({ servicesText: e.target.value })} /></Field>
+              {content.site.services.map((service, index) => <div className="admin-array-card admin-service-fields" key={service.id}><input value={service.title} onChange={(e) => patchSite({ services: content.site.services.map((item, itemIndex) => itemIndex === index ? { ...item, title: e.target.value } : item) })} /><textarea rows={3} value={service.text} onChange={(e) => patchSite({ services: content.site.services.map((item, itemIndex) => itemIndex === index ? { ...item, text: e.target.value } : item) })} /><input value={service.time} onChange={(e) => patchSite({ services: content.site.services.map((item, itemIndex) => itemIndex === index ? { ...item, time: e.target.value } : item) })} /><input value={service.price} onChange={(e) => patchSite({ services: content.site.services.map((item, itemIndex) => itemIndex === index ? { ...item, price: e.target.value } : item) })} /><input value={service.priceSecondary} onChange={(e) => patchSite({ services: content.site.services.map((item, itemIndex) => itemIndex === index ? { ...item, priceSecondary: e.target.value } : item) })} /></div>)}
+            </EditorSection>
+            <EditorSection title="Небольшие задачи" code="HOME / QUICK START">
+              <Field label="Заголовок"><input value={content.site.smallTasksTitle} onChange={(e) => patchSite({ smallTasksTitle: e.target.value })} /></Field>
+              {content.site.smallTasks.map((task, index) => <div className="admin-array-card admin-task-fields" key={task.id}><input value={task.title} onChange={(e) => patchSite({ smallTasks: content.site.smallTasks.map((item, itemIndex) => itemIndex === index ? { ...item, title: e.target.value } : item) })} /><textarea rows={3} value={task.text} onChange={(e) => patchSite({ smallTasks: content.site.smallTasks.map((item, itemIndex) => itemIndex === index ? { ...item, text: e.target.value } : item) })} /><textarea rows={4} value={task.deliverable} onChange={(e) => patchSite({ smallTasks: content.site.smallTasks.map((item, itemIndex) => itemIndex === index ? { ...item, deliverable: e.target.value } : item) })} /><input value={task.time} onChange={(e) => patchSite({ smallTasks: content.site.smallTasks.map((item, itemIndex) => itemIndex === index ? { ...item, time: e.target.value } : item) })} /><input value={task.price} onChange={(e) => patchSite({ smallTasks: content.site.smallTasks.map((item, itemIndex) => itemIndex === index ? { ...item, price: e.target.value } : item) })} /></div>)}
+            </EditorSection>
+            <EditorSection title="Контакты и подвал" code="HOME / CONTACT">
+              <div className="admin-inline-fields"><Field label="Призыв"><input value={content.site.contactTitle} onChange={(e) => patchSite({ contactTitle: e.target.value })} /></Field><Field label="Кнопка"><input value={content.site.contactButton} onChange={(e) => patchSite({ contactButton: e.target.value })} /></Field></div>
+              <Field label="Email"><input type="email" value={content.site.email} onChange={(e) => patchSite({ email: e.target.value })} /></Field>
+              <div className="admin-inline-fields"><Field label="Telegram"><input value={content.site.telegramUrl} onChange={(e) => patchSite({ telegramUrl: e.target.value })} /></Field><Field label="VK"><input value={content.site.vkUrl} onChange={(e) => patchSite({ vkUrl: e.target.value })} /></Field><Field label="MAX"><input value={content.site.maxUrl} onChange={(e) => patchSite({ maxUrl: e.target.value })} /></Field></div>
+              <div className="admin-inline-fields"><Field label="Kwork"><input value={content.site.kworkUrl} onChange={(e) => patchSite({ kworkUrl: e.target.value })} /></Field><Field label="FL"><input value={content.site.flUrl} onChange={(e) => patchSite({ flUrl: e.target.value })} /></Field></div>
             </EditorSection>
             <div className="admin-editor-actions"><button className="button" disabled={saving} onClick={() => persist(content, "Тексты сайта обновлены")}>Сохранить изменения <span>↗</span></button></div>
           </div>
@@ -320,4 +355,39 @@ function Field({ label, wide = false, children }: { label: string; wide?: boolea
 
 function EditorSection({ title, code, children }: { title: string; code: string; children: React.ReactNode }) {
   return <section className="admin-editor-section"><div><span>{code}</span><h3>{title}</h3></div><div>{children}</div></section>;
+}
+
+function MediaField({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState("");
+
+  async function upload(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setError("");
+    try {
+      const body = new FormData();
+      body.set("file", file);
+      const response = await fetch("/api/admin/media", { method: "POST", body });
+      const result = await response.json() as { url?: string; error?: string };
+      if (!response.ok || !result.url) throw new Error(result.error || "Не удалось загрузить изображение");
+      onChange(result.url);
+    } catch (uploadError) {
+      setError((uploadError as Error).message);
+    } finally {
+      setUploading(false);
+      event.target.value = "";
+    }
+  }
+
+  return (
+    <div className="admin-media-field">
+      <span>{label}</span>
+      <div className="admin-media-preview">{value ? <img src={value} alt="" /> : <i>Нет изображения</i>}</div>
+      <label className="admin-media-upload"><input type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={upload} disabled={uploading} /><span>{uploading ? "Загружаю…" : "Загрузить файл"}</span></label>
+      <input value={value} onChange={(event) => onChange(event.target.value)} aria-label={`${label}: URL`} />
+      {error && <small>{error}</small>}
+    </div>
+  );
 }
