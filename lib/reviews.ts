@@ -4,6 +4,7 @@ export type VerifiedReview = {
   submittedAt: string;
   publishedAt: string;
   text: string;
+  image?: string;
   author: {
     name: string;
     initials: string;
@@ -47,6 +48,7 @@ export const verifiedReviews: VerifiedReview[] = [
     submittedAt: "2026-07-18T00:00:00.000Z",
     publishedAt: "2026-07-18",
     text: "Денис быстро разобрался в сложном продукте и предложил структуру, которую мы сами долго не могли сформулировать. Макеты получились ясными, современными и без лишних декоративных решений. Особенно понравилось, что каждое решение он мог объяснить с точки зрения бизнеса.",
+    image: "/assets/figma/rectangle25.png",
     author: {
       name: "Алексей Воронцов",
       initials: "АВ",
@@ -69,6 +71,7 @@ export const verifiedReviews: VerifiedReview[] = [
     submittedAt: "2026-06-04T00:00:00.000Z",
     publishedAt: "2026-06-04",
     text: "Пришли с задачей обновить интернет-магазин, но в процессе получили намного больше: понятную логику каталога, сильную подачу продукта и цельную визуальную систему. Работа шла спокойно, сроки соблюдались, а комментарии не терялись.",
+    image: "/assets/figma/rectangle12.png",
     author: {
       name: "Марина Крылова",
       initials: "МК",
@@ -92,6 +95,7 @@ export const verifiedReviews: VerifiedReview[] = [
     submittedAt: "2026-04-22T00:00:00.000Z",
     publishedAt: "2026-04-22",
     text: "Нам нужен был не просто красивый лендинг, а страница, которая понятно объясняет сложную услугу и ведёт к заявке. Денис выстроил аргументацию, помог сократить лишний текст и собрал дизайн, который выглядит убедительно для нашей аудитории.",
+    image: "/assets/figma/rectangle13.png",
     author: {
       name: "Илья Сафонов",
       initials: "ИС",

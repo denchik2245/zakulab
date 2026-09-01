@@ -72,7 +72,12 @@ function mergeWithDefaults(value: Partial<AdminContent>): AdminContent {
     version: 1,
     updatedAt: typeof value.updatedAt === "string" ? value.updatedAt : seed.updatedAt,
     cases: Array.isArray(value.cases) ? value.cases : seed.cases,
-    reviews: Array.isArray(value.reviews) ? value.reviews : seed.reviews,
+    reviews: Array.isArray(value.reviews)
+      ? value.reviews.map((review) => ({
+          ...seed.reviews.find((seedReview) => seedReview.id === review.id),
+          ...review,
+        }))
+      : seed.reviews,
     site,
   };
 }

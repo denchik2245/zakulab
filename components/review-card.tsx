@@ -1,4 +1,5 @@
 import type { VerifiedReview } from "@/lib/reviews";
+import { externalUrl } from "@/lib/external-url";
 
 export function ReviewCard({ review, index }: { review: VerifiedReview; index: number }) {
   const isDemo = review.status === "demo";
@@ -23,9 +24,9 @@ export function ReviewCard({ review, index }: { review: VerifiedReview; index: n
         <span className={`review-verified-mark${isDemo ? " is-demo" : ""}`}><i>{isDemo ? "D" : "✓"}</i> {isDemo ? "Демонстрационный отзыв" : "Проект и профиль проверены"}</span>
       </div>
       <div className="review-proof-links">
-        <a href={review.project.url} target="_blank" rel="noreferrer">
+        <a href={externalUrl(review.project.url)} target="_blank" rel="noreferrer">
           <span>{isDemo ? "Пример ссылки на проект" : "Реализованный проект"}</span>
-          <strong>{review.project.name} ↗</strong>
+          <strong>{review.project.url} ↗</strong>
         </a>
         <a href={review.profile.url} target="_blank" rel="noreferrer">
           <span>{isDemo ? "Пример профиля" : "Публичный профиль"} · {review.profile.network}</span>

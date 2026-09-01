@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { SiteSettings } from "@/lib/site-settings";
 import type { VerifiedReview } from "@/lib/reviews";
+import { ReviewsSlider } from "@/components/reviews-slider";
 import styles from "./home-page.module.css";
 
 const nav = [
@@ -107,8 +108,6 @@ function HomeFooter({ site }: { site: SiteSettings }) {
 }
 
 export function HomePage({ site, reviews }: { site: SiteSettings; reviews: VerifiedReview[] }) {
-  const review = reviews[0];
-
   return (
     <div className={styles.stage}>
       <div className={`figma-home-page ${styles.page}`} id="top">
@@ -118,16 +117,23 @@ export function HomePage({ site, reviews }: { site: SiteSettings; reviews: Verif
         <div className={styles.heroTop}>
           <h1 id="hero-title">— {typographic(site.heroTitle)}</h1>
           <div className={styles.profileCard}>
-            <div className={styles.portrait}><Image src={site.heroPortrait} alt={site.heroName} fill sizes="110px" /></div>
+            <div className={styles.portrait}><Image src={site.heroPortrait} alt={site.heroName} fill sizes="110px" priority /></div>
             <div><strong>{typographic(site.heroName)}</strong><span>{typographic(site.heroRole)}</span></div>
           </div>
         </div>
-        <div className={styles.heroGallery}>
-          {site.heroGallery.map((src, index) => (
-            <div className={styles.heroImage} key={`${src}-${index}`}>
-              <Image src={src} alt="" fill sizes="420px" quality={90} />
-            </div>
-          ))}
+        <div className={styles.heroGalleryWrapper}>
+          <div className={styles.heroGallery} style={{ "--speed": `${site.heroGallerySpeed || 30}s` } as React.CSSProperties}>
+            {site.heroGallery.map((src, index) => (
+              <div className={styles.heroImage} key={`orig-${src}-${index}`}>
+                <Image src={src} alt="" fill sizes="420px" quality={90} priority={index < 2} />
+              </div>
+            ))}
+            {site.heroGallery.map((src, index) => (
+              <div className={styles.heroImage} key={`dup-${src}-${index}`}>
+                <Image src={src} alt="" fill sizes="420px" quality={90} />
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -213,26 +219,7 @@ export function HomePage({ site, reviews }: { site: SiteSettings; reviews: Verif
         </div>
       </section>
 
-      <section className={styles.reviews} id="reviews" aria-labelledby="reviews-title">
-        <div className={styles.greenTexture} aria-hidden="true" />
-        <div className={styles.reviewsCopy}>
-          <SectionTitle eyebrow="Отзывы"><span id="reviews-title">{typographic(site.reviewsTitle)}</span></SectionTitle>
-          <p>{typographic(site.reviewsText)}</p>
-          <div className={styles.reviewControls}><strong>1/{Math.max(8, reviews.length)}</strong><span><Image src="/assets/figma/group34.svg" width={48} height={48} alt="" /><Image src="/assets/figma/group33.svg" width={48} height={48} alt="" /></span></div>
-          <Link className={styles.reviewButton} href="/reviews"><span>Все отзывы</span><small>{`{${reviews.length}}`}</small></Link>
-        </div>
-        <div className={styles.reviewCard}>
-          <div className={styles.reviewPhoto}><Image src={site.reviewImage} alt="" fill sizes="960px" quality={90} /></div>
-          {review ? <div className={styles.reviewBody}>
-            <div className={styles.reviewAuthor}><strong>{typographic(review.author.name)}</strong><span>{typographic(review.author.role || review.author.company)}</span></div>
-            <blockquote>«{typographic(review.text)}»</blockquote>
-            <div className={styles.reviewLinks}>
-              <a href={review.profile.url}><Image src="/assets/figma/tg.svg" width={36} height={36} alt="" /><span>Профиль<strong>{review.profile.label}</strong></span><ArrowIcon /></a>
-              <a href={review.project.url}><Image src="/assets/figma/image34-vectorized.svg" width={36} height={36} alt="" /><span>{typographic("Ссылка на проект")}<strong>{typographic(review.project.name)}</strong></span><ArrowIcon /></a>
-            </div>
-          </div> : <div className={styles.reviewBody}><blockquote>{typographic("Отзыв появится после публикации в админке.")}</blockquote></div>}
-        </div>
-      </section>
+      <ReviewsSlider reviews={reviews} title={site.reviewsTitle} text={site.reviewsText} fallbackImage={site.reviewImage} />
 
       <section className={styles.price} id="price" aria-labelledby="price-title">
         <div className={styles.shell}>

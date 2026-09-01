@@ -46,6 +46,7 @@ export type SiteSettings = {
   heroRole: string;
   heroPortrait: string;
   heroGallery: string[];
+  heroGallerySpeed: number;
   aboutTitle: string;
   aboutText: string;
   stats: HomeStat[];
@@ -85,6 +86,7 @@ export const defaultSiteSettings: SiteSettings = {
     "/assets/figma/rectangle15.png",
     "/assets/figma/rectangle16.png",
   ],
+  heroGallerySpeed: 30,
   aboutTitle: "Превращаю продукты и услуги в понятные цифровые решения",
   aboutText: "Сначала определяю, что важно бизнесу и пользователю, затем выстраиваю структуру, сценарии и визуальную коммуникацию. В результате дизайн помогает быстрее понять предложение и перейти к нужному действию.",
   stats: [

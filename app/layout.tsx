@@ -1,10 +1,20 @@
 import type { Metadata } from "next";
-import "@fontsource-variable/manrope";
-import "@fontsource/ibm-plex-mono/400.css";
+import { Manrope, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
 import { SmoothScroll } from "@/components/smooth-scroll";
+
+const manrope = Manrope({
+  subsets: ["cyrillic", "latin"],
+  display: "swap",
+  variable: "--font-manrope",
+});
+
+const ibmPlexMono = IBM_Plex_Mono({
+  weight: "400",
+  subsets: ["cyrillic", "latin"],
+  display: "swap",
+  variable: "--font-ibm-plex-mono",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://zakulab.ru"),
@@ -36,13 +46,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   };
 
   return (
-    <html lang="ru" data-scroll-behavior="smooth">
+    <html lang="ru" data-scroll-behavior="smooth" className={`${manrope.variable} ${ibmPlexMono.variable}`}>
       <body>
         <SmoothScroll />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-        <Header />
-        <main>{children}</main>
-        <Footer />
+        {children}
       </body>
     </html>
   );

@@ -1,9 +1,11 @@
 "use client";
 
 import { ChangeEvent, FormEvent, useMemo, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import type { AdminContent } from "@/lib/content-store";
 import type { CaseStudy } from "@/lib/cases";
+import { externalUrl } from "@/lib/external-url";
 import type { VerifiedReview } from "@/lib/reviews";
 import type { SiteSettings } from "@/lib/site-settings";
 
@@ -38,6 +40,21 @@ function blankCase(count: number): CaseStudy {
       ],
       result: "Опишите подтверждённый результат без неподтверждённых метрик.",
     },
+  };
+}
+
+function blankReview(): VerifiedReview {
+  const now = new Date().toISOString();
+  return {
+    id: `review-${Date.now()}`,
+    status: "pending",
+    submittedAt: now,
+    publishedAt: "",
+    text: "",
+    image: "",
+    author: { name: "Новый отзыв", initials: "", role: "", company: "" },
+    project: { name: "", url: "", caseUrl: "" },
+    profile: { network: "Telegram", label: "", url: "" },
   };
 }
 
@@ -158,6 +175,25 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
     setContent({ ...content, reviews: content.reviews.map((item) => item.id === id ? { ...item, ...patch } : item) });
   }
 
+  function createReview() {
+    if (!content) return;
+    const item = blankReview();
+    setContent({ ...content, reviews: [item, ...content.reviews] });
+    setSelectedReview(item.id);
+    setTab("reviews");
+  }
+
+  async function saveReview() {
+    if (!content || !activeReview) return;
+    await persist(content, "Изменения отзыва сохранены");
+  }
+
+  async function deleteReview(id: string) {
+    if (!content || !window.confirm("Удалить отзыв без возможности восстановления?")) return;
+    setSelectedReview(null);
+    await persist({ ...content, reviews: content.reviews.filter((item) => item.id !== id) }, "Отзыв удалён");
+  }
+
   function patchSite(patch: Partial<SiteSettings>) {
     if (!content) return;
     setContent({ ...content, site: { ...content.site, ...patch } });
@@ -173,7 +209,7 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
   if (!isAuthenticated || !content) {
     return (
       <section className="admin-login shell">
-        <div className="admin-login-code">ZK / CONTROL</div>
+        <div className="admin-login-code"><Image src="/assets/figma/logo.svg" width={48} height={48} alt="" /><span>ZAKULAB / ADMIN</span></div>
         <form onSubmit={login}>
           <span>PRIVATE / ACCESS</span>
           <h1>Вход<br /><em>в студию</em></h1>
@@ -189,7 +225,7 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
   return (
     <section className="admin-studio">
       <aside className="admin-sidebar">
-        <div className="admin-sidebar-head"><span>ZK</span><div><strong>Control room</strong><small>CONTENT / SYSTEM</small></div></div>
+        <div className="admin-sidebar-head"><span><Image src="/assets/figma/logo.svg" width={42} height={42} alt="" /></span><div><strong>Панель управления</strong><small>ZAKULAB / CONTENT</small></div></div>
         <nav aria-label="Разделы админки">
           {([
             ["overview", "Обзор", "01"],
@@ -270,7 +306,7 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
 
         {tab === "reviews" && (
           <div className="admin-view">
-            <div className="admin-list-head"><div><span>TRUST / MODERATION</span><h1>Отзывы</h1></div><p>{pendingReviews} требуют решения</p></div>
+            <div className="admin-list-head"><div><span>TRUST / MODERATION</span><h1>Отзывы</h1></div><div className="admin-list-actions"><p>{pendingReviews} требуют решения</p><button className="admin-add-button" onClick={createReview}>+ Добавить отзыв</button></div></div>
             <div className="admin-split-view">
               <div className="admin-entity-list admin-review-list">
                 {content.reviews.map((item) => (
@@ -285,13 +321,21 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
                 <div className="admin-editor admin-review-editor">
                   <div className="admin-editor-head"><div><span>REVIEW / {activeReview.status.toUpperCase()}</span><h2>{activeReview.author.name}</h2></div><small>{formatDate(activeReview.submittedAt)}</small></div>
                   <blockquote>«{activeReview.text}»</blockquote>
-                  <div className="admin-review-proof"><a href={activeReview.project.url} target="_blank" rel="noreferrer">Проект: {activeReview.project.name} ↗</a><a href={activeReview.profile.url} target="_blank" rel="noreferrer">Профиль: {activeReview.profile.label} ↗</a></div>
+                  <div className="admin-review-proof"><a href={externalUrl(activeReview.project.url)} target="_blank" rel="noreferrer">Проект: {activeReview.project.url} ↗</a><a href={activeReview.profile.url} target="_blank" rel="noreferrer">Профиль: {activeReview.profile.label} ↗</a></div>
                   <div className="admin-fields">
                     <Field label="Имя"><input value={activeReview.author.name} onChange={(e) => patchReview(activeReview.id, { author: { ...activeReview.author, name: e.target.value } })} /></Field>
+                    <Field label="Должность"><input value={activeReview.author.role} onChange={(e) => patchReview(activeReview.id, { author: { ...activeReview.author, role: e.target.value } })} /></Field>
                     <Field label="Компания"><input value={activeReview.author.company} onChange={(e) => patchReview(activeReview.id, { author: { ...activeReview.author, company: e.target.value } })} /></Field>
+                    <Field label="Инициалы"><input value={activeReview.author.initials} onChange={(e) => patchReview(activeReview.id, { author: { ...activeReview.author, initials: e.target.value } })} /></Field>
                     <Field wide label="Текст отзыва"><textarea rows={7} value={activeReview.text} onChange={(e) => patchReview(activeReview.id, { text: e.target.value })} /></Field>
+                    <Field label="Социальная сеть"><select value={activeReview.profile.network} onChange={(e) => patchReview(activeReview.id, { profile: { ...activeReview.profile, network: e.target.value as VerifiedReview["profile"]["network"] } })}><option>Telegram</option><option>MAX</option><option>VK</option><option>LinkedIn</option><option>Другая сеть</option></select></Field>
+                    <Field label="Подпись профиля"><input value={activeReview.profile.label} onChange={(e) => patchReview(activeReview.id, { profile: { ...activeReview.profile, label: e.target.value } })} /></Field>
+                    <Field wide label="Ссылка на профиль"><input type="url" value={activeReview.profile.url} onChange={(e) => patchReview(activeReview.id, { profile: { ...activeReview.profile, url: e.target.value } })} /></Field>
+                    <Field wide label="Ссылка на проект"><input value={activeReview.project.url} placeholder="normdev.ru" onChange={(e) => patchReview(activeReview.id, { project: { ...activeReview.project, url: e.target.value } })} /></Field>
+                    <Field wide label="Ссылка на кейс"><input type="url" value={activeReview.project.caseUrl ?? ""} onChange={(e) => patchReview(activeReview.id, { project: { ...activeReview.project, caseUrl: e.target.value } })} /></Field>
                   </div>
-                  <div className="admin-review-actions"><button onClick={() => setReviewStatus(activeReview.id, "published")}>✓ Одобрить и опубликовать</button><button onClick={() => setReviewStatus(activeReview.id, "rejected")}>× Отклонить</button><button onClick={() => content && persist(content, "Изменения отзыва сохранены")}>Сохранить правки</button></div>
+                  <MediaField label="Фоновое изображение" value={activeReview.image ?? ""} onChange={(value) => patchReview(activeReview.id, { image: value })} />
+                  <div className="admin-review-actions"><button disabled={saving} onClick={() => setReviewStatus(activeReview.id, "published")}>✓ Одобрить и опубликовать</button><button disabled={saving} onClick={() => setReviewStatus(activeReview.id, "rejected")}>× Отклонить</button><button disabled={saving} onClick={saveReview}>Сохранить правки</button><button className="admin-review-delete" disabled={saving} onClick={() => deleteReview(activeReview.id)}>Удалить отзыв</button></div>
                 </div>
               ) : <div className="admin-empty-panel"><span>←</span><p>Выберите отзыв.<br />Перед публикацией проверьте ссылки и согласие.</p></div>}
             </div>
@@ -305,7 +349,16 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
               <Field label="Главный заголовок"><textarea rows={4} value={content.site.heroTitle} onChange={(e) => patchSite({ heroTitle: e.target.value })} /></Field>
               <div className="admin-inline-fields"><Field label="Имя"><input value={content.site.heroName} onChange={(e) => patchSite({ heroName: e.target.value })} /></Field><Field label="Роль"><input value={content.site.heroRole} onChange={(e) => patchSite({ heroRole: e.target.value })} /></Field></div>
               <MediaField label="Портрет" value={content.site.heroPortrait} onChange={(value) => patchSite({ heroPortrait: value })} />
-              <div className="admin-media-grid">{content.site.heroGallery.map((image, index) => <MediaField label={`Работа ${index + 1}`} value={image} onChange={(value) => patchMediaArray("heroGallery", index, value)} key={index} />)}</div>
+              <div className="admin-media-grid">
+                {content.site.heroGallery.map((image, index) => (
+                  <div key={index} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <MediaField label={`Фото ${index + 1}`} value={image} onChange={(value) => patchMediaArray("heroGallery", index, value)} />
+                    <button className="admin-danger" style={{ alignSelf: 'flex-start', padding: '4px 0' }} onClick={() => patchSite({ heroGallery: content.site.heroGallery.filter((_, i) => i !== index) })}>Удалить фото</button>
+                  </div>
+                ))}
+              </div>
+              <button className="button" style={{ marginTop: 12, padding: '4px 12px', fontSize: 13, background: 'transparent', color: 'var(--ink)', border: '1px solid #c4c6bf' }} onClick={() => patchSite({ heroGallery: [...content.site.heroGallery, ""] })}>+ Добавить фото в галерею</button>
+              <Field label="Скорость галереи (сек)"><input type="number" min={5} max={120} value={content.site.heroGallerySpeed || 30} onChange={(e) => patchSite({ heroGallerySpeed: Number(e.target.value) })} /></Field>
             </EditorSection>
             <EditorSection title="Обо мне" code="HOME / ABOUT">
               <Field label="Заголовок"><textarea rows={3} value={content.site.aboutTitle} onChange={(e) => patchSite({ aboutTitle: e.target.value })} /></Field>
