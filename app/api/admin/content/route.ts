@@ -9,7 +9,7 @@ export async function GET() {
 export async function PUT(request: Request) {
   if (!(await isAdminAuthenticated())) return Response.json({ error: "Unauthorized" }, { status: 401 });
   const body = await request.json().catch(() => null) as AdminContent | null;
-  if (!body || body.version !== 1 || !Array.isArray(body.cases) || !Array.isArray(body.reviews) || !body.site) {
+  if (!body || body.version !== 1 || !Array.isArray(body.reviews) || !body.site || !Array.isArray(body.site.portfolioProjects)) {
     return Response.json({ error: "Некорректный формат данных" }, { status: 400 });
   }
   return Response.json(await writeContent(body));

@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { SiteSettings } from "@/lib/site-settings";
 import type { VerifiedReview } from "@/lib/reviews";
+import { Header } from "@/components/header";
 import { ReviewsSlider } from "@/components/reviews-slider";
 import styles from "./home-page.module.css";
 
@@ -55,33 +56,6 @@ function SectionTitle({ eyebrow, children }: { eyebrow: string; children: React.
   );
 }
 
-function HomeHeader() {
-  return (
-    <header className={styles.header}>
-      <Link href="/" className={styles.homeLogo} aria-label="Zakulab — на главную">
-        <Image src="/assets/figma/logo.svg" width={48} height={48} alt="" />
-      </Link>
-      <nav className={styles.primaryNav} aria-label="Навигация по главной странице">
-        {nav.map(([label, href]) => <a href={href} key={href}>{typographic(label)}</a>)}
-      </nav>
-      <nav className={styles.secondaryNav} aria-label="Инструменты">
-        <Link href="/#contact">{typographic("Бриф на разработку")}</Link>
-        <Link href="/style-check">Выбор стиля</Link>
-      </nav>
-      <a className={styles.socialStrip} href="https://t.me/deniszak" target="_blank" rel="noreferrer" aria-label="Социальные сети">
-        <Image src="/assets/figma/btn.svg" width={169} height={48} alt="" />
-      </a>
-      <details className={styles.mobileMenu}>
-        <summary>Меню</summary>
-        <nav>
-          {nav.map(([label, href]) => <a href={href} key={href}>{typographic(label)}</a>)}
-          <Link href="/style-check">Выбор стиля</Link>
-        </nav>
-      </details>
-    </header>
-  );
-}
-
 function HomeFooter({ site }: { site: SiteSettings }) {
   return (
     <footer className={styles.footer} id="contact">
@@ -91,7 +65,9 @@ function HomeFooter({ site }: { site: SiteSettings }) {
         <a className={styles.discussButton} href={site.telegramUrl} target="_blank" rel="noreferrer">
           <span>{typographic(site.contactButton)}</span><small>{`{TG}`}</small>
         </a>
-        <a className={styles.toTop} href="#top" aria-label="Наверх">↑</a>
+        <a className={styles.toTop} href="#top" aria-label="Наверх">
+          <Image className={styles.footerTopArrow} src="/assets/figma/group.svg" width={20} height={10} alt="" />
+        </a>
       </div>
       <div className={styles.footerColumns}>
         <div><span>Навигация</span>{nav.map(([label, href]) => <a href={href} key={href}>{typographic(label)}</a>)}</div>
@@ -108,10 +84,14 @@ function HomeFooter({ site }: { site: SiteSettings }) {
 }
 
 export function HomePage({ site, reviews }: { site: SiteSettings; reviews: VerifiedReview[] }) {
+  const portfolioProjects = site.portfolioProjects.filter((project) => project.published).sort((a, b) => a.order - b.order);
+  const featuredProjects = portfolioProjects.filter((project) => project.homePlacement === "featured").slice(0, 4);
+  const listedProjects = portfolioProjects.filter((project) => project.homePlacement === "list");
+
   return (
     <div className={styles.stage}>
       <div className={`figma-home-page ${styles.page}`} id="top">
-      <HomeHeader />
+      <Header />
 
       <section className={styles.hero} aria-labelledby="hero-title">
         <div className={styles.heroTop}>
@@ -167,25 +147,22 @@ export function HomePage({ site, reviews }: { site: SiteSettings; reviews: Verif
         <div className={styles.portfolioInner}>
           <SectionTitle eyebrow="Лучшие проекты"><span id="portfolio-title">{typographic(site.portfolioTitle)}</span></SectionTitle>
           <div className={styles.portfolioGallery}>
-            {site.portfolioImages.slice(0, 4).map((src, index) => {
-              const project = site.projects[index];
-              const label = index === 1 ? "Курсы ЕГЭ и ОГЭ" : project?.title ?? "Проект";
-              const tags = index === 1
-                ? ["UX-исследование", "15 страниц"]
-                : [project?.description, project?.platform].filter((tag): tag is string => Boolean(tag));
+            {featuredProjects.map((project) => {
+              const label = project.title || "Проект";
+              const tags = project.tags.filter(Boolean);
 
               return (
-                <div key={`${src}-${index}`}>
-                  <Image src={src} alt="Превью проекта" fill sizes="(max-width: 900px) 50vw, 540px" quality={90} />
+                <a href={project.url || "#"} key={project.id} target={project.url.startsWith("http") ? "_blank" : undefined} rel={project.url.startsWith("http") ? "noreferrer" : undefined}>
+                  <Image src={project.image} alt={`Превью проекта ${project.title}`} fill sizes="(max-width: 900px) 50vw, 540px" quality={90} />
                   <span className={styles.featuredLabel}>{typographic(label)}</span>
-                  <span className={styles.featuredTags}>{tags.map((tag) => <small key={tag}>{typographic(tag)}</small>)}</span>
+                  <span className={styles.featuredTags}>{tags.map((tag, i) => <small key={`${tag}-${i}`}>{typographic(tag)}</small>)}</span>
                   <span className={styles.featuredArrow}><ArrowIcon /></span>
-                </div>
+                </a>
               );
             })}
           </div>
           <div className={styles.projectRows}>
-            {site.projects.map((project) => (
+            {listedProjects.map((project) => (
               <a href={project.url} key={project.id} target={project.url.startsWith("http") ? "_blank" : undefined} rel={project.url.startsWith("http") ? "noreferrer" : undefined}>
                 <strong>{typographic(project.title)}<ArrowIcon /></strong>
                 <span className={styles.projectDescription}>{typographic(project.description)}</span>
@@ -193,7 +170,7 @@ export function HomePage({ site, reviews }: { site: SiteSettings; reviews: Verif
               </a>
             ))}
           </div>
-          <Link className={styles.allProjects} href="/projects"><span>Все проекты</span><small>{`{${site.portfolioCount}}`}</small></Link>
+          <Link className={styles.allProjects} href="/projects"><span>Все проекты</span><small>{`{${portfolioProjects.length}}`}</small></Link>
         </div>
       </section>
 
@@ -206,8 +183,25 @@ export function HomePage({ site, reviews }: { site: SiteSettings; reviews: Verif
                 <span className={styles.stepNumber}>{`{${String(index + 1).padStart(2, "0")}}`}</span>
                 <div className={styles.stepCopy}>
                   <h3>{typographic(step.title)}</h3>
-                  <p>{typographic(step.text)}</p>
-                  {step.secondaryTitle && <div className={styles.secondaryStep}><h4>{typographic(step.secondaryTitle)}</h4><p>{typographic(step.secondaryText ?? "")}</p></div>}
+                  {index === 4 ? (
+                    <div className={styles.stepParagraphs}>
+                      {step.text.split(/(?=Если сайт)/).map((paragraph) => <p key={paragraph}>{typographic(paragraph)}</p>)}
+                    </div>
+                  ) : <p>{typographic(step.text)}</p>}
+                  {index === 3 && (
+                    <div className={styles.processOptions}>
+                      <div className={styles.processOption}>
+                        <h4><Image src="/assets/figma/platform.svg" width={28} height={28} alt="" />{typographic("Разработка на Tilda")}</h4>
+                        <p>{typographic("Собираю сайт по утверждённым макетам, настраиваю адаптивы, анимации, формы и базовые интеграции. Проверяю отображение на разных устройствах и подготавливаю сайт к публикации.")}</p>
+                      </div>
+                      {step.secondaryTitle && (
+                        <div className={styles.processOption}>
+                          <h4><Image src="/assets/figma/image36-vectorized.svg" width={28} height={28} alt="" />{typographic(step.secondaryTitle)}</h4>
+                          <p>{typographic(step.secondaryText ?? "")}</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <div className={styles.stepMedia}>
                   <div><Image src={step.image} alt="" fill sizes="(max-width: 900px) 100vw, 770px" quality={90} /></div>
@@ -225,11 +219,11 @@ export function HomePage({ site, reviews }: { site: SiteSettings; reviews: Verif
         <div className={styles.shell}>
           <div className={styles.priceHeading}><SectionTitle eyebrow="Стоимость"><span id="price-title">{typographic(site.servicesTitle)}</span></SectionTitle><p>{typographic(site.servicesText)}</p></div>
           <div className={styles.services}>
-            {site.services.map((service) => <article key={service.id}><h3>{typographic(service.title)}<ArrowIcon /></h3><p>{typographic(service.text)}</p><div><span>{typographic(service.time)}</span><strong>{typographic(service.price)}</strong><strong>{typographic(service.priceSecondary)}</strong></div></article>)}
+            {site.services.map((service) => <article key={service.id}><h3>{typographic(service.title)}<ArrowIcon light /></h3><p>{typographic(service.text)}</p><div><span>{typographic(service.time)}</span><strong>{typographic(service.price)}</strong><strong>{typographic(service.priceSecondary)}</strong></div></article>)}
           </div>
           <h2 className={styles.smallTasksTitle}>{typographic(site.smallTasksTitle)}</h2>
           <div className={styles.smallTasks}>
-            {site.smallTasks.map((task) => <article key={task.id}><h3>{typographic(task.title)}<ArrowIcon /></h3><p>{typographic(task.text)}</p><div><h4>{typographic("Что вы получите")}</h4><p>{typographic(task.deliverable)}</p></div><footer><span>{typographic(task.time)}</span><strong>{typographic(task.price)}</strong></footer></article>)}
+            {site.smallTasks.map((task) => <article key={task.id}><h3>{typographic(task.title)}<ArrowIcon light /></h3><p>{typographic(task.text)}</p><div><h4>{typographic("Что вы получите")}</h4><p>{typographic(task.deliverable)}</p></div><footer><span>{typographic(task.time)}</span><strong>{typographic(task.price)}</strong></footer></article>)}
           </div>
         </div>
       </section>

@@ -6,8 +6,8 @@ export const dynamic = "force-dynamic";
 export default async function Home() {
   const content = await readContent();
   const reviews = content.reviews
-    .filter((item) => item.status === "published" || item.status === "demo")
-    .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
+    .filter((item) => (item.status === "published" || item.status === "demo") && item.showOnHome)
+    .sort((a, b) => a.order - b.order);
 
   return <HomePage site={content.site} reviews={reviews} />;
 }

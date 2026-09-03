@@ -10,7 +10,6 @@ import { defaultSiteSettings, type SiteSettings } from "@/lib/site-settings";
 export type AdminContent = {
   version: 1;
   updatedAt: string;
-  cases: CaseStudy[];
   reviews: VerifiedReview[];
   site: SiteSettings;
 };
@@ -19,12 +18,17 @@ const localFile = path.join(process.cwd(), ".data", "zakulab-content.json");
 const blobKey = "content-v1";
 
 function seedContent(): AdminContent {
+  const site = structuredClone(defaultSiteSettings);
+  site.portfolioProjects = site.portfolioProjects.map((project) => {
+    const caseSlug = project.url.match(/^\/cases\/([^/?#]+)/)?.[1] ?? project.id;
+    const caseStudy = seedCases.find((item) => item.slug === caseSlug);
+    return caseStudy ? { ...project, caseStudy: structuredClone(caseStudy) } : project;
+  });
   return {
     version: 1,
     updatedAt: new Date().toISOString(),
-    cases: structuredClone(seedCases),
     reviews: structuredClone(seedReviews),
-    site: structuredClone(defaultSiteSettings),
+    site,
   };
 }
 
@@ -34,29 +38,80 @@ function isNetlifyRuntime() {
 
 function mergeWithDefaults(value: Partial<AdminContent>): AdminContent {
   const seed = seedContent();
-  const incomingSite = value.site as Partial<SiteSettings> | undefined;
-  const isLegacySite = Boolean(
-    incomingSite &&
-      (!("heroName" in incomingSite) ||
-        !Array.isArray(incomingSite.portfolioImages)),
-  );
+  const legacyCases = Array.isArray((value as Partial<AdminContent> & { cases?: CaseStudy[] }).cases)
+    ? (value as Partial<AdminContent> & { cases: CaseStudy[] }).cases
+    : [];
+  const rawSite = value.site as (Partial<SiteSettings> & {
+    portfolioCards?: { id?: string; image?: string; title?: string; tags?: string[] }[];
+    portfolioImages?: string[];
+    projects?: { id?: string; title?: string; description?: string; url?: string; platform?: string }[];
+  }) | undefined;
+  const { portfolioCards: legacyCards, portfolioImages: legacyImages, projects: legacyProjects, ...incomingSite } = rawSite ?? {};
+  const isLegacySite = Boolean(rawSite && !("heroName" in rawSite) && !legacyCards && !legacyImages);
+  const portfolioProjects = Array.isArray(incomingSite.portfolioProjects)
+    ? incomingSite.portfolioProjects.map((project, index) => ({
+        ...(seed.site.portfolioProjects.find((item) => item.id === project.id) ?? seed.site.portfolioProjects[index] ?? seed.site.portfolioProjects[0]),
+        ...project,
+        tags: (Array.isArray(project.tags) ? [project.tags[0] ?? "", project.tags[1] ?? ""] : ["", ""]) as [string, string],
+        filters: Array.isArray(project.filters) ? project.filters : [],
+      }))
+    : (() => {
+        const projects = structuredClone(seed.site.portfolioProjects);
+        const cards: { image?: string; title?: string; tags?: string[] }[] = Array.isArray(legacyCards)
+          ? legacyCards
+          : Array.isArray(legacyImages)
+            ? legacyImages.map((image) => ({ image }))
+            : [];
+        const featuredOnHome = projects.filter((project) => project.homePlacement === "featured");
+        cards.slice(0, 4).forEach((card, index) => {
+          const target = featuredOnHome[index];
+          if (!target) return;
+          if (card.image) target.image = card.image;
+          if (card.title) target.title = card.title;
+          if (Array.isArray(card.tags)) target.tags = [card.tags[0] ?? "", card.tags[1] ?? ""];
+        });
+        const archived = projects.filter((project) => project.portfolioPlacement === "archive");
+        if (Array.isArray(legacyProjects)) legacyProjects.forEach((project, index) => {
+          const target = archived[index];
+          if (!target) return;
+          Object.assign(target, project);
+        });
+        return projects;
+      })();
+  legacyCases.forEach((caseStudy) => {
+    const projectIndex = portfolioProjects.findIndex((project) => project.caseStudy?.slug === caseStudy.slug || project.id === caseStudy.slug || project.url === `/cases/${caseStudy.slug}`);
+    if (projectIndex >= 0) {
+      portfolioProjects[projectIndex] = { ...portfolioProjects[projectIndex], url: `/cases/${caseStudy.slug}`, caseStudy: { ...portfolioProjects[projectIndex].caseStudy, ...caseStudy } };
+      return;
+    }
+    portfolioProjects.push({
+      id: caseStudy.slug,
+      title: caseStudy.title,
+      description: caseStudy.summary,
+      image: "/assets/figma/rectangle10.png",
+      url: `/cases/${caseStudy.slug}`,
+      platform: "",
+      tags: [caseStudy.category === "commerce" ? "Интернет-магазин" : "Многостраничный", caseStudy.year],
+      filters: [caseStudy.category === "commerce" ? "commerce" : "multipage"],
+      homePlacement: "hidden",
+      portfolioPlacement: "archive",
+      published: caseStudy.status === "published",
+      order: (portfolioProjects.length + 1) * 10,
+      caseStudy,
+    });
+  });
   const site = isLegacySite
     ? seed.site
     : {
         ...seed.site,
-        ...(incomingSite ?? {}),
+        ...incomingSite,
         heroGallery: Array.isArray(incomingSite?.heroGallery)
           ? incomingSite.heroGallery
           : seed.site.heroGallery,
         stats: Array.isArray(incomingSite?.stats)
           ? incomingSite.stats
           : seed.site.stats,
-        portfolioImages: Array.isArray(incomingSite?.portfolioImages)
-          ? incomingSite.portfolioImages
-          : seed.site.portfolioImages,
-        projects: Array.isArray(incomingSite?.projects)
-          ? incomingSite.projects
-          : seed.site.projects,
+        portfolioProjects,
         process: Array.isArray(incomingSite?.process)
           ? incomingSite.process
           : seed.site.process,
@@ -67,17 +122,25 @@ function mergeWithDefaults(value: Partial<AdminContent>): AdminContent {
           ? incomingSite.smallTasks
           : seed.site.smallTasks,
       };
+  const hasLegacyReviewPlacements = Array.isArray(value.reviews) && value.reviews.some((review) => typeof review.showOnHome !== "boolean" || typeof review.showOnReviewsPage !== "boolean");
+  const reviews = Array.isArray(value.reviews)
+    ? value.reviews.map((review, index) => ({
+        ...seed.reviews.find((seedReview) => seedReview.id === review.id),
+        ...review,
+        showOnHome: review.showOnHome ?? true,
+        showOnReviewsPage: review.showOnReviewsPage ?? true,
+        order: Number.isFinite(review.order) ? review.order : (index + 1) * 10,
+      }))
+    : seed.reviews;
+  if (hasLegacyReviewPlacements) {
+    const migratedIds = new Set(reviews.map((review) => review.id));
+    reviews.push(...seed.reviews.filter((review) => !migratedIds.has(review.id)));
+  }
 
   return {
     version: 1,
     updatedAt: typeof value.updatedAt === "string" ? value.updatedAt : seed.updatedAt,
-    cases: Array.isArray(value.cases) ? value.cases : seed.cases,
-    reviews: Array.isArray(value.reviews)
-      ? value.reviews.map((review) => ({
-          ...seed.reviews.find((seedReview) => seedReview.id === review.id),
-          ...review,
-        }))
-      : seed.reviews,
+    reviews,
     site,
   };
 }
@@ -113,12 +176,15 @@ export async function writeContent(value: AdminContent): Promise<AdminContent> {
 
 export async function getPublishedCases() {
   const content = await readContent();
-  return content.cases.filter((item) => item.status === "published").sort((a, b) => a.index.localeCompare(b.index, "ru"));
+  return content.site.portfolioProjects
+    .filter((project) => project.published && project.caseStudy?.status === "published")
+    .map((project) => ({ ...(project.caseStudy as CaseStudy), title: project.title }))
+    .sort((a, b) => a.index.localeCompare(b.index, "ru"));
 }
 
 export async function getPublishedReviews() {
   const content = await readContent();
-  return content.reviews.filter((item) => item.status === "published" || item.status === "demo").sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
+  return content.reviews.filter((item) => item.status === "published" || item.status === "demo").sort((a, b) => a.order - b.order);
 }
 
 export async function getPublishedCase(slug: string) {

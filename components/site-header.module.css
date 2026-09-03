@@ -1,0 +1,65 @@
+.siteHeader {
+  --header-ink: #050505;
+  --header-hover: #809e91;
+  --header-line: #babcaf;
+  --header-bg: #fefefe;
+  --header-hover-speed: .45s;
+  --header-hover-easing: cubic-bezier(.22, .72, .24, 1);
+  position: relative;
+  z-index: 20;
+  height: 72px;
+  color: var(--header-ink);
+  background: var(--header-bg);
+  border: 0;
+  font-family: "Manrope Variable", "Manrope", sans-serif;
+}
+
+.headerInner {
+  width: min(1660px, calc(100% - 260px));
+  height: 48px;
+  margin-inline: auto;
+  position: relative;
+  top: 24px;
+  display: grid;
+  grid-template-columns: 48px 1fr auto 169px;
+  align-items: center;
+  gap: 36px;
+}
+
+.logo, .socials { display: block; height: 48px; }
+.logo { width: 48px; }
+.socials { width: 169px; }
+
+.primaryNav, .secondaryNav { display: flex; align-items: center; gap: 36px; white-space: nowrap; font-size: 18px; font-weight: 600; line-height: 1; }
+.primaryNav { padding-left: 56px; }
+.secondaryNav a { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+.primaryNav a, .secondaryNav a { color: var(--header-ink); will-change: color; transition: color var(--header-hover-speed) var(--header-hover-easing); }
+.primaryNav a:hover, .secondaryNav a:hover { color: var(--header-hover); }
+.primaryNav a:focus-visible, .secondaryNav a:focus-visible, .logo:focus-visible, .socials:focus-visible { outline: 2px solid var(--header-hover); outline-offset: 4px; }
+.mobileMenu { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .primaryNav a, .secondaryNav a { transition-duration: var(--header-hover-speed) !important; }
+}
+
+@media (max-width: 1200px) {
+  .headerInner { width: calc(100% - 80px); }
+  .primaryNav { padding-left: 0; }
+  .primaryNav, .secondaryNav { gap: 20px; font-size: 15px; }
+}
+
+@media (max-width: 959px) {
+  .headerInner { grid-template-columns: 48px 1fr auto; }
+  .primaryNav, .secondaryNav, .socials { display: none; }
+  .mobileMenu { display: block; justify-self: end; position: relative; }
+  .mobileMenu summary { list-style: none; padding: 12px 18px; border: 1px solid var(--header-line); border-radius: 5px; cursor: pointer; }
+  .mobileMenu summary::-webkit-details-marker { display: none; }
+  .mobileMenu nav { position: absolute; z-index: 30; top: 56px; right: 0; width: 260px; padding: 20px; display: grid; gap: 12px; border-radius: 5px; background: var(--header-bg); box-shadow: 0 18px 45px #05050524; }
+  .mobileMenu a { transition: color var(--header-hover-speed) var(--header-hover-easing); }
+  .mobileMenu a:hover { color: var(--header-hover); }
+}
+
+@media (max-width: 700px) {
+  .siteHeader { height: 64px; }
+  .headerInner { width: calc(100% - 40px); top: 16px; }
+}

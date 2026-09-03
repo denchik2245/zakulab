@@ -13,12 +13,22 @@ export type HomeStat = {
   label: string;
 };
 
-export type HomeProject = {
+export type PortfolioFilter = "landing" | "multipage" | "commerce" | "interface";
+export type PortfolioPlacement = "featured" | "list" | "hidden";
+export type PortfolioProject = {
   id: string;
   title: string;
   description: string;
+  image: string;
   url: string;
   platform: string;
+  tags: [string, string];
+  filters: PortfolioFilter[];
+  homePlacement: PortfolioPlacement;
+  portfolioPlacement: "featured" | "archive" | "hidden";
+  published: boolean;
+  order: number;
+  caseStudy?: CaseStudy;
 };
 
 export type ProcessStep = {
@@ -51,9 +61,7 @@ export type SiteSettings = {
   aboutText: string;
   stats: HomeStat[];
   portfolioTitle: string;
-  portfolioCount: string;
-  portfolioImages: string[];
-  projects: HomeProject[];
+  portfolioProjects: PortfolioProject[];
   processTitle: string;
   process: ProcessStep[];
   reviewsTitle: string;
@@ -95,19 +103,23 @@ export const defaultSiteSettings: SiteSettings = {
     { id: "reviews", value: "85", label: "Положительных отзывов" },
   ],
   portfolioTitle: "Портфолио",
-  portfolioCount: "26",
-  portfolioImages: [
-    "/assets/figma/rectangle8.png",
-    "/assets/figma/rectangle11.png",
-    "/assets/figma/rectangle10.png",
-    "/assets/figma/rectangle9.png",
-  ],
-  projects: [
-    { id: "siding-moldova", title: "Siding-Moldova", description: "Виниловый сайдинг для дома под ключ", url: "#", platform: "Tilda" },
-    { id: "tck-levit", title: "TCK Levit", description: "Закупка строительных материалов", url: "#", platform: "" },
-    { id: "estet-apart", title: "Estet-Apart", description: "Управление посуточной и долгосрочной арендой", url: "#", platform: "WordPress" },
-    { id: "smol-aqua-pro", title: "SmolAquaPro", description: "Системы водоочистки", url: "#", platform: "Tilda" },
-    { id: "flat-design", title: "Flat Design", description: "Студия дизайна интерьеров", url: "#", platform: "" },
+  portfolioProjects: [
+    { id: "vladkovsky", title: "На Владковском", description: "Центр дополнительного образования", image: "/assets/figma/rectangle8.png", url: "#", platform: "", tags: ["Интерфейс", "Мобильная версия"], filters: ["interface"], homePlacement: "featured", portfolioPlacement: "featured", published: true, order: 10 },
+    { id: "talantum", title: "Центр творчества", description: "Онлайн-курсы подготовки к экзаменам", image: "/assets/figma/rectangle11.png", url: "#", platform: "", tags: ["Анализ конкурентов", "15 страниц"], filters: ["multipage"], homePlacement: "featured", portfolioPlacement: "featured", published: true, order: 20 },
+    { id: "nextdev", title: "NextDev", description: "Digital-решения для бизнеса", image: "/assets/figma/rectangle10.png", url: "#", platform: "", tags: ["Многостраничный", "Корпоративный"], filters: ["multipage"], homePlacement: "featured", portfolioPlacement: "featured", published: true, order: 30 },
+    { id: "nextdev-interface", title: "NextDev — интерфейсы", description: "Интерфейсы цифровых продуктов", image: "/assets/figma/rectangle10.png", url: "#", platform: "", tags: ["UX/UI", "Интерфейсы"], filters: ["interface"], homePlacement: "hidden", portfolioPlacement: "featured", published: true, order: 40 },
+    { id: "kuzin-partners", title: "Кузин и партнёры", description: "Юридическая помощь физическим лицам", image: "/assets/figma/rectangle9.png", url: "#", platform: "", tags: ["Одностраничный", "Юридические услуги"], filters: ["landing"], homePlacement: "featured", portfolioPlacement: "featured", published: true, order: 50 },
+    { id: "vladkovsky-mobile", title: "На Владковском — mobile", description: "Мобильная версия образовательного центра", image: "/assets/figma/rectangle8.png", url: "#", platform: "", tags: ["Mobile", "Интерфейс"], filters: ["interface"], homePlacement: "hidden", portfolioPlacement: "featured", published: true, order: 60 },
+    { id: "siding-moldova", title: "Siding-Moldova", description: "Виниловый сайдинг для дома под ключ", image: "/assets/figma/rectangle11.png", url: "#", platform: "Tilda", tags: ["Одностраничный", "Tilda"], filters: ["landing"], homePlacement: "list", portfolioPlacement: "archive", published: true, order: 70 },
+    { id: "tck-levit", title: "TCK Levit", description: "Закупка строительных материалов", image: "/assets/figma/rectangle9.png", url: "#", platform: "", tags: ["Многостраничный", "Корпоративный"], filters: ["multipage"], homePlacement: "list", portfolioPlacement: "archive", published: true, order: 80 },
+    { id: "estet-apart", title: "Estet-Apart", description: "Управление посуточной и долгосрочной арендой", image: "/assets/figma/rectangle10.png", url: "#", platform: "WordPress", tags: ["Интерфейсы", "WordPress"], filters: ["multipage", "interface"], homePlacement: "list", portfolioPlacement: "archive", published: true, order: 90 },
+    { id: "smol-aqua-pro", title: "SmolAquaPro", description: "Системы водоочистки", image: "/assets/figma/rectangle8.png", url: "#", platform: "Tilda", tags: ["Одностраничный", "Tilda"], filters: ["landing"], homePlacement: "list", portfolioPlacement: "archive", published: true, order: 100 },
+    { id: "flat-design", title: "Flat Design", description: "Студия дизайна интерьеров", image: "/assets/figma/rectangle11.png", url: "#", platform: "", tags: ["Интерфейсы", "Дизайн интерьеров"], filters: ["interface"], homePlacement: "list", portfolioPlacement: "archive", published: true, order: 110 },
+    { id: "alts", title: "АЛТС", description: "Обслуживание железнодорожной инфраструктуры", image: "/assets/figma/rectangle8.png", url: "/cases/alts", platform: "", tags: ["Многостраничный", "Корпоративный"], filters: ["multipage"], homePlacement: "hidden", portfolioPlacement: "archive", published: true, order: 120 },
+    { id: "ashanti", title: "Ashanti", description: "Интернет-магазин индийских товаров", image: "/assets/figma/rectangle9.png", url: "/cases/ashanti", platform: "", tags: ["Интернет-магазин", "E-commerce"], filters: ["commerce"], homePlacement: "hidden", portfolioPlacement: "archive", published: true, order: 130 },
+    { id: "seo-roi", title: "SEO & ROI", description: "Коммерческий сайт SEO-команды", image: "/assets/figma/rectangle10.png", url: "/cases/seo-roi", platform: "", tags: ["Одностраничный", "B2B"], filters: ["landing"], homePlacement: "hidden", portfolioPlacement: "archive", published: true, order: 140 },
+    { id: "normdev", title: "NormDev", description: "Сайт digital-команды", image: "/assets/figma/rectangle10.png", url: "#", platform: "Tilda", tags: ["Многостраничный", "Tilda"], filters: ["multipage"], homePlacement: "hidden", portfolioPlacement: "archive", published: true, order: 150 },
+    { id: "zakulab", title: "Zakulab", description: "Портфолио UI/UX-дизайнера", image: "/assets/figma/rectangle11.png", url: "#", platform: "", tags: ["Интерфейсы", "Портфолио"], filters: ["interface"], homePlacement: "hidden", portfolioPlacement: "archive", published: true, order: 160 },
   ],
   processTitle: "Как проходит работа над проектом",
   process: [
@@ -169,3 +181,4 @@ export const defaultSiteSettings: SiteSettings = {
   kworkUrl: "https://kwork.ru/",
   flUrl: "https://fl.ru/",
 };
+import type { CaseStudy } from "@/lib/cases";
