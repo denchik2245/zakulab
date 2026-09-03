@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { VerifiedReview } from "@/lib/reviews";
 import type { SiteSettings } from "@/lib/site-settings";
 import { externalUrl } from "@/lib/external-url";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import styles from "./reviews-page.module.css";
 
 const navigation = [
@@ -43,7 +44,7 @@ function Footer({ site }: { site: SiteSettings }) {
 export function ReviewsPageView({ reviews, site }: { reviews: VerifiedReview[]; site: SiteSettings }) {
   return <div className={`figma-reviews-page ${styles.page}`} id="top">
     <section className={styles.intro}>
-      <div className={styles.heading}><div className={styles.breadcrumbs}><Link href="/">Главная</Link><span aria-hidden="true">›</span><span>Отзывы</span></div><h1>Отзывы тех,<br />с кем мы работали</h1></div>
+      <div className={styles.heading}><Breadcrumbs current="Отзывы" /><h1>Отзывы тех,<br />с кем мы работали</h1></div>
       <div className={styles.cta}><span><small>Работали вместе?</small><strong>Поделитесь впечатлениями о сотрудничестве</strong></span><a href={`mailto:${site.email}?subject=${encodeURIComponent("Отзыв о сотрудничестве")}`}>Оставить отзыв</a></div>
     </section>
     <section className={styles.grid} aria-label="Отзывы клиентов">{reviews.map((review) => <ReviewCard review={review} key={review.id} />)}</section>

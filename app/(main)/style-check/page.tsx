@@ -1,38 +1,63 @@
 import type { Metadata } from "next";
-import { LabMark } from "@/components/marks";
+import Image from "next/image";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { StyleQuiz } from "@/components/style-quiz";
+import styles from "@/components/style-check.module.css";
 
 export const metadata: Metadata = {
-  title: "Визуальный тест",
-  description: "Короткий тест, который помогает определить подходящий визуальный стиль будущего сайта.",
+  title: "Выбрать стиль",
+  description: "Выберите визуальные направления, которые подходят для будущего сайта.",
   alternates: { canonical: "/style-check" },
 };
 
+const hints = [
+  {
+    title: "Оцените направление целиком",
+    text: "Сначала выберите общее впечатление: нравится, не нравится или пока сложно определиться.",
+    activeMarks: 1,
+  },
+  {
+    title: "Отметьте, что именно понравилось",
+    text: "Выберите детали, которые вам близки: цвет, шрифты, композицию или графику.",
+    activeMarks: 2,
+  },
+  {
+    title: <>Не ищите<br />готовый дизайн</>,
+    text: "Примеры нужны как ориентиры, чтобы точнее понять ваши визуальные предпочтения.",
+    activeMarks: 3,
+  },
+] as const;
+
 export default function StyleCheckPage() {
   return (
-    <>
-      <section className="style-page-hero shell">
-        <div className="style-hero-meta">
-          <LabMark>VISUAL / DIRECTION</LabMark>
-          <span>8 направлений · 3–4 минуты</span>
+    <div className={`style-check-page ${styles.page}`} id="top">
+      <section className={styles.intro} aria-labelledby="style-page-title">
+        <div className={styles.introTop}>
+          <div>
+            <Breadcrumbs current="Выбрать стиль" />
+            <h1 id="style-page-title">Найдём стиль,<br />который вам подходит</h1>
+          </div>
+          <p>Выберите примеры, которые вам ближе по настроению и визуалу. По ответам я пойму, какие цвета, типографика, композиция и характер интерфейса лучше подойдут для будущего сайта.</p>
         </div>
-        <h1>Покажите,<br />что вам <em>близко</em></h1>
-        <div className="style-hero-bottom">
-          <p>Если у вас нет готовых примеров — это нормально. Оцените несколько контрастных направлений, а я переведу ваши реакции в полезные ориентиры для дизайна.</p>
-          <div className="style-hero-scale" aria-hidden="true"><span>LIKE</span><i /><span>AVOID</span></div>
+
+        <div className={styles.hints}>
+          {hints.map((hint) => (
+            <article key={typeof hint.title === "string" ? hint.title : hint.text}>
+              <div>
+                <h2>{hint.title}</h2>
+                <span className={styles.marks} aria-hidden="true">
+                  {[0, 1, 2].map((mark) => (
+                    <Image key={mark} src={mark < hint.activeMarks ? "/assets/figma/logo2.svg" : "/assets/figma/logo3.svg"} width={20} height={20} alt="" />
+                  ))}
+                </span>
+              </div>
+              <p>{hint.text}</p>
+            </article>
+          ))}
         </div>
       </section>
-      <div className="style-lab-section">
-        <div className="shell"><StyleQuiz /></div>
-      </div>
-      <section className="style-explainer shell">
-        <div><LabMark>HOW / I USE IT</LabMark><h2>Что я получу<br /><em>из ответов</em></h2></div>
-        <div className="style-explainer-list">
-          <article><span>01</span><h3>Направление</h3><p>Пойму, насколько спокойным, выразительным, плотным и эмоциональным должен быть будущий сайт.</p></article>
-          <article><span>02</span><h3>Конкретные детали</h3><p>Увижу, на что вы реагируете: цвет, типографику, композицию, графику, плотность или эффекты.</p></article>
-          <article><span>03</span><h3>Антипримеры</h3><p>Зафиксирую не только предпочтения, но и решения, которых точно стоит избегать в первой концепции.</p></article>
-        </div>
-      </section>
-    </>
+
+      <StyleQuiz />
+    </div>
   );
 }

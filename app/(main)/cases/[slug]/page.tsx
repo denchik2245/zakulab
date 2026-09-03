@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { CaseVisual } from "@/components/case-visual";
 import { LabMark, Arrow } from "@/components/marks";
 import { getPublishedCase, getPublishedCases } from "@/lib/content-store";
@@ -28,7 +29,7 @@ export default async function CasePage({ params }: { params: Promise<{ slug: str
   return (
     <article className="case-page">
       <section className="case-hero shell">
-        <div className="case-breadcrumb"><Link href="/projects">Все проекты</Link><span>/</span><span>{item.index}</span></div>
+        <Breadcrumbs homeHref="/projects" homeLabel="Все проекты" current={item.index} />
         <div className="case-title-row">
           <div><LabMark>{item.eyebrow.toUpperCase()}</LabMark><h1>{item.title}</h1></div>
           <p>{item.summary}</p>

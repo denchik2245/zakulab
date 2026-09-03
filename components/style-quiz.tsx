@@ -1,14 +1,15 @@
 "use client";
 
+import Image from "next/image";
 import { useMemo, useState } from "react";
 import { styleAxes, styleReasons, styleReferences, type StyleAxis } from "@/lib/style-references";
 import { StylePreview } from "@/components/style-preview";
+import styles from "@/components/style-check.module.css";
 
 type Vote = "like" | "dislike" | "skip";
 type Response = { vote: Vote; reasons: string[] };
 
 export function StyleQuiz() {
-  const [started, setStarted] = useState(false);
   const [index, setIndex] = useState(0);
   const [responses, setResponses] = useState<Record<string, Response>>({});
   const [completed, setCompleted] = useState(false);
@@ -18,8 +19,6 @@ export function StyleQuiz() {
 
   const current = styleReferences[index];
   const currentResponse = responses[current.id];
-  const ratedCount = Object.values(responses).filter((item) => item.vote !== "skip").length;
-
   const result = useMemo(() => {
     const totals: Record<StyleAxis, number> = { space: 0, energy: 0, expression: 0, emotion: 0 };
     const evaluated = styleReferences.filter((item) => {
@@ -109,6 +108,16 @@ export function StyleQuiz() {
     if (index > 0) setIndex((value) => value - 1);
   }
 
+  function goNext() {
+    if (!currentResponse) {
+      const nextResponses = { ...responses, [current.id]: { vote: "skip" as const, reasons: [] } };
+      setResponses(nextResponses);
+      moveForward(nextResponses);
+      return;
+    }
+    moveForward();
+  }
+
   async function copySummary() {
     try {
       await navigator.clipboard.writeText(summary);
@@ -127,7 +136,6 @@ export function StyleQuiz() {
     setResponses({});
     setIndex(0);
     setCompleted(false);
-    setStarted(false);
     setNote("");
     setValidationMessage("");
     setCopyState("Скопировать итог");
@@ -136,35 +144,9 @@ export function StyleQuiz() {
     });
   }
 
-  function startQuiz() {
-    setStarted(true);
-    requestAnimationFrame(() => {
-      document.getElementById("visual-style-test")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-  }
-
-  if (!started) {
-    return (
-      <section className="style-intro-panel" id="visual-style-test">
-        <div className="style-intro-index">01—08</div>
-        <div>
-          <h2>Вам не нужно знать<br />названия стилей</h2>
-          <p>Просто реагируйте на примеры. Здесь нет правильных ответов: важна первая честная реакция, а не попытка выбрать «самый профессиональный» вариант.</p>
-          <ul>
-            <li><span>01</span> Оцените минимум 4 из 8 направлений</li>
-            <li><span>02</span> Отметьте, что именно повлияло на выбор</li>
-            <li><span>03</span> Получите профиль, который можно приложить к заявке</li>
-          </ul>
-          <button type="button" className="button" onClick={startQuiz}>Начать тест <span aria-hidden="true">→</span></button>
-          <small>Обычно занимает 3–4 минуты</small>
-        </div>
-      </section>
-    );
-  }
-
   if (completed) {
     return (
-      <section className="style-result" id="visual-style-test" aria-live="polite">
+      <section className={`${styles.resultShell} style-result`} id="visual-style-test" aria-live="polite">
         <div className="style-result-head">
           <span className="style-result-code">PROFILE / COMPLETE</span>
           <h2>Ваш визуальный<br /><em>профиль готов</em></h2>
@@ -214,50 +196,51 @@ export function StyleQuiz() {
     );
   }
 
-  const requiresReason = currentResponse && currentResponse.vote !== "skip";
-  const canContinue = Boolean(requiresReason && currentResponse.reasons.length > 0);
+  const requiresReason = Boolean(currentResponse && currentResponse.vote !== "skip");
 
   return (
-    <section className="style-quiz" id="visual-style-test" aria-live="polite">
-      <div className="style-progress">
-        <div><span>VISUAL / TEST</span><b>{current.number} / {styleReferences.length.toString().padStart(2, "0")}</b></div>
-        <div className="progress-track"><i style={{ width: `${((index + 1) / styleReferences.length) * 100}%` }} /></div>
-        <p>{ratedCount} направлений оценено</p>
-      </div>
+    <section className={styles.quiz} id="visual-style-test" aria-live="polite">
+      {validationMessage && <p className={styles.validation}>{validationMessage}</p>}
 
-      {validationMessage && <p className="style-validation">{validationMessage}</p>}
+      <div className={styles.quizGrid}>
+        <div className={styles.previewFrame}>
+          {current.id === "editorial" ? (
+            <Image className={styles.referenceImage} src="/assets/figma/style-reference-catering.png" alt="Пример сайта в стиле редакционного минимализма" fill sizes="(max-width: 959px) 100vw, 760px" quality={92} priority />
+          ) : (
+            <div className={styles.syntheticPreview}><StylePreview reference={current} /></div>
+          )}
+        </div>
 
-      <div className="style-question-grid">
-        <StylePreview reference={current} />
-        <div className="style-question-copy">
-          <span className="style-category">{current.category}</span>
+        <div className={styles.question}>
+          <span className={styles.category}>{`{${current.traits.slice(0, 2).map((trait) => trait[0].toUpperCase() + trait.slice(1)).join(", ")}}`}</span>
           <h2>{current.title}</h2>
-          <p>{current.description}</p>
-          <div className="style-traits">{current.traits.map((trait) => <span key={trait}>{trait}</span>)}</div>
+          <p className={styles.description}>{current.description}</p>
 
-          <fieldset className="vote-fieldset">
+          <fieldset className={styles.voteFieldset}>
             <legend>Как вам это направление?</legend>
-            <div className="vote-buttons">
-              <button type="button" className={currentResponse?.vote === "dislike" ? "is-active dislike" : ""} onClick={() => chooseVote("dislike")} aria-pressed={currentResponse?.vote === "dislike"}><span>−</span> Не нравится</button>
+            <div className={styles.voteButtons}>
+              <button type="button" data-active={currentResponse?.vote === "dislike"} onClick={() => chooseVote("dislike")} aria-pressed={currentResponse?.vote === "dislike"}>Не нравится <span className={styles.voteIcon}><Image src="/assets/figma/minus.svg" alt="" fill sizes="20px" /></span></button>
               <button type="button" className="skip" onClick={() => chooseVote("skip")}>Пропустить</button>
-              <button type="button" className={currentResponse?.vote === "like" ? "is-active like" : ""} onClick={() => chooseVote("like")} aria-pressed={currentResponse?.vote === "like"}><span>+</span> Нравится</button>
+              <button type="button" data-active={currentResponse?.vote === "like"} onClick={() => chooseVote("like")} aria-pressed={currentResponse?.vote === "like"}>Нравится <span className={styles.voteIcon}><Image src="/assets/figma/plus.svg" alt="" fill sizes="20px" /></span></button>
             </div>
           </fieldset>
 
-          {requiresReason && (
-            <fieldset className="reason-fieldset">
-              <legend>{currentResponse.vote === "like" ? "Что именно понравилось?" : "Что именно не подошло?"} <small>Можно выбрать несколько</small></legend>
-              <div className="reason-buttons">
-                {styleReasons.map((reason) => (
-                  <button type="button" key={reason} className={currentResponse.reasons.includes(reason) ? "is-active" : ""} onClick={() => toggleReason(reason)} aria-pressed={currentResponse.reasons.includes(reason)}>{reason}</button>
-                ))}
-              </div>
-            </fieldset>
-          )}
+          <fieldset className={styles.reasonFieldset} data-disabled={!requiresReason} disabled={!requiresReason}>
+            <legend>{currentResponse?.vote === "dislike" ? "Что именно не подошло?" : "Что именно понравилось?"}</legend>
+            <div className={styles.reasonOptions}>
+              {styleReasons.slice(0, 5).map((reason) => (
+                <label key={reason}>
+                  <input type="checkbox" checked={currentResponse?.reasons.includes(reason) ?? false} onChange={() => toggleReason(reason)} />
+                  <span className={styles.checkbox} aria-hidden="true" />
+                  <span>{reason}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
 
-          <div className="style-nav-actions">
-            <button type="button" onClick={goBack} disabled={index === 0}>← Назад</button>
-            {requiresReason && <button type="button" className="style-next" disabled={!canContinue} onClick={() => moveForward()}>{index === styleReferences.length - 1 ? "Показать результат" : "Следующий пример"} →</button>}
+          <div className={styles.navButtons}>
+            <button type="button" onClick={goBack} disabled={index === 0}>Назад</button>
+            <button type="button" className={styles.next} onClick={goNext}>{index === styleReferences.length - 1 ? "Показать результат" : "Далее"}</button>
           </div>
         </div>
       </div>

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import type { PortfolioFilter, SiteSettings } from "@/lib/site-settings";
 import styles from "./portfolio-page.module.css";
 
@@ -38,7 +39,7 @@ export function PortfolioPage({ site }: { site: SiteSettings }) {
 
   return <div className={`figma-portfolio-page ${styles.page}`} id="top">
     <section className={styles.intro}>
-      <div className={styles.heading}><div className={styles.breadcrumbs}><Link href="/">Главная</Link><span aria-hidden="true">›</span><span>Портфолио</span></div><h1>Сайты и интерфейсы,<br />которые я спроектировал</h1></div>
+      <div className={styles.heading}><Breadcrumbs current="Портфолио" /><h1>Сайты и интерфейсы,<br />которые я спроектировал</h1></div>
       <div className={styles.updated}><span><small>Последнее обновление</small><strong>28 августа 2026</strong></span><Image src="/assets/figma/portfolio-update.svg" width={28} height={28} alt="" /></div>
     </section>
 

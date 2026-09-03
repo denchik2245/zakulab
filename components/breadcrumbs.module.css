@@ -1,0 +1,38 @@
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #050505;
+  font-family: "Manrope Variable", "Manrope", sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.4;
+  text-transform: none;
+}
+
+.breadcrumbs a {
+  color: inherit;
+  transition: color .35s cubic-bezier(.22, .72, .24, 1);
+}
+
+.breadcrumbs a:hover { color: #809e91; }
+.breadcrumbs a:focus-visible { outline: 2px solid #809e91; outline-offset: 3px; border-radius: 2px; }
+
+.separator {
+  width: 16px;
+  color: #050505;
+  text-align: center;
+  font-size: 21px;
+  line-height: 16px;
+}
+
+.current { color: #727272; }
+
+@media (max-width: 600px) {
+  .breadcrumbs { font-size: 13px; }
+  .separator { font-size: 18px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .breadcrumbs a { transition-duration: .01ms; }
+}

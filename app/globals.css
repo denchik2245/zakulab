@@ -197,7 +197,6 @@ em { font-family: Georgia, "Times New Roman", serif; font-weight: 400; }
 
 /* Case pages */
 .case-hero { padding-top: 55px; }
-.case-breadcrumb { display: flex; gap: 12px; color: var(--muted); font: 400 10px/1 "IBM Plex Mono", monospace; text-transform: uppercase; }
 .case-title-row { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; align-items: end; margin: 80px 0 55px; }
 .case-title-row h1 { margin: 35px 0 0; font-size: clamp(85px, 13vw, 200px); line-height: .7; letter-spacing: -.09em; }
 .case-title-row p { max-width: 560px; margin: 0 0 5px auto; font-size: 22px; line-height: 1.25; letter-spacing: -.035em; }

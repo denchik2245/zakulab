@@ -5,9 +5,6 @@
 .intro,.grid { width:min(1660px,calc(100% - 260px)); margin-inline:auto; }
 .intro { height:444px; position:relative; }
 .heading { position:absolute; top:116px; left:0; }
-.breadcrumbs { display:flex; align-items:center; gap:8px; font-size:16px; line-height:1.4; }
-.breadcrumbs span:last-child { color:var(--muted); }
-.breadcrumbs > span[aria-hidden] { width:16px; color:var(--ink); text-align:center; font-size:21px; line-height:16px; }
 .heading h1 { width:500px; margin-top:28px; font-size:56px; font-weight:500; line-height:1.1; letter-spacing:-.03em; }
 .cta { position:absolute; top:188px; right:0; width:870px; height:96px; padding:20px 24px; display:flex; align-items:center; gap:36px; border-radius:5px; background:var(--card); }
 .cta > span { min-width:0; display:grid; gap:5px; }
