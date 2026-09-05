@@ -2,22 +2,12 @@ import Image from "next/image";
 import Link from "next/link";
 import type { SiteSettings } from "@/lib/site-settings";
 import type { VerifiedReview } from "@/lib/reviews";
+import { typographic } from "@/lib/typographic";
+import { navigation } from "@/lib/navigation";
 import { Header } from "@/components/header";
+import { Footer } from "@/components/footer";
 import { ReviewsSlider } from "@/components/reviews-slider";
 import styles from "./home-page.module.css";
-
-const nav = [
-  ["Портфолио", "#portfolio"],
-  ["Этапы", "#process"],
-  ["Отзывы", "#reviews"],
-  ["Услуги и стоимость", "#price"],
-] as const;
-
-const shortWordsPattern = /(?<![\p{L}\p{N}])(а|без|бы|в|во|для|до|же|за|и|из|или|к|как|ко|ли|на|над|не|ни|но|о|об|от|по|под|при|про|с|со|у|через|что)\s+/giu;
-
-function typographic(text: string) {
-  return text.replace(shortWordsPattern, (word) => `${word.trim()}\u00a0`);
-}
 
 function ArrowIcon({ light = false }: { light?: boolean }) {
   return (
@@ -53,33 +43,6 @@ function SectionTitle({ eyebrow, children }: { eyebrow: string; children: React.
       <span>{`{${eyebrow}}`}</span>
       <h2>{children}</h2>
     </div>
-  );
-}
-
-function HomeFooter({ site }: { site: SiteSettings }) {
-  return (
-    <footer className={styles.footer} id="contact">
-      <div className={styles.footerTexture} aria-hidden="true" />
-      <div className={styles.footerTop}>
-        <h2>{typographic(site.contactTitle)}</h2>
-        <a className={styles.discussButton} href={site.telegramUrl} target="_blank" rel="noreferrer">
-          <span>{typographic(site.contactButton)}</span><small>{`{TG}`}</small>
-        </a>
-        <a className={styles.toTop} href="#top" aria-label="Наверх">
-          <Image className={styles.footerTopArrow} src="/assets/figma/group.svg" width={20} height={10} alt="" />
-        </a>
-      </div>
-      <div className={styles.footerColumns}>
-        <div><span>Навигация</span>{nav.map(([label, href]) => <a href={href} key={href}>{typographic(label)}</a>)}</div>
-        <div><span>Связаться</span><a href={site.telegramUrl}>Telegram</a><a href={site.vkUrl}>VK</a><a href={site.maxUrl}>MAX</a><a href={`mailto:${site.email}`}>{site.email}</a></div>
-        <div><span>Мои фриланс биржи</span><a href={site.kworkUrl}>Kwork</a><a href={site.flUrl}>FL</a></div>
-      </div>
-      <div className={styles.footerLegal}>
-        <Link href="/privacy">Политика обработки ПД</Link>
-        <Link href="/privacy">{typographic("Согласие на обработку ПД")}</Link>
-      </div>
-      <Image className={styles.footerMark} src="/assets/figma/logo1.svg" width={500} height={500} alt="" />
-    </footer>
   );
 }
 
@@ -228,7 +191,7 @@ export function HomePage({ site, reviews }: { site: SiteSettings; reviews: Verif
         </div>
       </section>
 
-      <HomeFooter site={site} />
+      <Footer site={site} />
       </div>
     </div>
   );

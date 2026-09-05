@@ -1,4 +1,4 @@
-.page { --white:#fefefe; --ink:#050505; --card:#eaeaea; --green:#304e41; --green-soft:#809e91; --muted:#727272; --line:#babcaf; min-width:0; overflow:hidden; color:var(--ink); background:var(--white); font-family:"Manrope Variable","Manrope",sans-serif; }
+.page { --white:#fefefe; --ink:#050505; --card:#eaeaea; --green:#304e41; --green-soft:#809e91; --muted:#727272; --line:#babcaf; min-width:0; overflow:clip; color:var(--ink); background:var(--white); font-family:"Manrope Variable","Manrope",sans-serif; }
 .page *,.page *::before,.page *::after { box-sizing:border-box; }
 .page h1,.page h2,.page p,.page blockquote { margin:0; }
 .page img { display:block; }
@@ -18,18 +18,35 @@
 .trainImage { width:132.73% !important; height:146.04% !important; max-width:none !important; inset:auto !important; left:-16.37% !important; top:-46.07% !important; object-fit:fill; }
 .shade { position:absolute; z-index:1; inset:0; background:rgba(5,5,5,.5); }
 .category { position:absolute; z-index:2; top:20px; left:20px; padding:5px 12px; border-radius:3px; color:var(--white); background:rgba(254,254,254,.3); backdrop-filter:blur(4px); font-size:14px; line-height:1.4; }
-.cardPanel { position:absolute; z-index:2; left:20px; right:20px; top:258px; bottom:20px; border-radius:2px; background:var(--white); }
+.cardPanel { position:absolute; z-index:2; left:20px; right:20px; top:258px; bottom:20px; border-radius:2px; background:var(--white); overflow:hidden; }
 .author { position:absolute; top:24px; left:24px; width:300px; display:grid; gap:8px; }
 .author strong { font-size:20px; font-weight:500; line-height:1.2; }
 .author span { color:var(--line); font-size:14px; font-weight:600; line-height:1; }
 .card blockquote { position:absolute; top:24px; left:calc(50% + 4px); right:24px; font-size:16px; font-weight:400; line-height:1.4; }
 .links { position:absolute; left:0; right:0; bottom:0; height:86px; display:grid; grid-template-columns:1fr 1fr; border-top:1px solid var(--line); }
-.links > a { min-width:0; padding:20px 24px; display:grid; grid-template-columns:36px minmax(0,1fr) 20px; align-items:center; gap:16px; }
+.links > a { min-width:0; padding:20px 24px; display:grid; grid-template-columns:36px minmax(0,1fr) 20px; align-items:center; gap:16px; transition:all 0.4s ease !important; }
 .links > a + a { border-left:1px solid var(--line); }
 .links > a > span:not(.arrow) { min-width:0; display:grid; gap:3px; }
-.links small { color:var(--line); font-size:14px; font-weight:600; line-height:1; }
-.links strong { overflow:hidden; font-size:20px; font-weight:500; line-height:1.2; text-overflow:ellipsis; white-space:nowrap; }
-.arrow { width:20px; height:20px; position:relative; }
+.linkIcon, .linkArrow { color:var(--line); transition:color 0.4s ease !important; flex-shrink:0; }
+.linkIcon { width:36px; height:36px; display:block; }
+.linkArrow { width:20px; height:20px; display:block; }
+.links small { color:var(--line); font-size:14px; font-weight:600; line-height:1; transition:color 0.4s ease !important; }
+.links strong { overflow:hidden; font-size:20px; font-weight:500; line-height:1.2; text-overflow:ellipsis; white-space:nowrap; color:var(--ink); }
+
+@media (hover: hover) and (pointer: fine) {
+  .links > a:hover {
+    background-color: #eaeaea;
+  }
+  .links > a:hover .linkIcon {
+    color: #727272;
+  }
+  .links > a:hover .linkArrow {
+    color: #050505;
+  }
+  .links > a:hover small {
+    color: #727272;
+  }
+}
 .footer { height:649px; padding:100px 130px 30px; position:relative; overflow:hidden; color:var(--white); background:var(--green); }
 .footerTexture { position:absolute; top:-1px; left:0; right:0; height:531px; opacity:.2; mix-blend-mode:multiply; background:url("/assets/figma/image44.png") top left/567px 567px repeat; }
 .footerTop { position:relative; z-index:1; display:flex; align-items:flex-start; }

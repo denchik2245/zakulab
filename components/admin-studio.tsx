@@ -384,7 +384,17 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
               </div>
               <h4>Слайдер</h4>
               <div className="admin-gallery-grid">
-                {content.site.heroGallery.map((image, index) => <GalleryMediaField key={index} label={`Фото ${index + 1}`} value={image} onChange={(value) => patchMediaArray("heroGallery", index, value)} />)}
+                {content.site.heroGallery.map((image, index) => (
+                  <GalleryMediaField
+                    key={index}
+                    className="is-slider"
+                    isSlider={true}
+                    label={`Фото ${index + 1}`}
+                    value={image}
+                    onChange={(value) => patchMediaArray("heroGallery", index, value)}
+                    onDelete={() => patchSite({ heroGallery: content.site.heroGallery.filter((_, i) => i !== index) })}
+                  />
+                ))}
                 <button className="admin-gallery-add" type="button" aria-label="Добавить фото в слайдер" onClick={() => patchSite({ heroGallery: [...content.site.heroGallery, ""] })}><Image src="/assets/figma/admin-asset-1.svg" width={36} height={36} alt="" /></button>
               </div>
               <Field label="Скорость галереи (сек.)"><input type="number" min={5} max={120} value={content.site.heroGallerySpeed || 30} onChange={(e) => patchSite({ heroGallerySpeed: Number(e.target.value) })} /></Field>
@@ -447,7 +457,25 @@ function SiteCard({ title, className = "", children }: { title: string; classNam
   return <section className={`admin-site-card ${className}`}><h3>{title}</h3><div>{children}</div></section>;
 }
 
-function GalleryMediaField({ label, value, onChange, className = "", emptyLabel = "Добавить", iconSrc = "/assets/figma/admin-asset-2.svg" }: { label: string; value: string; onChange: (value: string) => void; className?: string; emptyLabel?: string; iconSrc?: string }) {
+function GalleryMediaField({
+  label,
+  value,
+  onChange,
+  onDelete,
+  className = "",
+  emptyLabel = "Добавить",
+  iconSrc = "/assets/figma/admin-asset-2.svg",
+  isSlider = false,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  onDelete?: () => void;
+  className?: string;
+  emptyLabel?: string;
+  iconSrc?: string;
+  isSlider?: boolean;
+}) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
 
@@ -471,14 +499,69 @@ function GalleryMediaField({ label, value, onChange, className = "", emptyLabel 
     }
   }
 
-  return <div className={`admin-gallery-field ${value ? "has-image" : "is-empty"} ${className}`}>
-    <label aria-label={`${value ? "Заменить" : "Добавить"}: ${label}`}>
-      <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={upload} disabled={uploading} />
-      {value ? <img className="admin-gallery-image" src={value} alt="" /> : <span className="admin-gallery-empty">+</span>}
-      <span className="admin-gallery-hover"><Image src={iconSrc} width={42} height={42} alt="" /><b>{uploading ? "Загружаю…" : value ? "Заменить" : emptyLabel}</b></span>
-    </label>
-    {error && <small>{error}</small>}
-  </div>;
+  return (
+    <div className={`admin-gallery-field ${value ? "has-image" : "is-empty"} ${className}`}>
+      <label aria-label={`${value ? "Заменить" : "Добавить"}: ${label}`}>
+        <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={upload} disabled={uploading} />
+        {value ? <img className="admin-gallery-image" src={value} alt="" /> : <span className="admin-gallery-empty">+</span>}
+        {isSlider && value ? (
+          <div className="admin-slider-hover">
+            {onDelete && (
+              <button
+                type="button"
+                className="admin-slider-delete"
+                aria-label="Удалить фото из слайдера"
+                title="Удалить фото"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onDelete();
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="3" y1="3" x2="13" y2="13" />
+                  <line x1="13" y1="3" x2="3" y2="13" />
+                </svg>
+              </button>
+            )}
+            <div className="admin-slider-btn">
+              <span>{uploading ? "Загружаю…" : "Новое фото"}</span>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2.5 10.5V12.5C2.5 13.0523 2.94772 13.5 3.5 13.5H12.5C13.0523 13.5 13.5 13.0523 13.5 12.5V10.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M8 2.5V10.5M8 2.5L5 5.5M8 2.5L11 5.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+          </div>
+        ) : (
+          <>
+            {isSlider && !value && onDelete && (
+              <button
+                type="button"
+                className="admin-slider-delete is-empty-delete"
+                aria-label="Удалить пустой слот"
+                title="Удалить слот"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onDelete();
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="3" y1="3" x2="13" y2="13" />
+                  <line x1="13" y1="3" x2="3" y2="13" />
+                </svg>
+              </button>
+            )}
+            <span className="admin-gallery-hover">
+              <Image src={iconSrc} width={42} height={42} alt="" />
+              <b>{uploading ? "Загружаю…" : value ? "Заменить" : emptyLabel}</b>
+            </span>
+          </>
+        )}
+      </label>
+      {error && <small>{error}</small>}
+    </div>
+  );
 }
 
 function MediaField({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {

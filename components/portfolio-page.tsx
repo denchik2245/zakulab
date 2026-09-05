@@ -7,7 +7,6 @@ import { Breadcrumbs } from "@/components/breadcrumbs";
 import type { PortfolioFilter, SiteSettings } from "@/lib/site-settings";
 import styles from "./portfolio-page.module.css";
 
-const navigation = [["Портфолио", "/projects"], ["Этапы", "/#process"], ["Отзывы", "/reviews"], ["Услуги и стоимость", "/#price"]] as const;
 const filters = [{ id: "all", label: "Все" }, { id: "tilda", label: "Tilda" }, { id: "landing", label: "Одностраничные" }, { id: "multipage", label: "Многостраничные" }, { id: "commerce", label: "Интернет-магазины" }, { id: "interface", label: "Интерфейсы" }] as const;
 type Filter = (typeof filters)[number]["id"];
 
@@ -19,15 +18,6 @@ function Platform({ name }: { name: string }) {
   if (platform === "tilda") return <Image src="/assets/figma/property1-tilda.svg" width={36} height={36} alt="Tilda" />;
   if (platform === "wordpress") return <Image src="/assets/figma/property1-wordpress.svg" width={32} height={32} alt="WordPress" />;
   return <span className={styles.platformPlaceholder} aria-hidden="true" />;
-}
-function Footer({ site }: { site: SiteSettings }) {
-  return <footer className={styles.footer} id="contact">
-    <div className={styles.footerTexture} aria-hidden="true" />
-    <div className={styles.footerTop}><h2>{site.contactTitle}</h2><a className={styles.discuss} href={site.telegramUrl} target="_blank" rel="noreferrer"><span>{site.contactButton}</span><small>{`{TG}`}</small></a><a className={styles.toTop} href="#top" aria-label="Наверх"><Image src="/assets/figma/group.svg" width={20} height={10} alt="" /></a></div>
-    <div className={styles.footerColumns}><div><span>Навигация</span>{navigation.map(([label, href]) => <Link href={href} key={href}>{label}</Link>)}</div><div><span>Связаться</span><a href={site.telegramUrl}>Telegram</a><a href={site.vkUrl}>VK</a><a href={site.maxUrl}>MAX</a><a href={`mailto:${site.email}`}>{site.email}</a></div><div><span>Мои фриланс биржи</span><a href={site.kworkUrl}>Kwork</a><a href={site.flUrl}>FL</a></div></div>
-    <div className={styles.legal}><Link href="/privacy">Политика обработки ПД</Link><Link href="/privacy">Согласие на обработку ПД</Link></div>
-    <Image className={styles.footerMark} src="/assets/figma/logo1.svg" width={500} height={500} alt="" />
-  </footer>;
 }
 
 export function PortfolioPage({ site }: { site: SiteSettings }) {
@@ -60,6 +50,5 @@ export function PortfolioPage({ site }: { site: SiteSettings }) {
       <div className={styles.services}>{site.services.map((service) => <article key={service.id}><div className={styles.serviceCopy}><h3>{service.title}<Arrow /></h3><p>{service.text}</p></div><div className={styles.serviceTerms}><span>{service.time}</span><strong>{service.price}</strong><strong>{service.priceSecondary}</strong></div></article>)}</div>
       <div className={styles.smallTasks}><h2>{site.smallTasksTitle}</h2><div className={styles.taskGrid}>{site.smallTasks.map((task) => <article key={task.id}><div className={styles.taskHead}><h3>{task.title}<Arrow /></h3><p>{task.text}</p></div><div className={styles.deliverable}><h4>Что вы получите</h4><p>{task.deliverable}</p></div><div className={styles.taskTerms}><span>{task.time}</span><strong>{task.price}</strong></div></article>)}</div></div>
     </section>
-    <Footer site={site} />
   </div>;
 }

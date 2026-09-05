@@ -4,18 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { externalUrl } from "@/lib/external-url";
+import { typographic } from "@/lib/typographic";
 import type { VerifiedReview } from "@/lib/reviews";
 import styles from "./home-page.module.css";
 
-const shortWordsPattern = /(?<![\p{L}\p{N}])(а|без|бы|в|во|для|до|же|за|и|из|или|к|как|ко|ли|на|над|не|ни|но|о|об|от|по|под|при|про|с|со|у|через|что)\s+/giu;
-
-function typographic(text: string) {
-  return text.replace(shortWordsPattern, (word) => `${word.trim()}\u00a0`);
-}
-
-function LinkArrow() {
-  return <Image src="/assets/figma/arrow2.svg" width={20} height={20} alt="" />;
-}
+import { TgIcon, WebIcon, ArrowIcon } from "./review-icons";
 
 function SliderArrow({ direction }: { direction: "previous" | "next" }) {
   return (
@@ -45,7 +38,7 @@ export function ReviewsSlider({ reviews, title, text, fallbackImage }: ReviewsSl
       <div className={styles.reviewsTexture} aria-hidden="true" />
       <div className={styles.reviewsCopy}>
         <div className={styles.sectionTitle}>
-          <span>{`{Отзывы}`}</span>
+          <span>{`{ОТЗЫВЫ}`}</span>
           <h2 id="reviews-title">{typographic(title)}</h2>
         </div>
         <p>{typographic(text)}</p>
@@ -77,20 +70,20 @@ export function ReviewsSlider({ reviews, title, text, fallbackImage }: ReviewsSl
               <blockquote>«{typographic(activeReview.text)}»</blockquote>
               <div className={styles.reviewLinks}>
                 <a href={activeReview.profile.url} target="_blank" rel="noreferrer">
-                  <Image src="/assets/figma/tg.svg" width={36} height={36} alt="" />
+                  <TgIcon className={styles.reviewLinkIcon} />
                   <span>Профиль<strong>{activeReview.profile.label}</strong></span>
-                  <LinkArrow />
+                  <ArrowIcon className={styles.reviewLinkArrow} />
                 </a>
                 <a href={externalUrl(activeReview.project.url)} target="_blank" rel="noreferrer">
-                  <Image src="/assets/figma/image34-vectorized.svg" width={36} height={36} alt="" />
+                  <WebIcon className={styles.reviewLinkIcon} />
                   <span>{typographic("Ссылка на проект")}<strong>{activeReview.project.url}</strong></span>
-                  <LinkArrow />
+                  <ArrowIcon className={styles.reviewLinkArrow} />
                 </a>
               </div>
             </div>
           </div>
         ) : (
-          <div className={styles.reviewBody}><blockquote>{typographic("Отзыв появится после публикации в админке.")}</blockquote></div>
+          <div className={styles.reviewBody}><blockquote>{typographic("Отзывы временно недоступны.")}</blockquote></div>
         )}
       </div>
     </section>

@@ -1,7 +1,7 @@
 .stage {
   width: 100%;
   min-width: 0;
-  overflow: hidden;
+  overflow: clip;
   background: #fefefe;
 }
 
@@ -28,7 +28,7 @@
   --portfolio-hover-easing: var(--site-hover-easing);
   width: 1920px;
   min-width: 1920px;
-  overflow: hidden;
+  overflow: clip;
   transform-origin: top left;
   color: var(--text-primary);
   background: var(--background-primary);
@@ -178,6 +178,7 @@
 }
 .projectRows > a::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background-color: var(--border-on-primary); transition: background-color var(--portfolio-hover-speed) var(--portfolio-hover-easing); }
 .projectRows strong { display: flex; align-items: start; gap: 10px; font-size: 28px; font-weight: 500; line-height: 1.2; text-decoration: underline; text-decoration-thickness: .05em; text-underline-offset: 3px; }
+.projectRows strong .arrowIcon { opacity: 0; transform: translate(-4px, 4px); transition: all 0.4s ease !important; }
 .projectRows span { color: var(--text-on-primary); font-size: 20px; line-height: 1.4; }
 .projectRows .projectDescription { transition: color var(--portfolio-hover-speed) var(--portfolio-hover-easing); }
 .platformIcon { width: 36px; height: 36px; display: grid; place-items: center; }
@@ -190,9 +191,10 @@
   gap: 8px;
   border-radius: var(--radius-sm);
   font-weight: 700;
+  transition: all 0.4s ease !important;
 }
 .allProjects { position: absolute; left: 50%; bottom: 150px; transform: translateX(-50%); padding: 16px 50px; color: var(--text-primary); background: var(--background-primary); font-size: 18px; line-height: 1.4; }
-.allProjects small, .reviewButton small, .discussButton small { color: var(--text-on-primary); font-size: 16px; font-weight: 650; }
+.allProjects small, .reviewButton small, .discussButton small { color: var(--text-on-primary); font-size: 16px; font-weight: 650; transition: all 0.4s ease !important; }
 
 @media (hover: hover) and (pointer: fine) {
   .portfolioGallery > a:hover > img { transform: scale(1.07); }
@@ -202,11 +204,36 @@
   .portfolioGallery > a:hover .featuredArrow { opacity: 1; }
   .projectRows > a:hover::after { background-color: var(--text-secondary); }
   .projectRows > a:hover .projectDescription { color: var(--text-secondary); }
+  .projectRows > a:hover strong .arrowIcon { opacity: 1; transform: translate(0, 0); }
+
+  .allProjects:hover, .reviewButton:hover, .discussButton:hover {
+    color: #809e91;
+    background-color: #eff5f3;
+  }
+  .allProjects:hover small, .reviewButton:hover small, .discussButton:hover small {
+    color: #809e91;
+  }
+
+  .reviewLinks a:hover {
+    background-color: #eaeaea;
+  }
+  .reviewLinks a:hover .reviewLinkIcon {
+    color: #727272;
+  }
+  .reviewLinks a:hover .reviewLinkArrow {
+    color: #050505;
+  }
+  .reviewLinks a:hover span {
+    color: #727272;
+  }
 }
 
 @media (hover: none), (pointer: coarse) {
   .portfolioGallery > a::after { opacity: 1; }
-  .featuredLabel, .featuredTags, .featuredArrow { opacity: 1; }
+  .portfolioGallery > a .featuredLabel,
+  .portfolioGallery > a .featuredTags,
+  .portfolioGallery > a .featuredArrow { opacity: 1; }
+  .projectRows strong .arrowIcon { opacity: 1; transform: translate(0, 0); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -285,16 +312,17 @@
 .reviewPhoto { position: absolute; inset: 0; overflow: hidden; }
 .reviewPhoto::after { content: ""; position: absolute; inset: 0; z-index: 1; background: #304e4199; }
 .reviewPhoto img { object-fit: cover; }
-.reviewBody { position: absolute; left: 20px; right: 20px; bottom: 20px; z-index: 2; height: 352px; padding: 32px; display: grid; grid-template-columns: 300px 1fr; grid-template-rows: 1fr 102px; column-gap: 36px; color: var(--text-primary); border-radius: var(--radius-xs); background: var(--background-primary); }
+.reviewBody { position: absolute; left: 20px; right: 20px; bottom: 20px; z-index: 2; height: 352px; padding: 32px; display: grid; grid-template-columns: 300px 1fr; grid-template-rows: 1fr auto; column-gap: 36px; color: var(--text-primary); border-radius: var(--radius-xs); background: var(--background-primary); }
 .reviewAuthor { display: grid; align-content: start; gap: 8px; }
 .reviewAuthor strong { font-size: 24px; font-weight: 500; }
 .reviewAuthor span { color: var(--border-on-bg); font-size: 16px; }
 .reviewBody blockquote { margin: 0; font-size: 20px; line-height: 1.4; }
 .reviewLinks { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, 1fr); margin: 0 -32px -32px; border-top: 1px solid var(--border-on-bg); }
-.reviewLinks a { padding: 28px 32px; display: grid; grid-template-columns: 36px 1fr 20px; gap: 16px; align-items: center; }
-.reviewLinks a > img:last-child { width: 20px; height: 20px; display: block; }
+.reviewLinks a { padding: 28px 32px; display: grid; grid-template-columns: 36px 1fr 20px; gap: 16px; align-items: center; transition: all 0.4s ease !important; }
+.reviewLinkIcon, .reviewLinkArrow { color: var(--border-on-bg); transition: color 0.4s ease !important; }
+.reviewLinkArrow { width: 20px; height: 20px; display: block; }
 .reviewLinks a + a { border-left: 1px solid var(--border-on-bg); }
-.reviewLinks span { display: grid; gap: 2px; color: var(--border-on-bg); font-size: 14px; }
+.reviewLinks span { display: grid; gap: 2px; color: var(--border-on-bg); font-size: 14px; transition: color 0.4s ease !important; }
 .reviewLinks strong { overflow-wrap: anywhere; color: var(--text-primary); font-size: 20px; font-weight: 500; }
 
 @keyframes reviewSlideReveal {
@@ -449,7 +477,7 @@
   .reviews { padding: 90px 20px; }
   .reviewsCopy { min-height: 500px; }
   .reviewCard { height: 720px; }
-  .reviewBody { height: 520px; grid-template-columns: 1fr; grid-template-rows: auto 1fr 190px; }
+  .reviewBody { height: 520px; grid-template-columns: 1fr; grid-template-rows: auto 1fr auto; }
   .reviewLinks { grid-column: 1; grid-template-columns: 1fr; }
   .reviewLinks a { padding: 16px 22px; }
   .reviewLinks a + a { border-left: 0; border-top: 1px solid var(--border-on-bg); }
