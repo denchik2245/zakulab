@@ -19,7 +19,7 @@ const portfolioFilterOptions: { id: PortfolioFilter; label: string }[] = [
 ];
 
 function blankPortfolioProject(count: number): PortfolioProject {
-  return { id: `portfolio-${Date.now()}`, title: "Новая работа", description: "Короткое описание проекта", image: "", url: "#", platform: "", tags: ["", ""], filters: [], homePlacement: "hidden", portfolioPlacement: "archive", published: false, order: (count + 1) * 10 };
+  return { id: `portfolio-${Date.now()}`, title: "Новая работа", description: "Короткое описание проекта", image: "", url: "#", platform: "", tags: ["", ""], filters: [], homePlacement: "hidden", portfolioPlacement: "archive", published: true, order: (count + 1) * 10 };
 }
 
 function blankCase(count: number, title = "Новый проект"): CaseStudy {
@@ -76,10 +76,14 @@ function formatDate(value: string) {
   return new Intl.DateTimeFormat("ru-RU", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(value));
 }
 
+function formatReviewDate(value: string) {
+  return new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "long", year: "numeric" }).format(new Date(value)).replace(" г.", "");
+}
+
 export function AdminStudio({ authenticated, initialContent }: { authenticated: boolean; initialContent: AdminContent | null }) {
   const [isAuthenticated, setIsAuthenticated] = useState(authenticated);
   const [content, setContent] = useState(initialContent);
-  const [tab, setTab] = useState<Tab>("portfolio");
+  const [tab, setTab] = useState<Tab>("site");
   const [selectedReview, setSelectedReview] = useState<string | null>(null);
   const [selectedPortfolio, setSelectedPortfolio] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -87,8 +91,8 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
   const [loginError, setLoginError] = useState("");
 
   const pendingReviews = content?.reviews.filter((item) => item.status === "pending").length ?? 0;
-  const activeReview = content?.reviews.find((item) => item.id === selectedReview) ?? null;
-  const activePortfolio = content?.site.portfolioProjects.find((item) => item.id === selectedPortfolio) ?? null;
+  const activeReview = content?.reviews.find((item) => item.id === selectedReview) ?? content?.reviews[1] ?? content?.reviews[0] ?? null;
+  const activePortfolio = content?.site.portfolioProjects.find((item) => item.id === selectedPortfolio) ?? content?.site.portfolioProjects[0] ?? null;
 
   async function login(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -250,61 +254,60 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
   }
 
   return (
-    <section className="admin-studio">
-      <aside className="admin-sidebar">
-        <div className="admin-sidebar-head"><span><Image src="/assets/figma/logo.svg" width={42} height={42} alt="" /></span><div><strong>Панель управления</strong><small>ZAKULAB / CONTENT</small></div></div>
+    <section className={`admin-studio ${tab === "site" ? "is-site-tab" : tab === "reviews" ? "is-reviews-tab" : ""}`}>
+      <aside className="admin-sidebar admin-unified-sidebar">
         <nav aria-label="Разделы админки">
           {([
-            ["site", "Сайт", "01"],
+            ["site", "Главная страница", "01"],
             ["portfolio", "Портфолио", String(content.site.portfolioProjects.length).padStart(2, "0")],
             ["reviews", "Отзывы", String(pendingReviews).padStart(2, "0")],
           ] as const).map(([id, label, count]) => (
             <button className={tab === id ? "is-active" : ""} onClick={() => setTab(id)} key={id}><span>{label}</span><i>{count}</i></button>
           ))}
         </nav>
-        <div className="admin-sidebar-foot"><Link href="/" target="_blank">Открыть сайт ↗</Link><button onClick={logout}>Выйти</button></div>
+        <div className="admin-sidebar-foot admin-site-actions">
+          <Link href="/" target="_blank">Открыть сайт <Image src="/assets/figma/admin-asset-3.svg" width={14} height={14} alt="" /></Link>
+          <button className="admin-sidebar-save" disabled={saving} onClick={() => persist(content, "Изменения сохранены")}>{saving ? "Сохраняю…" : "Сохранить изменения"}</button>
+          {notice && <span role="status">{notice}</span>}
+        </div>
       </aside>
 
       <main className="admin-main">
-        <header className="admin-topbar">
-          <div><span>ADMIN / {tab.toUpperCase()}</span><strong>{tab === "site" ? "Редактор сайта" : tab === "portfolio" ? "Единая база работ и кейсов" : "Единая база отзывов"}</strong></div>
-          <div className="admin-save-state"><i className={saving ? "is-saving" : ""} />{saving ? "Сохраняю…" : notice || `Обновлено ${formatDate(content.updatedAt)}`}</div>
-        </header>
-
         {tab === "portfolio" && (
-          <div className="admin-view">
-            <div className="admin-list-head"><div><span>PORTFOLIO / SINGLE SOURCE</span><h1>Работы</h1><p>Одна запись управляет показом на главной, внутренней странице и в фильтрах.</p></div><button className="admin-add-button" onClick={createPortfolioProject}>+ Новая работа</button></div>
-            <div className="admin-portfolio-summary"><span>На главной: <strong>{content.site.portfolioProjects.filter((item) => item.published && item.homePlacement !== "hidden").length}</strong></span><span>Избранные: <strong>{content.site.portfolioProjects.filter((item) => item.published && item.portfolioPlacement === "featured").length}/6</strong></span><span>Другие / архив: <strong>{content.site.portfolioProjects.filter((item) => item.published && item.portfolioPlacement === "archive").length}</strong></span><span>Внутренние кейсы: <strong>{content.site.portfolioProjects.filter((item) => item.caseStudy).length}</strong></span></div>
-            <div className="admin-split-view">
-              <div className="admin-entity-list">
+          <div className="admin-view admin-portfolio-view">
+            <div className="admin-portfolio-heading"><h1>Портфолио</h1><button className="admin-add-button" onClick={createPortfolioProject}>Новая работа</button></div>
+            <div className="admin-portfolio-layout">
+              <div className="admin-portfolio-list">
                 {[...content.site.portfolioProjects].sort((a, b) => a.order - b.order).map((item) => (
-                  <button className={selectedPortfolio === item.id ? "is-active" : ""} onClick={() => setSelectedPortfolio(item.id)} key={item.id}>
-                    <span className={`admin-status-dot is-${item.published ? "published" : "draft"}`} />
-                    <div><strong>{item.title}</strong><small>{item.description}{item.caseStudy ? " · есть кейс" : ""}</small></div>
-                    <span>{item.portfolioPlacement === "featured" ? "Избранное" : item.portfolioPlacement === "archive" ? "Архив" : "Скрыто"}</span>
+                  <button className={activePortfolio?.id === item.id ? "is-active" : ""} onClick={() => setSelectedPortfolio(item.id)} key={item.id}>
+                    <span><strong>{item.title}</strong><small>{item.description}</small></span>
+                    {item.portfolioPlacement === "featured" && <Image src="/assets/figma/portfolio-admin-3.svg" width={24} height={24} alt="Избранная работа" />}
                   </button>
                 ))}
               </div>
               {activePortfolio ? (
-                <div className="admin-editor">
-                  <div className="admin-editor-head"><div><span>WORK / {activePortfolio.id}</span><h2>{activePortfolio.title}</h2></div><button className="admin-danger" onClick={() => deletePortfolioProject(activePortfolio.id)}>Удалить</button></div>
-                  <div className="admin-publish-row"><label><input type="checkbox" checked={activePortfolio.published} onChange={(event) => patchPortfolio(activePortfolio.id, { published: event.target.checked })} /><span>Опубликована</span></label></div>
-                  <div className="admin-fields">
-                    <Field label="Название"><input value={activePortfolio.title} onChange={(event) => patchPortfolio(activePortfolio.id, { title: event.target.value })} /></Field>
+                <div className="admin-portfolio-editor">
+                  <div className="admin-portfolio-editor-head"><h2>{activePortfolio.title}</h2><button aria-label="Удалить работу" onClick={() => deletePortfolioProject(activePortfolio.id)}><Image src="/assets/figma/portfolio-admin-7.svg" width={28} height={28} alt="" /></button></div>
+                  <div className="admin-case-toggle"><h3>Страница кейса</h3><label><input type="checkbox" checked={Boolean(activePortfolio.caseStudy)} onChange={(event) => toggleCaseStudy(activePortfolio.id, event.target.checked)} /><span>{activePortfolio.caseStudy ? "Подключена" : "Не подключена"}</span></label></div>
+                  <section className="admin-placement-section">
+                    <h3>Размещение на главной</h3>
+                    <PortfolioRadioGroup name={`home-${activePortfolio.id}`} value={activePortfolio.homePlacement} onChange={(value) => patchPortfolio(activePortfolio.id, { homePlacement: value as PortfolioProject["homePlacement"] })} options={[["featured", "Избранное"], ["list", "Другие"], ["hidden", "Не показывать"]]} />
                     <Field label="Порядок"><input type="number" value={activePortfolio.order} onChange={(event) => patchPortfolio(activePortfolio.id, { order: Number(event.target.value) })} /></Field>
-                    <Field wide label="Описание"><textarea rows={3} value={activePortfolio.description} onChange={(event) => patchPortfolio(activePortfolio.id, { description: event.target.value })} /></Field>
-                    <Field wide label="Ссылка"><input value={activePortfolio.url} onChange={(event) => patchPortfolio(activePortfolio.id, { url: event.target.value })} /></Field>
-                    <Field label="Размещение на главной"><select value={activePortfolio.homePlacement} onChange={(event) => patchPortfolio(activePortfolio.id, { homePlacement: event.target.value as PortfolioProject["homePlacement"] })}><option value="featured">Избранное — карточка (макс. 4)</option><option value="list">Список проектов</option><option value="hidden">Не показывать</option></select></Field>
-                    <Field label="Размещение в портфолио"><select value={activePortfolio.portfolioPlacement} onChange={(event) => patchPortfolio(activePortfolio.id, { portfolioPlacement: event.target.value as PortfolioProject["portfolioPlacement"] })}><option value="featured">Избранные проекты (макс. 6)</option><option value="archive">Другие / архивные</option><option value="hidden">Не показывать</option></select></Field>
+                  </section>
+                  <section className="admin-placement-section">
+                    <h3>Размещение в портфолио</h3>
+                    <PortfolioRadioGroup name={`portfolio-${activePortfolio.id}`} value={activePortfolio.portfolioPlacement} onChange={(value) => patchPortfolio(activePortfolio.id, { portfolioPlacement: value as PortfolioProject["portfolioPlacement"] })} options={[["featured", "Избранное"], ["archive", "Другие"], ["hidden", "Не показывать"]]} />
+                    <Field label="Порядок"><input type="number" value={activePortfolio.order} onChange={(event) => patchPortfolio(activePortfolio.id, { order: Number(event.target.value) })} /></Field>
+                  </section>
+                  <div className="admin-portfolio-form">
+                    <div className="admin-portfolio-main-fields"><Field label="Название"><input value={activePortfolio.title} onChange={(event) => patchPortfolio(activePortfolio.id, { title: event.target.value })} /></Field><Field label="Ссылка"><input value={activePortfolio.url} onChange={(event) => patchPortfolio(activePortfolio.id, { url: event.target.value })} /></Field></div>
+                    <GalleryMediaField className="is-portfolio-preview" label="Превью проекта" value={activePortfolio.image} emptyLabel="Загрузить" iconSrc="/assets/figma/portfolio-admin-2.svg" onChange={(value) => patchPortfolio(activePortfolio.id, { image: value })} />
+                    <Field label="Описание"><textarea rows={3} value={activePortfolio.description} onChange={(event) => patchPortfolio(activePortfolio.id, { description: event.target.value })} /></Field>
                     <Field label="Платформа"><select value={activePortfolio.platform} onChange={(event) => patchPortfolio(activePortfolio.id, { platform: event.target.value })}><option value="">Без логотипа</option><option value="Tilda">Tilda</option><option value="WordPress">WordPress</option></select></Field>
-                    <Field label="Тег 1"><input value={activePortfolio.tags[0]} onChange={(event) => patchPortfolio(activePortfolio.id, { tags: [event.target.value, activePortfolio.tags[1]] })} /></Field>
-                    <Field label="Тег 2"><input value={activePortfolio.tags[1]} onChange={(event) => patchPortfolio(activePortfolio.id, { tags: [activePortfolio.tags[0], event.target.value] })} /></Field>
-                    <div className="admin-portfolio-filters"><span>Фильтры внутренней страницы</span>{portfolioFilterOptions.map((filter) => <label key={filter.id}><input type="checkbox" checked={activePortfolio.filters.includes(filter.id)} onChange={(event) => togglePortfolioFilter(activePortfolio.id, filter.id, event.target.checked)} />{filter.label}</label>)}</div>
+                    <div className="admin-two-columns"><Field label="Тег 1"><input value={activePortfolio.tags[0]} onChange={(event) => patchPortfolio(activePortfolio.id, { tags: [event.target.value, activePortfolio.tags[1]] })} /></Field><Field label="Тег 2"><input value={activePortfolio.tags[1]} onChange={(event) => patchPortfolio(activePortfolio.id, { tags: [activePortfolio.tags[0], event.target.value] })} /></Field></div>
                   </div>
-                  <div className="admin-portfolio-media"><MediaField label="Превью проекта" value={activePortfolio.image} onChange={(value) => patchPortfolio(activePortfolio.id, { image: value })} /></div>
-                  <section className="admin-case-settings">
+                  {activePortfolio.caseStudy && <details className="admin-case-settings"><summary>Содержимое страницы кейса</summary><div>
                     <div className="admin-case-settings-head"><div><span>CASE / INNER PAGE</span><h3>Внутренняя страница кейса</h3><p>Контент кейса хранится внутри этой же работы — отдельной записи больше нет.</p></div><label><input type="checkbox" checked={Boolean(activePortfolio.caseStudy)} onChange={(event) => toggleCaseStudy(activePortfolio.id, event.target.checked)} /><span>{activePortfolio.caseStudy ? "Подключена" : "Не подключена"}</span></label></div>
-                    {activePortfolio.caseStudy && <>
                       <div className="admin-publish-row"><label><input type="checkbox" checked={activePortfolio.caseStudy.status === "published"} onChange={(event) => patchCaseStudy(activePortfolio.id, { status: event.target.checked ? "published" : "draft" })} /><span>Опубликовать внутреннюю страницу</span></label></div>
                       <div className="admin-fields">
                         <Field label="URL-адрес"><input value={activePortfolio.caseStudy.slug} onChange={(event) => { const slug = event.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-"); patchPortfolio(activePortfolio.id, { url: `/cases/${slug}`, caseStudy: { ...activePortfolio.caseStudy!, slug } }); }} /></Field>
@@ -325,50 +328,42 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
                         {activePortfolio.caseStudy.draft.decisions.map((decision, index) => <div className="admin-decision-fields" key={index}><input value={decision.title} onChange={(event) => updateCaseArray(activePortfolio.id, "decisions", index, event.target.value, "title")} /><textarea rows={3} value={decision.text} onChange={(event) => updateCaseArray(activePortfolio.id, "decisions", index, event.target.value, "text")} /></div>)}
                         <Field label="Результат"><textarea rows={5} value={activePortfolio.caseStudy.draft.result} onChange={(event) => patchCaseStudy(activePortfolio.id, { draft: { ...activePortfolio.caseStudy!.draft, result: event.target.value } })} /></Field>
                       </EditorSection>
-                    </>}
-                  </section>
-                  <div className="admin-editor-actions"><button className="button" disabled={saving} onClick={() => persist(content, "Работа и кейс обновлены")}>Сохранить работу <span>↗</span></button>{activePortfolio.caseStudy?.status === "published" && <Link href={`/cases/${activePortfolio.caseStudy.slug}`} target="_blank">Предпросмотр кейса ↗</Link>}</div>
+                  </div></details>}
                 </div>
-              ) : <div className="admin-empty-panel"><span>←</span><p>Выберите работу или добавьте новую.<br />Все размещения и фильтры настраиваются в одной записи.</p></div>}
+              ) : <div className="admin-empty-panel"><p>Добавьте первую работу.</p></div>}
             </div>
           </div>
         )}
 
         {tab === "reviews" && (
-          <div className="admin-view">
-            <div className="admin-list-head"><div><span>REVIEWS / SINGLE SOURCE</span><h1>Отзывы</h1><p>Одна запись управляет модерацией и показом отзыва на главной и внутренней странице.</p></div><div className="admin-list-actions"><p>{pendingReviews} требуют решения</p><button className="admin-add-button" onClick={createReview}>+ Добавить отзыв</button></div></div>
-            <div className="admin-portfolio-summary"><span>На главной: <strong>{content.reviews.filter((item) => (item.status === "published" || item.status === "demo") && item.showOnHome).length}</strong></span><span>На странице отзывов: <strong>{content.reviews.filter((item) => (item.status === "published" || item.status === "demo") && item.showOnReviewsPage).length}</strong></span><span>На модерации: <strong>{pendingReviews}</strong></span></div>
-            <div className="admin-split-view">
-              <div className="admin-entity-list admin-review-list">
+          <div className="admin-view admin-reviews-view">
+            <h1>Отзывы</h1>
+            <div className="admin-reviews-layout">
+              <div className="admin-review-list">
                 {[...content.reviews].sort((a, b) => a.order - b.order).map((item) => (
-                  <button className={selectedReview === item.id ? "is-active" : ""} onClick={() => setSelectedReview(item.id)} key={item.id}>
-                    <span className={`admin-status-dot is-${item.status}`} />
-                    <div><strong>{item.author.name}</strong><small>{item.author.company} · {formatDate(item.submittedAt)}</small></div>
-                    <span>{item.status === "pending" ? "На проверке" : item.status === "published" ? "Опубликован" : item.status === "rejected" ? "Отклонён" : "Демо"}</span>
+                  <button className={activeReview?.id === item.id ? "is-active" : ""} onClick={() => setSelectedReview(item.id)} key={item.id}>
+                    <strong>{item.author.name}</strong>
+                    <small><span>{item.author.company}</span><i />{formatReviewDate(item.submittedAt)}</small>
                   </button>
                 ))}
               </div>
               {activeReview ? (
-                <div className="admin-editor admin-review-editor">
-                  <div className="admin-editor-head"><div><span>REVIEW / {activeReview.status.toUpperCase()}</span><h2>{activeReview.author.name}</h2></div><small>{formatDate(activeReview.submittedAt)}</small></div>
-                  <blockquote>«{activeReview.text}»</blockquote>
-                  <div className="admin-review-proof"><a href={externalUrl(activeReview.project.url)} target="_blank" rel="noreferrer">Проект: {activeReview.project.url} ↗</a><a href={activeReview.profile.url} target="_blank" rel="noreferrer">Профиль: {activeReview.profile.label} ↗</a></div>
+                <div className="admin-review-editor">
+                  <div className="admin-review-editor-head"><h2>{activeReview.author.name}</h2><button type="button" aria-label="Удалить отзыв" onClick={() => deleteReview(activeReview.id)}><Image src="/assets/figma/reviews-admin-trash.svg" width={28} height={28} alt="" /></button></div>
                   <div className="admin-publish-row"><label><input type="checkbox" checked={activeReview.showOnHome} onChange={(event) => patchReview(activeReview.id, { showOnHome: event.target.checked })} /><span>Показывать на главной</span></label><label><input type="checkbox" checked={activeReview.showOnReviewsPage} onChange={(event) => patchReview(activeReview.id, { showOnReviewsPage: event.target.checked })} /><span>Показывать на странице отзывов</span></label></div>
-                  <div className="admin-fields">
-                    <Field label="Имя"><input value={activeReview.author.name} onChange={(e) => patchReview(activeReview.id, { author: { ...activeReview.author, name: e.target.value } })} /></Field>
-                    <Field label="Порядок показа"><input type="number" value={activeReview.order} onChange={(event) => patchReview(activeReview.id, { order: Number(event.target.value) })} /></Field>
-                    <Field label="Должность"><input value={activeReview.author.role} onChange={(e) => patchReview(activeReview.id, { author: { ...activeReview.author, role: e.target.value } })} /></Field>
-                    <Field label="Компания"><input value={activeReview.author.company} onChange={(e) => patchReview(activeReview.id, { author: { ...activeReview.author, company: e.target.value } })} /></Field>
-                    <Field label="Инициалы"><input value={activeReview.author.initials} onChange={(e) => patchReview(activeReview.id, { author: { ...activeReview.author, initials: e.target.value } })} /></Field>
-                    <Field wide label="Текст отзыва"><textarea rows={7} value={activeReview.text} onChange={(e) => patchReview(activeReview.id, { text: e.target.value })} /></Field>
-                    <Field label="Социальная сеть"><select value={activeReview.profile.network} onChange={(e) => patchReview(activeReview.id, { profile: { ...activeReview.profile, network: e.target.value as VerifiedReview["profile"]["network"] } })}><option>Telegram</option><option>MAX</option><option>VK</option><option>LinkedIn</option><option>Другая сеть</option></select></Field>
+                  <section className="admin-review-order"><Field label="Порядок"><input type="number" value={activeReview.order} onChange={(event) => patchReview(activeReview.id, { order: Number(event.target.value) })} /></Field></section>
+                  <div className="admin-review-form">
+                    <Field label="Название проекта"><input value={activeReview.project.name} onChange={(e) => patchReview(activeReview.id, { project: { ...activeReview.project, name: e.target.value } })} /></Field>
+                    <div className="admin-review-author-fields"><Field label="Имя"><input value={activeReview.author.name} onChange={(e) => patchReview(activeReview.id, { author: { ...activeReview.author, name: e.target.value } })} /></Field><Field label="Должность"><input value={activeReview.author.role} onChange={(e) => patchReview(activeReview.id, { author: { ...activeReview.author, role: e.target.value } })} /></Field></div>
+                    <Field label="Текст отзыва"><textarea rows={6} value={activeReview.text} onChange={(e) => patchReview(activeReview.id, { text: e.target.value })} /></Field>
+                    <div className="admin-review-profile-fields">
+                    <Field label="Соц.сеть"><select value={activeReview.profile.network} onChange={(e) => patchReview(activeReview.id, { profile: { ...activeReview.profile, network: e.target.value as VerifiedReview["profile"]["network"] } })}><option>Telegram</option><option>MAX</option><option>VK</option><option>LinkedIn</option><option>Другая сеть</option></select></Field>
                     <Field label="Подпись профиля"><input value={activeReview.profile.label} onChange={(e) => patchReview(activeReview.id, { profile: { ...activeReview.profile, label: e.target.value } })} /></Field>
-                    <Field wide label="Ссылка на профиль"><input type="url" value={activeReview.profile.url} onChange={(e) => patchReview(activeReview.id, { profile: { ...activeReview.profile, url: e.target.value } })} /></Field>
-                    <Field wide label="Ссылка на проект"><input value={activeReview.project.url} placeholder="normdev.ru" onChange={(e) => patchReview(activeReview.id, { project: { ...activeReview.project, url: e.target.value } })} /></Field>
-                    <Field wide label="Ссылка на кейс"><input type="url" value={activeReview.project.caseUrl ?? ""} onChange={(e) => patchReview(activeReview.id, { project: { ...activeReview.project, caseUrl: e.target.value } })} /></Field>
+                    <Field label="Ссылка на профиль"><input type="url" value={activeReview.profile.url} onChange={(e) => patchReview(activeReview.id, { profile: { ...activeReview.profile, url: e.target.value } })} /></Field>
+                    </div>
+                    <Field label="Ссылка на проект"><input value={activeReview.project.url} onChange={(e) => patchReview(activeReview.id, { project: { ...activeReview.project, url: e.target.value } })} /></Field>
+                    <GalleryMediaField className="is-review-image" label="Изображение отзыва" value={activeReview.image ?? ""} emptyLabel="Загрузить изображение" iconSrc="/assets/figma/reviews-admin-upload.svg" onChange={(value) => patchReview(activeReview.id, { image: value })} />
                   </div>
-                  <MediaField label="Фоновое изображение" value={activeReview.image ?? ""} onChange={(value) => patchReview(activeReview.id, { image: value })} />
-                  <div className="admin-review-actions"><button disabled={saving} onClick={() => setReviewStatus(activeReview.id, "published")}>✓ Одобрить и опубликовать</button><button disabled={saving} onClick={() => setReviewStatus(activeReview.id, "rejected")}>× Отклонить</button><button disabled={saving} onClick={saveReview}>Сохранить правки</button><button className="admin-review-delete" disabled={saving} onClick={() => deleteReview(activeReview.id)}>Удалить отзыв</button></div>
                 </div>
               ) : <div className="admin-empty-panel"><span>←</span><p>Выберите отзыв.<br />Перед публикацией проверьте ссылки и согласие.</p></div>}
             </div>
@@ -377,59 +372,58 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
 
         {tab === "site" && (
           <div className="admin-view admin-site-editor">
-            <div className="admin-list-head"><div><span>PUBLIC / COPY</span><h1>Сайт</h1></div><Link href="/" target="_blank">Открыть сайт ↗</Link></div>
-            <EditorSection title="Первый экран" code="HOME / HERO">
-              <Field label="Главный заголовок"><textarea rows={4} value={content.site.heroTitle} onChange={(e) => patchSite({ heroTitle: e.target.value })} /></Field>
-              <div className="admin-inline-fields"><Field label="Имя"><input value={content.site.heroName} onChange={(e) => patchSite({ heroName: e.target.value })} /></Field><Field label="Роль"><input value={content.site.heroRole} onChange={(e) => patchSite({ heroRole: e.target.value })} /></Field></div>
-              <div style={{ maxWidth: 300 }}>
-                <MediaField label="Портрет" value={content.site.heroPortrait} onChange={(value) => patchSite({ heroPortrait: value })} />
+            <h1>Главная страница</h1>
+
+            <SiteCard title="Первый экран" className="admin-home-hero-card">
+              <div className="admin-hero-fields">
+                <div className="admin-hero-copy">
+                  <Field label="Заголовок"><textarea rows={3} value={content.site.heroTitle} onChange={(e) => patchSite({ heroTitle: e.target.value })} /></Field>
+                  <div className="admin-inline-fields"><Field label="Имя"><input value={content.site.heroName} onChange={(e) => patchSite({ heroName: e.target.value })} /></Field><Field label="Роль"><input value={content.site.heroRole} onChange={(e) => patchSite({ heroRole: e.target.value })} /></Field></div>
+                </div>
+                <GalleryMediaField className="is-portrait" label="Портрет" value={content.site.heroPortrait} onChange={(value) => patchSite({ heroPortrait: value })} />
               </div>
-              <div className="admin-media-grid">
-                {content.site.heroGallery.map((image, index) => (
-                  <div key={index} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <MediaField label={`Фото ${index + 1}`} value={image} onChange={(value) => patchMediaArray("heroGallery", index, value)} />
-                    <button className="admin-danger" style={{ alignSelf: 'flex-start', padding: '4px 0' }} onClick={() => patchSite({ heroGallery: content.site.heroGallery.filter((_, i) => i !== index) })}>Удалить фото</button>
-                  </div>
-                ))}
+              <h4>Слайдер</h4>
+              <div className="admin-gallery-grid">
+                {content.site.heroGallery.map((image, index) => <GalleryMediaField key={index} label={`Фото ${index + 1}`} value={image} onChange={(value) => patchMediaArray("heroGallery", index, value)} />)}
+                <button className="admin-gallery-add" type="button" aria-label="Добавить фото в слайдер" onClick={() => patchSite({ heroGallery: [...content.site.heroGallery, ""] })}><Image src="/assets/figma/admin-asset-1.svg" width={36} height={36} alt="" /></button>
               </div>
-              <button className="button" style={{ marginTop: 12, padding: '4px 12px', fontSize: 13, background: 'transparent', color: 'var(--ink)', border: '1px solid #c4c6bf' }} onClick={() => patchSite({ heroGallery: [...content.site.heroGallery, ""] })}>+ Добавить фото в галерею</button>
-              <Field label="Скорость галереи (сек)"><input type="number" min={5} max={120} value={content.site.heroGallerySpeed || 30} onChange={(e) => patchSite({ heroGallerySpeed: Number(e.target.value) })} /></Field>
-            </EditorSection>
-            <EditorSection title="Обо мне" code="HOME / ABOUT">
-              <Field label="Заголовок"><textarea rows={3} value={content.site.aboutTitle} onChange={(e) => patchSite({ aboutTitle: e.target.value })} /></Field>
-              <Field label="Описание"><textarea rows={5} value={content.site.aboutText} onChange={(e) => patchSite({ aboutText: e.target.value })} /></Field>
-              <div className="admin-media-grid">{content.site.stats.map((stat, index) => <div className="admin-array-card" key={stat.id}><input value={stat.value} onChange={(e) => patchSite({ stats: content.site.stats.map((item, itemIndex) => itemIndex === index ? { ...item, value: e.target.value } : item) })} /><input value={stat.label} onChange={(e) => patchSite({ stats: content.site.stats.map((item, itemIndex) => itemIndex === index ? { ...item, label: e.target.value } : item) })} /></div>)}</div>
-            </EditorSection>
-            <EditorSection title="Портфолио" code="HOME / PORTFOLIO">
+              <Field label="Скорость галереи (сек.)"><input type="number" min={5} max={120} value={content.site.heroGallerySpeed || 30} onChange={(e) => patchSite({ heroGallerySpeed: Number(e.target.value) })} /></Field>
+            </SiteCard>
+
+            <SiteCard title="Обо мне" className="admin-about-card">
+              <div className="admin-two-columns"><Field label="Заголовок"><textarea rows={3} value={content.site.aboutTitle} onChange={(e) => patchSite({ aboutTitle: e.target.value })} /></Field><Field label="Описание"><textarea rows={3} value={content.site.aboutText} onChange={(e) => patchSite({ aboutText: e.target.value })} /></Field></div>
+              <h4>Преимущества</h4>
+              <div className="admin-stats-fields">{content.site.stats.map((stat, index) => <div key={stat.id}><input aria-label={`Значение преимущества ${index + 1}`} value={stat.value} onChange={(e) => patchSite({ stats: content.site.stats.map((item, itemIndex) => itemIndex === index ? { ...item, value: e.target.value } : item) })} /><input aria-label={`Описание преимущества ${index + 1}`} value={stat.label} onChange={(e) => patchSite({ stats: content.site.stats.map((item, itemIndex) => itemIndex === index ? { ...item, label: e.target.value } : item) })} /></div>)}</div>
+            </SiteCard>
+
+            <SiteCard title="Портфолио" className="admin-site-portfolio-card">
               <Field label="Заголовок"><input value={content.site.portfolioTitle} onChange={(e) => patchSite({ portfolioTitle: e.target.value })} /></Field>
-              <p className="admin-portfolio-note">Карточки, списки, изображения и фильтры теперь управляются в единой базе. Изменения названия этого блока сохраняются вместе с остальными настройками главной.</p>
-              <button className="admin-add-button" type="button" onClick={() => setTab("portfolio")}>Открыть базу портфолио →</button>
-            </EditorSection>
-            <EditorSection title="Процесс" code="HOME / PROCESS">
+              <button className="admin-site-primary" type="button" onClick={() => setTab("portfolio")}>Открыть базу портфолио</button>
+            </SiteCard>
+
+            <SiteCard title="Процесс работы" className="admin-site-process-card">
               <Field label="Заголовок"><input value={content.site.processTitle} onChange={(e) => patchSite({ processTitle: e.target.value })} /></Field>
-              {content.site.process.map((step, index) => <div className="admin-array-card admin-process-fields" key={step.id}><input value={step.title} onChange={(e) => patchSite({ process: content.site.process.map((item, itemIndex) => itemIndex === index ? { ...item, title: e.target.value } : item) })} /><textarea rows={4} value={step.text} onChange={(e) => patchSite({ process: content.site.process.map((item, itemIndex) => itemIndex === index ? { ...item, text: e.target.value } : item) })} /><MediaField label={`Изображение этапа ${index + 1}`} value={step.image} onChange={(value) => patchSite({ process: content.site.process.map((item, itemIndex) => itemIndex === index ? { ...item, image: value } : item) })} />{step.secondaryTitle !== undefined && <><input value={step.secondaryTitle} onChange={(e) => patchSite({ process: content.site.process.map((item, itemIndex) => itemIndex === index ? { ...item, secondaryTitle: e.target.value } : item) })} /><textarea rows={3} value={step.secondaryText} onChange={(e) => patchSite({ process: content.site.process.map((item, itemIndex) => itemIndex === index ? { ...item, secondaryText: e.target.value } : item) })} />{step.secondaryImage && <MediaField label="Второе изображение" value={step.secondaryImage} onChange={(value) => patchSite({ process: content.site.process.map((item, itemIndex) => itemIndex === index ? { ...item, secondaryImage: value } : item) })} />}</>}</div>)}
-            </EditorSection>
-            <EditorSection title="Отзывы" code="HOME / REVIEWS">
-              <Field label="Заголовок"><textarea rows={3} value={content.site.reviewsTitle} onChange={(e) => patchSite({ reviewsTitle: e.target.value })} /></Field>
-              <Field label="Пояснение"><textarea rows={4} value={content.site.reviewsText} onChange={(e) => patchSite({ reviewsText: e.target.value })} /></Field>
-              <MediaField label="Фоновое изображение отзыва" value={content.site.reviewImage} onChange={(value) => patchSite({ reviewImage: value })} />
-            </EditorSection>
-            <EditorSection title="Услуги и стоимость" code="HOME / SERVICES">
-              <Field label="Заголовок"><input value={content.site.servicesTitle} onChange={(e) => patchSite({ servicesTitle: e.target.value })} /></Field>
-              <Field label="Пояснение"><textarea rows={4} value={content.site.servicesText} onChange={(e) => patchSite({ servicesText: e.target.value })} /></Field>
-              {content.site.services.map((service, index) => <div className="admin-array-card admin-service-fields" key={service.id}><input value={service.title} onChange={(e) => patchSite({ services: content.site.services.map((item, itemIndex) => itemIndex === index ? { ...item, title: e.target.value } : item) })} /><textarea rows={3} value={service.text} onChange={(e) => patchSite({ services: content.site.services.map((item, itemIndex) => itemIndex === index ? { ...item, text: e.target.value } : item) })} /><input value={service.time} onChange={(e) => patchSite({ services: content.site.services.map((item, itemIndex) => itemIndex === index ? { ...item, time: e.target.value } : item) })} /><input value={service.price} onChange={(e) => patchSite({ services: content.site.services.map((item, itemIndex) => itemIndex === index ? { ...item, price: e.target.value } : item) })} /><input value={service.priceSecondary} onChange={(e) => patchSite({ services: content.site.services.map((item, itemIndex) => itemIndex === index ? { ...item, priceSecondary: e.target.value } : item) })} /></div>)}
-            </EditorSection>
-            <EditorSection title="Небольшие задачи" code="HOME / QUICK START">
+              <div className="admin-process-list">{content.site.process.map((step, index) => <div className="admin-process-row" key={step.id}><div className="admin-process-copy"><Field label={`Этап ${index + 1}`}><input value={step.title} onChange={(e) => patchSite({ process: content.site.process.map((item, itemIndex) => itemIndex === index ? { ...item, title: e.target.value } : item) })} /></Field><textarea aria-label={`Описание этапа ${index + 1}`} rows={3} value={step.text} onChange={(e) => patchSite({ process: content.site.process.map((item, itemIndex) => itemIndex === index ? { ...item, text: e.target.value } : item) })} />{step.secondaryTitle !== undefined && <><input aria-label="Название дополнительного этапа" value={step.secondaryTitle} onChange={(e) => patchSite({ process: content.site.process.map((item, itemIndex) => itemIndex === index ? { ...item, secondaryTitle: e.target.value } : item) })} /><textarea aria-label="Описание дополнительного этапа" rows={3} value={step.secondaryText} onChange={(e) => patchSite({ process: content.site.process.map((item, itemIndex) => itemIndex === index ? { ...item, secondaryText: e.target.value } : item) })} /></>}</div><GalleryMediaField className="is-process" label={`Изображение этапа ${index + 1}`} value={step.image} onChange={(value) => patchSite({ process: content.site.process.map((item, itemIndex) => itemIndex === index ? { ...item, image: value } : item) })} /></div>)}</div>
+            </SiteCard>
+
+            <SiteCard title="Отзывы">
+              <div className="admin-two-columns"><Field label="Заголовок"><textarea rows={3} value={content.site.reviewsTitle} onChange={(e) => patchSite({ reviewsTitle: e.target.value })} /></Field><Field label="Описание"><textarea rows={3} value={content.site.reviewsText} onChange={(e) => patchSite({ reviewsText: e.target.value })} /></Field></div>
+              <button className="admin-site-primary" type="button" onClick={() => setTab("reviews")}>Открыть базу отзывов</button>
+            </SiteCard>
+
+            <SiteCard title="Услуги и стоимость" className="admin-site-services-card">
+              <div className="admin-two-columns"><Field label="Заголовок"><input value={content.site.servicesTitle} onChange={(e) => patchSite({ servicesTitle: e.target.value })} /></Field><Field label="Описание"><input value={content.site.servicesText} onChange={(e) => patchSite({ servicesText: e.target.value })} /></Field></div>
+              <div className="admin-service-list">{content.site.services.map((service, index) => <div className="admin-site-service" key={service.id}><Field label={`Услуга ${index + 1}`}><input value={service.title} onChange={(e) => patchSite({ services: content.site.services.map((item, itemIndex) => itemIndex === index ? { ...item, title: e.target.value } : item) })} /></Field><div className="admin-service-text"><textarea aria-label={`Описание услуги ${index + 1}`} rows={3} value={service.text} onChange={(e) => patchSite({ services: content.site.services.map((item, itemIndex) => itemIndex === index ? { ...item, text: e.target.value } : item) })} /><input aria-label={`Срок услуги ${index + 1}`} value={service.time} onChange={(e) => patchSite({ services: content.site.services.map((item, itemIndex) => itemIndex === index ? { ...item, time: e.target.value } : item) })} /></div><div className="admin-two-columns"><input aria-label={`Стоимость услуги ${index + 1}`} value={service.price} onChange={(e) => patchSite({ services: content.site.services.map((item, itemIndex) => itemIndex === index ? { ...item, price: e.target.value } : item) })} /><input aria-label={`Стоимость с вёрсткой ${index + 1}`} value={service.priceSecondary} onChange={(e) => patchSite({ services: content.site.services.map((item, itemIndex) => itemIndex === index ? { ...item, priceSecondary: e.target.value } : item) })} /></div></div>)}</div>
+              <h4>Небольшие задачи</h4>
               <Field label="Заголовок"><input value={content.site.smallTasksTitle} onChange={(e) => patchSite({ smallTasksTitle: e.target.value })} /></Field>
-              {content.site.smallTasks.map((task, index) => <div className="admin-array-card admin-task-fields" key={task.id}><input value={task.title} onChange={(e) => patchSite({ smallTasks: content.site.smallTasks.map((item, itemIndex) => itemIndex === index ? { ...item, title: e.target.value } : item) })} /><textarea rows={3} value={task.text} onChange={(e) => patchSite({ smallTasks: content.site.smallTasks.map((item, itemIndex) => itemIndex === index ? { ...item, text: e.target.value } : item) })} /><textarea rows={4} value={task.deliverable} onChange={(e) => patchSite({ smallTasks: content.site.smallTasks.map((item, itemIndex) => itemIndex === index ? { ...item, deliverable: e.target.value } : item) })} /><input value={task.time} onChange={(e) => patchSite({ smallTasks: content.site.smallTasks.map((item, itemIndex) => itemIndex === index ? { ...item, time: e.target.value } : item) })} /><input value={task.price} onChange={(e) => patchSite({ smallTasks: content.site.smallTasks.map((item, itemIndex) => itemIndex === index ? { ...item, price: e.target.value } : item) })} /></div>)}
-            </EditorSection>
-            <EditorSection title="Контакты и подвал" code="HOME / CONTACT">
-              <div className="admin-inline-fields"><Field label="Призыв"><input value={content.site.contactTitle} onChange={(e) => patchSite({ contactTitle: e.target.value })} /></Field><Field label="Кнопка"><input value={content.site.contactButton} onChange={(e) => patchSite({ contactButton: e.target.value })} /></Field></div>
-              <Field label="Email"><input type="email" value={content.site.email} onChange={(e) => patchSite({ email: e.target.value })} /></Field>
-              <div className="admin-inline-fields"><Field label="Telegram"><input value={content.site.telegramUrl} onChange={(e) => patchSite({ telegramUrl: e.target.value })} /></Field><Field label="VK"><input value={content.site.vkUrl} onChange={(e) => patchSite({ vkUrl: e.target.value })} /></Field><Field label="MAX"><input value={content.site.maxUrl} onChange={(e) => patchSite({ maxUrl: e.target.value })} /></Field></div>
-              <div className="admin-inline-fields"><Field label="Kwork"><input value={content.site.kworkUrl} onChange={(e) => patchSite({ kworkUrl: e.target.value })} /></Field><Field label="FL"><input value={content.site.flUrl} onChange={(e) => patchSite({ flUrl: e.target.value })} /></Field></div>
-            </EditorSection>
-            <div className="admin-editor-actions"><button className="button" disabled={saving} onClick={() => persist(content, "Тексты сайта обновлены")}>Сохранить изменения <span>↗</span></button></div>
+              <div className="admin-service-list">{content.site.smallTasks.map((task, index) => <div className="admin-site-service" key={task.id}><Field label={`Задача ${index + 1}`}><input value={task.title} onChange={(e) => patchSite({ smallTasks: content.site.smallTasks.map((item, itemIndex) => itemIndex === index ? { ...item, title: e.target.value } : item) })} /></Field><div className="admin-two-columns"><textarea aria-label={`Описание задачи ${index + 1}`} rows={3} value={task.text} onChange={(e) => patchSite({ smallTasks: content.site.smallTasks.map((item, itemIndex) => itemIndex === index ? { ...item, text: e.target.value } : item) })} /><textarea aria-label={`Результат задачи ${index + 1}`} rows={3} value={task.deliverable} onChange={(e) => patchSite({ smallTasks: content.site.smallTasks.map((item, itemIndex) => itemIndex === index ? { ...item, deliverable: e.target.value } : item) })} /></div><div className="admin-two-columns"><input aria-label={`Срок задачи ${index + 1}`} value={task.time} onChange={(e) => patchSite({ smallTasks: content.site.smallTasks.map((item, itemIndex) => itemIndex === index ? { ...item, time: e.target.value } : item) })} /><input aria-label={`Стоимость задачи ${index + 1}`} value={task.price} onChange={(e) => patchSite({ smallTasks: content.site.smallTasks.map((item, itemIndex) => itemIndex === index ? { ...item, price: e.target.value } : item) })} /></div></div>)}</div>
+            </SiteCard>
+
+            <SiteCard title="Контакты и подвал" className="admin-site-contact-card">
+              <Field label="Призыв"><input value={content.site.contactTitle} onChange={(e) => patchSite({ contactTitle: e.target.value })} /></Field>
+              <div className="admin-four-columns"><Field label="Email"><input type="email" value={content.site.email} onChange={(e) => patchSite({ email: e.target.value })} /></Field><Field label="Telegram"><input value={content.site.telegramUrl} onChange={(e) => patchSite({ telegramUrl: e.target.value })} /></Field><Field label="VK"><input value={content.site.vkUrl} onChange={(e) => patchSite({ vkUrl: e.target.value })} /></Field><Field label="MAX"><input value={content.site.maxUrl} onChange={(e) => patchSite({ maxUrl: e.target.value })} /></Field></div>
+              <div className="admin-two-columns"><Field label="Kwork"><input value={content.site.kworkUrl} onChange={(e) => patchSite({ kworkUrl: e.target.value })} /></Field><Field label="FL"><input value={content.site.flUrl} onChange={(e) => patchSite({ flUrl: e.target.value })} /></Field></div>
+            </SiteCard>
           </div>
         )}
       </main>
@@ -443,6 +437,48 @@ function Field({ label, wide = false, children }: { label: string; wide?: boolea
 
 function EditorSection({ title, code, children }: { title: string; code: string; children: React.ReactNode }) {
   return <section className="admin-editor-section"><div><span>{code}</span><h3>{title}</h3></div><div>{children}</div></section>;
+}
+
+function PortfolioRadioGroup({ name, value, options, onChange }: { name: string; value: string; options: [string, string][]; onChange: (value: string) => void }) {
+  return <div className="admin-placement-options">{options.map(([id, label]) => <label key={id}><input type="radio" name={name} value={id} checked={value === id} onChange={(event) => onChange(event.target.value)} /><span>{label}</span></label>)}</div>;
+}
+
+function SiteCard({ title, className = "", children }: { title: string; className?: string; children: React.ReactNode }) {
+  return <section className={`admin-site-card ${className}`}><h3>{title}</h3><div>{children}</div></section>;
+}
+
+function GalleryMediaField({ label, value, onChange, className = "", emptyLabel = "Добавить", iconSrc = "/assets/figma/admin-asset-2.svg" }: { label: string; value: string; onChange: (value: string) => void; className?: string; emptyLabel?: string; iconSrc?: string }) {
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState("");
+
+  async function upload(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setError("");
+    try {
+      const body = new FormData();
+      body.set("file", file);
+      const response = await fetch("/api/admin/media", { method: "POST", body });
+      const result = await response.json() as { url?: string; error?: string };
+      if (!response.ok || !result.url) throw new Error(result.error || "Не удалось загрузить изображение");
+      onChange(result.url);
+    } catch (uploadError) {
+      setError((uploadError as Error).message);
+    } finally {
+      setUploading(false);
+      event.target.value = "";
+    }
+  }
+
+  return <div className={`admin-gallery-field ${value ? "has-image" : "is-empty"} ${className}`}>
+    <label aria-label={`${value ? "Заменить" : "Добавить"}: ${label}`}>
+      <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={upload} disabled={uploading} />
+      {value ? <img className="admin-gallery-image" src={value} alt="" /> : <span className="admin-gallery-empty">+</span>}
+      <span className="admin-gallery-hover"><Image src={iconSrc} width={42} height={42} alt="" /><b>{uploading ? "Загружаю…" : value ? "Заменить" : emptyLabel}</b></span>
+    </label>
+    {error && <small>{error}</small>}
+  </div>;
 }
 
 function MediaField({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {

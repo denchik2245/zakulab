@@ -1320,3 +1320,687 @@ body:has(.admin-login) {
   .admin-site-editor > .admin-editor-section { padding: 24px 16px; }
   .admin-editor-section { gap: 18px; }
 }
+
+/* Main page editor — Figma node 620:658 */
+.admin-studio {
+  grid-template-columns: 270px minmax(0, 1fr);
+  background: #fefefe;
+}
+
+.admin-sidebar.admin-unified-sidebar {
+  height: 100vh;
+  padding: 20px;
+  background: #304e41;
+}
+
+.admin-unified-sidebar .admin-sidebar-head { display: none; }
+.admin-unified-sidebar nav { gap: 3px; margin: 0; }
+.admin-unified-sidebar nav button {
+  min-height: 39px;
+  padding: 11px 16px;
+  color: #809e91;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.admin-unified-sidebar nav button:hover { color: #fefefe; background: #3a594c; }
+.admin-unified-sidebar nav button.is-active { color: #fefefe; background: #446255; }
+.admin-unified-sidebar nav button span { display: block; }
+.admin-unified-sidebar nav i { display: none; }
+
+.admin-unified-sidebar .admin-site-actions {
+  display: grid;
+  gap: 12px;
+  padding: 0;
+  border: 0;
+}
+.admin-unified-sidebar .admin-site-actions > a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px;
+  color: #fefefe;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+}
+.admin-unified-sidebar .admin-site-actions > a img { width: 14px; height: 14px; }
+.admin-unified-sidebar .admin-sidebar-save {
+  width: 100%;
+  min-height: 52px;
+  padding: 16px 18px;
+  color: #050505;
+  background: #fefefe;
+  border: 0;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+}
+.admin-unified-sidebar .admin-sidebar-save:hover { background: #eaeaea; }
+.admin-unified-sidebar .admin-sidebar-save:disabled { cursor: wait; opacity: .72; }
+.admin-unified-sidebar .admin-site-actions > span {
+  color: #c5d4cd;
+  font-size: 11px;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.is-site-tab .admin-main { min-width: 0; }
+.is-site-tab .admin-site-editor {
+  width: 100%;
+  max-width: 1650px;
+  padding: 80px 80px 100px;
+}
+.is-site-tab .admin-site-editor > h1 {
+  margin: 0 0 50px;
+  color: #050505;
+  font-size: 56px;
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -.03em;
+}
+.is-site-tab .admin-site-card {
+  margin: 0 0 20px;
+  padding: 50px;
+  color: #050505;
+  background: #eaeaea;
+  border-radius: 5px;
+}
+.is-site-tab .admin-home-hero-card { padding-bottom: 45px; }
+.is-site-tab .admin-about-card { padding-bottom: 64px; }
+.is-site-tab .admin-site-portfolio-card { padding-bottom: 36px; }
+.is-site-tab .admin-site-process-card { padding-bottom: 249px; }
+.is-site-tab .admin-site-services-card { padding-bottom: 90px; }
+.is-site-tab .admin-site-contact-card { padding-bottom: 43px; }
+.is-site-tab .admin-site-card > h3,
+.is-site-tab .admin-site-card h4 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+.is-site-tab .admin-site-card > div { display: grid; gap: 32px; margin-top: 32px; }
+.is-site-tab .admin-site-card label { display: grid; gap: 10px; }
+.is-site-tab .admin-site-card label > span {
+  color: #727272;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: normal;
+}
+.is-site-tab .admin-site-card input,
+.is-site-tab .admin-site-card textarea {
+  min-height: 50px;
+  padding: 14px 16px;
+  color: #050505;
+  background: #fefefe;
+  border: 1px solid #babcaf;
+  border-radius: 5px;
+  outline: 0;
+  font: 500 16px/1.4 "Manrope Variable", "Manrope", sans-serif;
+}
+.is-site-tab .admin-site-card textarea { min-height: 100px; resize: vertical; }
+.is-site-tab .admin-site-card input:focus,
+.is-site-tab .admin-site-card textarea:focus { border-color: #304e41; box-shadow: 0 0 0 1px #304e41; }
+.is-site-tab .admin-inline-fields,
+.is-site-tab .admin-two-columns,
+.is-site-tab .admin-four-columns,
+.is-site-tab .admin-stats-fields { display: grid; gap: 20px; }
+.is-site-tab .admin-inline-fields,
+.is-site-tab .admin-two-columns { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.is-site-tab .admin-four-columns { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px; }
+.is-site-tab .admin-stats-fields { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; }
+.is-site-tab .admin-stats-fields > div { display: grid; gap: 10px; }
+
+.is-site-tab .admin-home-hero-card > div { gap: 34px; }
+.is-site-tab .admin-home-hero-card h4 { margin-top: 13px; }
+.is-site-tab .admin-hero-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 210px;
+  gap: 28px;
+  align-items: end;
+}
+.is-site-tab .admin-hero-copy { display: grid; gap: 28px; }
+.is-site-tab .admin-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 20px;
+}
+.is-site-tab .admin-gallery-add {
+  height: 150px;
+  display: grid;
+  place-items: center;
+  background: #fefefe;
+  border: 0;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.is-site-tab .admin-gallery-add:hover { background: #f6f6f4; }
+.is-site-tab .admin-gallery-add img { width: 36px; height: 36px; }
+.admin-gallery-field { min-width: 0; }
+.admin-gallery-field > label {
+  position: relative;
+  height: 150px;
+  display: block !important;
+  overflow: hidden;
+  background: #fefefe;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.admin-gallery-field.is-portrait > label { width: 210px; height: 210px; }
+.admin-gallery-field.is-process > label { width: 440px; height: 210px; }
+.admin-gallery-field input {
+  position: absolute;
+  width: 1px !important;
+  min-height: 1px !important;
+  height: 1px;
+  padding: 0 !important;
+  opacity: 0;
+  pointer-events: none;
+}
+.admin-gallery-image { width: 100%; height: 100%; display: block; object-fit: cover; }
+.admin-gallery-empty {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: #babcaf !important;
+  font-size: 42px !important;
+  font-weight: 400 !important;
+}
+.admin-gallery-hover {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #fefefe !important;
+  background: rgba(0, 0, 0, .58);
+  opacity: 0;
+  transition: opacity .2s ease;
+}
+.admin-gallery-hover img { width: 42px; height: 42px; filter: brightness(0) invert(1); }
+.admin-gallery-hover b { font-size: 25px; font-weight: 500; line-height: 1; }
+.admin-gallery-field label:hover .admin-gallery-hover,
+.admin-gallery-field label:focus-within .admin-gallery-hover { opacity: 1; }
+.admin-gallery-field small { display: block; margin-top: 6px; color: #934e45; font-size: 11px; }
+
+.is-site-tab .admin-site-primary {
+  width: 100%;
+  min-height: 52px;
+  padding: 15px 24px;
+  color: #fefefe;
+  background: #304e41;
+  border: 0;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 700;
+}
+.is-site-tab .admin-site-primary:hover { background: #446255; }
+.is-site-tab .admin-process-list,
+.is-site-tab .admin-service-list { display: grid; gap: 32px; }
+.is-site-tab .admin-process-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 440px;
+  gap: 28px;
+  align-items: end;
+}
+.is-site-tab .admin-process-copy { display: grid; gap: 10px; }
+.is-site-tab .admin-process-copy textarea { height: 100px; }
+.is-site-tab .admin-site-service { display: grid; gap: 10px; }
+.is-site-tab .admin-service-text { display: grid; grid-template-columns: minmax(0, 2fr) minmax(180px, 1fr); gap: 10px; }
+.is-site-tab .admin-service-text textarea { min-height: 100px; }
+
+@media (max-width: 1280px) {
+  .admin-studio { grid-template-columns: 230px minmax(0, 1fr); }
+  .is-site-tab .admin-site-editor { padding-inline: 40px; }
+  .is-site-tab .admin-gallery-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .is-site-tab .admin-process-row { grid-template-columns: minmax(0, 1fr) minmax(280px, 38%); }
+  .admin-gallery-field.is-process > label { width: 100%; }
+}
+
+@media (max-width: 760px) {
+  .admin-studio { display: block; padding-bottom: 76px; }
+  .admin-sidebar.admin-unified-sidebar { height: 76px; padding: 9px 10px; }
+  .admin-unified-sidebar nav { grid-template-columns: repeat(3, 1fr); }
+  .admin-unified-sidebar nav button { min-height: 56px; padding: 7px 4px; justify-content: center; text-align: center; }
+  .admin-unified-sidebar nav button span { display: block; font-size: 10px; }
+  .admin-unified-sidebar .admin-site-actions { display: none; }
+  .is-site-tab .admin-site-editor { padding: 38px 14px 72px; }
+  .is-site-tab .admin-site-editor > h1 { margin-bottom: 30px; font-size: 42px; }
+  .is-site-tab .admin-site-card { padding: 28px 16px; }
+  .is-site-tab .admin-site-card > h3,
+  .is-site-tab .admin-site-card h4 { font-size: 24px; }
+  .is-site-tab .admin-hero-fields,
+  .is-site-tab .admin-two-columns,
+  .is-site-tab .admin-four-columns,
+  .is-site-tab .admin-stats-fields,
+  .is-site-tab .admin-process-row,
+  .is-site-tab .admin-service-text { grid-template-columns: 1fr; }
+  .is-site-tab .admin-gallery-grid { grid-template-columns: 1fr; }
+  .admin-gallery-field.is-portrait > label,
+  .admin-gallery-field.is-process > label { width: 100%; }
+  .admin-gallery-field.is-portrait > label { height: min(78vw, 360px); }
+  .admin-gallery-field > label { height: min(52vw, 220px); }
+}
+
+/* Portfolio editor — Figma node 623:1210 */
+.admin-portfolio-view {
+  width: 100%;
+  max-width: 1650px;
+  padding: 80px;
+}
+.admin-portfolio-heading {
+  min-height: 62px;
+  margin-bottom: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+}
+.admin-portfolio-heading h1 {
+  margin: 0;
+  color: #050505;
+  font-size: 56px;
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -.03em;
+}
+.admin-portfolio-heading .admin-add-button {
+  min-width: 238px;
+  min-height: 52px;
+  padding: 16px 50px;
+  color: #fefefe;
+  background: #304e41;
+  border: 0;
+  border-radius: 5px;
+  font-size: 18px;
+  font-weight: 700;
+}
+.admin-portfolio-layout {
+  display: grid;
+  grid-template-columns: 584px minmax(0, 886px);
+  gap: 20px;
+  align-items: start;
+}
+.admin-portfolio-list {
+  height: 958px;
+  overflow: auto;
+  background: #eaeaea;
+  border-radius: 5px;
+  scrollbar-width: thin;
+  scrollbar-color: #b8b8b8 transparent;
+}
+.admin-portfolio-list > button {
+  position: relative;
+  width: 100%;
+  min-height: 117px;
+  padding: 28px 32px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 28px;
+  color: #050505;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #b8b8b8;
+  cursor: pointer;
+  text-align: left;
+}
+.admin-portfolio-list > button:hover { background: #f4f4f2; }
+.admin-portfolio-list > button.is-active { background: #fefefe; }
+.admin-portfolio-list > button.is-active::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: #304e41;
+}
+.admin-portfolio-list > button > span { min-width: 0; display: grid; gap: 10px; }
+.admin-portfolio-list strong { overflow: hidden; font-size: 24px; font-weight: 500; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
+.admin-portfolio-list small { overflow: hidden; color: #727272; font-size: 16px; font-weight: 400; line-height: 1.4; text-overflow: ellipsis; white-space: nowrap; }
+.admin-portfolio-list img { flex: 0 0 auto; width: 24px; height: 24px; }
+
+.admin-portfolio-editor {
+  min-width: 0;
+  min-height: 1371px;
+  overflow: hidden;
+  color: #050505;
+  background: #eaeaea;
+  border-radius: 5px;
+}
+.admin-portfolio-editor h2,
+.admin-portfolio-editor h3 { margin: 0; font-weight: 500; line-height: 1.2; }
+.admin-portfolio-editor h2 { font-size: 28px; }
+.admin-portfolio-editor h3 { font-size: 24px; }
+.admin-portfolio-editor-head {
+  height: 98px;
+  padding: 32px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 28px;
+  border-bottom: 1px solid #b8b8b8;
+}
+.admin-portfolio-editor-head button { padding: 0; background: transparent; border: 0; cursor: pointer; }
+.admin-portfolio-editor-head img { width: 28px; height: 28px; display: block; }
+.admin-case-toggle {
+  height: 115px;
+  padding: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  border-bottom: 1px solid #b8b8b8;
+}
+.admin-case-toggle > label {
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  background: #fefefe;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.admin-case-toggle input { width: 25px; height: 25px; margin: 0; accent-color: #304e41; }
+.admin-case-toggle span { font-size: 16px; font-weight: 600; }
+.admin-placement-section {
+  height: 260px;
+  padding: 32px;
+  display: grid;
+  align-content: start;
+  gap: 28px;
+  border-bottom: 1px solid #b8b8b8;
+}
+.admin-placement-options { display: flex; flex-wrap: wrap; align-items: center; gap: 32px; }
+.admin-placement-options label { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+.admin-placement-options input { width: 25px; height: 25px; margin: 0; accent-color: #304e41; }
+.admin-placement-options span { font-size: 16px; font-weight: 600; }
+.admin-portfolio-editor label { display: grid; gap: 10px; }
+.admin-portfolio-editor label > span,
+.admin-portfolio-form label > span { color: #727272; font-size: 16px; font-weight: 600; }
+.admin-portfolio-editor input:not([type="checkbox"]):not([type="radio"]),
+.admin-portfolio-editor textarea,
+.admin-portfolio-editor select {
+  width: 100%;
+  min-height: 50px;
+  padding: 13px 16px;
+  color: #050505;
+  background: #fefefe;
+  border: 1px solid #babcaf;
+  border-radius: 5px;
+  outline: 0;
+  font: 500 16px/1.4 "Manrope Variable", "Manrope", sans-serif;
+}
+.admin-portfolio-editor textarea { height: 100px; resize: vertical; }
+.admin-portfolio-editor input:focus,
+.admin-portfolio-editor textarea:focus,
+.admin-portfolio-editor select:focus { border-color: #304e41; box-shadow: 0 0 0 1px #304e41; }
+.admin-portfolio-form {
+  padding: 32px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 210px;
+  gap: 28px;
+  align-items: end;
+}
+.admin-portfolio-main-fields { display: grid; gap: 28px; }
+.admin-portfolio-form > label,
+.admin-portfolio-form > .admin-two-columns,
+.admin-portfolio-form > details { grid-column: 1 / -1; }
+.admin-gallery-field.is-portfolio-preview > label {
+  width: 210px;
+  height: 194px;
+  background: #b8b8b8;
+}
+.admin-gallery-field.is-portfolio-preview .admin-gallery-hover { color: #727272 !important; background: #b8b8b8; opacity: 1; }
+.admin-gallery-field.is-portfolio-preview .admin-gallery-hover img { width: 32px; height: 32px; filter: none; }
+.admin-gallery-field.is-portfolio-preview .admin-gallery-hover b { color: #727272; font-size: 20px; font-weight: 500; }
+.admin-gallery-field.is-portfolio-preview.has-image .admin-gallery-image { opacity: 1; }
+.admin-gallery-field.is-portfolio-preview.has-image .admin-gallery-hover { color: #fefefe !important; background: rgba(0, 0, 0, .58); opacity: 0; }
+.admin-gallery-field.is-portfolio-preview.has-image .admin-gallery-hover img { filter: brightness(0) invert(1); }
+.admin-gallery-field.is-portfolio-preview.has-image .admin-gallery-hover b { color: #fefefe; }
+.admin-gallery-field.is-portfolio-preview.has-image label:hover .admin-gallery-hover,
+.admin-gallery-field.is-portfolio-preview.has-image label:focus-within .admin-gallery-hover { opacity: 1; }
+.admin-portfolio-form .admin-two-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; }
+.admin-portfolio-editor .admin-case-toggle > label,
+.admin-portfolio-editor .admin-placement-options label { display: flex; }
+.admin-portfolio-editor .admin-case-toggle > label > span,
+.admin-portfolio-editor .admin-placement-options label > span { color: #050505; line-height: 1; }
+.admin-portfolio-form label > span { line-height: 1; }
+.admin-portfolio-extra { color: #727272; font-size: 14px; }
+.admin-portfolio-extra summary,
+.admin-case-settings > summary { cursor: pointer; font-weight: 600; }
+.admin-portfolio-extra > div { margin-top: 18px; display: grid; gap: 18px; }
+.admin-portfolio-extra > div > label { display: flex; align-items: center; gap: 10px; }
+.admin-portfolio-extra input[type="checkbox"] { width: 20px; height: 20px; accent-color: #304e41; }
+.admin-portfolio-editor .admin-case-settings {
+  margin: 0;
+  padding: 24px 32px 32px;
+  border-top: 1px solid #b8b8b8;
+}
+.admin-portfolio-editor .admin-case-settings > div { margin-top: 24px; }
+
+@media (max-width: 1500px) {
+  .admin-portfolio-view { padding-inline: 40px; }
+  .admin-portfolio-layout { grid-template-columns: minmax(340px, .8fr) minmax(560px, 1.2fr); }
+}
+
+@media (max-width: 1050px) {
+  .admin-portfolio-view { padding: 52px 28px 80px; }
+  .admin-portfolio-layout { grid-template-columns: minmax(260px, .7fr) minmax(470px, 1.3fr); }
+  .admin-portfolio-list > button { padding-inline: 22px; }
+  .admin-portfolio-list strong { font-size: 20px; }
+  .admin-portfolio-list small { font-size: 14px; }
+  .admin-portfolio-form { grid-template-columns: 1fr; }
+  .admin-gallery-field.is-portfolio-preview > label { width: 100%; }
+  .admin-placement-options { gap: 18px; }
+}
+
+@media (max-width: 760px) {
+  .admin-portfolio-view { padding: 38px 14px 72px; }
+  .admin-portfolio-heading { min-height: 0; margin-bottom: 30px; align-items: flex-end; }
+  .admin-portfolio-heading h1 { font-size: 42px; }
+  .admin-portfolio-heading .admin-add-button { min-width: 0; min-height: 44px; padding: 12px 16px; font-size: 14px; }
+  .admin-portfolio-layout { display: block; }
+  .admin-portfolio-list { height: 360px; margin-bottom: 16px; }
+  .admin-portfolio-editor { min-height: 0; }
+  .admin-portfolio-editor-head,
+  .admin-case-toggle,
+  .admin-placement-section { height: auto; padding: 24px 18px; }
+  .admin-case-toggle { align-items: flex-start; }
+  .admin-case-toggle > label { padding: 10px 12px; }
+  .admin-placement-section { gap: 20px; }
+  .admin-placement-options { align-items: flex-start; flex-direction: column; gap: 14px; }
+  .admin-portfolio-form { padding: 24px 18px; }
+  .admin-portfolio-form .admin-two-columns { grid-template-columns: 1fr; }
+}
+
+/* Reviews editor — Figma node 650:959 */
+.admin-reviews-view {
+  width: 100%;
+  max-width: 1650px;
+  padding: 80px;
+}
+.admin-reviews-view > h1 {
+  margin: 0 0 50px;
+  color: #050505;
+  font-size: 56px;
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -.03em;
+}
+.admin-reviews-layout {
+  display: grid;
+  grid-template-columns: 584px minmax(0, 886px);
+  gap: 20px;
+  align-items: start;
+}
+.admin-review-list {
+  height: 958px;
+  overflow: auto;
+  background: #eaeaea;
+  border-radius: 5px;
+  scrollbar-width: thin;
+  scrollbar-color: #b8b8b8 transparent;
+}
+.admin-review-list > button {
+  position: relative;
+  width: 100%;
+  min-height: 117px;
+  padding: 28px 32px;
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  color: #050505;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #b8b8b8;
+  cursor: pointer;
+  text-align: left;
+}
+.admin-review-list > button:hover { background: #f4f4f2; }
+.admin-review-list > button.is-active { background: #fefefe; }
+.admin-review-list > button.is-active::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: #304e41;
+}
+.admin-review-list strong {
+  overflow: hidden;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.admin-review-list small {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  overflow: hidden;
+  color: #727272;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+.admin-review-list small span { overflow: hidden; text-overflow: ellipsis; }
+.admin-review-list small i { width: 6px; height: 6px; flex: 0 0 auto; background: #727272; border-radius: 50%; }
+
+.admin-review-editor {
+  min-width: 0;
+  min-height: 1521px;
+  overflow: hidden;
+  color: #050505;
+  background: #eaeaea;
+  border-radius: 5px;
+}
+.admin-review-editor-head {
+  height: 98px;
+  padding: 32px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 28px;
+  border-bottom: 1px solid #b8b8b8;
+}
+.admin-review-editor-head h2 { margin: 0; font-size: 28px; font-weight: 500; line-height: 1.2; }
+.admin-review-editor-head button { padding: 0; background: transparent; border: 0; cursor: pointer; }
+.admin-review-editor-head img { width: 28px; height: 28px; display: block; }
+.admin-review-editor .admin-publish-row {
+  height: 81px;
+  padding: 27px 32px 29px;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 32px;
+  border: 0;
+}
+.admin-review-editor .admin-publish-row label { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+.admin-review-editor .admin-publish-row input {
+  width: 25px;
+  height: 25px;
+  margin: 0;
+  flex: 0 0 auto;
+  accent-color: #304e41;
+}
+.admin-review-editor .admin-publish-row span { color: #050505; font-size: 16px; font-weight: 600; line-height: 1; white-space: nowrap; }
+.admin-review-order {
+  height: 114px;
+  padding: 0 32px 34px;
+  border-bottom: 1px solid #b8b8b8;
+}
+.admin-review-form {
+  padding: 32px 32px 37px;
+  display: grid;
+  gap: 30px;
+}
+.admin-review-editor label { display: grid; gap: 10px; }
+.admin-review-editor label > span { color: #727272; font-size: 16px; font-weight: 600; line-height: 1; }
+.admin-review-editor input:not([type="checkbox"]),
+.admin-review-editor textarea,
+.admin-review-editor select {
+  width: 100%;
+  min-height: 50px;
+  padding: 13px 16px;
+  color: #050505;
+  background: #fefefe;
+  border: 1px solid #babcaf;
+  border-radius: 5px;
+  outline: 0;
+  font: 500 16px/1.4 "Manrope Variable", "Manrope", sans-serif;
+}
+.admin-review-editor textarea { height: 150px; resize: vertical; }
+.admin-review-editor input:focus,
+.admin-review-editor textarea:focus,
+.admin-review-editor select:focus { border-color: #304e41; box-shadow: 0 0 0 1px #304e41; }
+.admin-review-author-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; }
+.admin-review-profile-fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; }
+.admin-gallery-field.is-review-image > label { width: 100%; height: 514px; background: #b8b8b8; }
+.admin-gallery-field.is-review-image .admin-gallery-empty { display: none; }
+.admin-gallery-field.is-review-image .admin-gallery-hover { gap: 20px; color: #727272 !important; background: #b8b8b8; opacity: 1; }
+.admin-gallery-field.is-review-image .admin-gallery-hover img { width: 55px; height: 55px; filter: none; }
+.admin-gallery-field.is-review-image .admin-gallery-hover b { color: #727272; font-size: 28px; font-weight: 500; line-height: 1.2; }
+.admin-gallery-field.is-review-image.has-image .admin-gallery-image { opacity: 1; }
+.admin-gallery-field.is-review-image.has-image .admin-gallery-hover { color: #fefefe !important; background: rgba(0, 0, 0, .58); opacity: 0; }
+.admin-gallery-field.is-review-image.has-image .admin-gallery-hover img { filter: brightness(0) invert(1); }
+.admin-gallery-field.is-review-image.has-image .admin-gallery-hover b { color: #fefefe; }
+.admin-gallery-field.is-review-image.has-image label:hover .admin-gallery-hover,
+.admin-gallery-field.is-review-image.has-image label:focus-within .admin-gallery-hover { opacity: 1; }
+
+@media (max-width: 1500px) {
+  .admin-reviews-view { padding-inline: 40px; }
+  .admin-reviews-layout { grid-template-columns: minmax(340px, .8fr) minmax(560px, 1.2fr); }
+}
+
+@media (max-width: 1050px) {
+  .admin-reviews-view { padding: 52px 28px 80px; }
+  .admin-reviews-layout { grid-template-columns: minmax(260px, .7fr) minmax(470px, 1.3fr); }
+  .admin-review-list > button { padding-inline: 22px; }
+  .admin-review-list strong { font-size: 20px; }
+  .admin-review-list small { font-size: 14px; }
+  .admin-review-profile-fields { gap: 16px; }
+}
+
+@media (max-width: 760px) {
+  .admin-reviews-view { padding: 38px 14px 72px; }
+  .admin-reviews-view > h1 { margin-bottom: 30px; font-size: 42px; }
+  .admin-reviews-layout { display: block; }
+  .admin-review-list { height: 360px; margin-bottom: 16px; }
+  .admin-review-editor { min-height: 0; }
+  .admin-review-editor-head { height: auto; padding: 24px 18px; }
+  .admin-review-editor .admin-publish-row { height: auto; padding: 24px 18px; flex-direction: column; align-items: flex-start; gap: 16px; }
+  .admin-review-order { height: auto; padding: 0 18px 24px; }
+  .admin-review-form { padding: 24px 18px; }
+  .admin-review-author-fields,
+  .admin-review-profile-fields { grid-template-columns: 1fr; }
+  .admin-gallery-field.is-review-image > label { height: min(72vw, 420px); }
+  .admin-gallery-field.is-review-image .admin-gallery-hover b { font-size: 22px; }
+}
