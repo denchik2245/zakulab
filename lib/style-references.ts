@@ -9,6 +9,13 @@ export type StyleReference = {
   traits: string[];
   preview: "editorial" | "brutal" | "premium" | "organic" | "technical" | "product" | "vivid" | "catalog";
   axes: Record<StyleAxis, number>;
+  images: string[];
+  active: boolean;
+  order: number;
+};
+
+export type StyleChoiceSettings = {
+  styles: StyleReference[];
 };
 
 export const styleReasons = [
@@ -42,6 +49,9 @@ export const styleReferences: StyleReference[] = [
     traits: ["светлый", "воздушный", "типографичный"],
     preview: "editorial",
     axes: { space: -1, energy: -0.65, expression: 0.05, emotion: -0.15 },
+    images: ["/assets/figma/style-reference-catering.png"],
+    active: true,
+    order: 10,
   },
   {
     id: "brutal",
@@ -52,6 +62,9 @@ export const styleReferences: StyleReference[] = [
     traits: ["контрастный", "дерзкий", "прямой"],
     preview: "brutal",
     axes: { space: 0.2, energy: 1, expression: 1, emotion: 0.35 },
+    images: [],
+    active: true,
+    order: 20,
   },
   {
     id: "premium",
@@ -62,6 +75,9 @@ export const styleReferences: StyleReference[] = [
     traits: ["тёмный", "статусный", "атмосферный"],
     preview: "premium",
     axes: { space: -0.35, energy: -0.45, expression: 0.45, emotion: 0.7 },
+    images: [],
+    active: true,
+    order: 30,
   },
   {
     id: "organic",
@@ -72,6 +88,9 @@ export const styleReferences: StyleReference[] = [
     traits: ["тёплый", "мягкий", "дружелюбный"],
     preview: "organic",
     axes: { space: -0.25, energy: -0.4, expression: 0.2, emotion: 1 },
+    images: [],
+    active: true,
+    order: 40,
   },
   {
     id: "technical",
@@ -82,6 +101,9 @@ export const styleReferences: StyleReference[] = [
     traits: ["системный", "технологичный", "точный"],
     preview: "technical",
     axes: { space: 0.15, energy: 0.25, expression: 0.35, emotion: -1 },
+    images: [],
+    active: true,
+    order: 50,
   },
   {
     id: "product",
@@ -92,6 +114,9 @@ export const styleReferences: StyleReference[] = [
     traits: ["понятный", "практичный", "интерфейсный"],
     preview: "product",
     axes: { space: 0.15, energy: -0.2, expression: -0.65, emotion: -0.85 },
+    images: [],
+    active: true,
+    order: 60,
   },
   {
     id: "vivid",
@@ -102,6 +127,9 @@ export const styleReferences: StyleReference[] = [
     traits: ["яркий", "динамичный", "эмоциональный"],
     preview: "vivid",
     axes: { space: -0.1, energy: 0.85, expression: 0.9, emotion: 0.85 },
+    images: [],
+    active: true,
+    order: 70,
   },
   {
     id: "catalog",
@@ -112,5 +140,12 @@ export const styleReferences: StyleReference[] = [
     traits: ["информативный", "плотный", "коммерческий"],
     preview: "catalog",
     axes: { space: 1, energy: 0.35, expression: -0.25, emotion: -0.7 },
+    images: [],
+    active: true,
+    order: 80,
   },
 ];
+
+export const defaultStyleChoiceSettings: StyleChoiceSettings = {
+  styles: styleReferences,
+};

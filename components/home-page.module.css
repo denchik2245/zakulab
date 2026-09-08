@@ -339,7 +339,7 @@
 .services article + article { padding-left: 35px; border-left: 1px solid var(--border-on-bg); }
 .services article:last-child { padding-right: 0; }
 .services article:last-child > p { width: 436px; }
-.services h3, .smallTasks h3 { margin: 0; display: flex; align-items: start; gap: 10px; font-size: 28px; font-weight: 500; line-height: 1.2; text-decoration: underline; text-decoration-thickness: .05em; text-underline-offset: 2px; }
+.services h3, .smallTasks h3 { margin: 0; font-size: 28px; font-weight: 500; line-height: 1.2; }
 .services > article > p { margin: 28px 0 0; font-size: 16px; line-height: 1.4; }
 .services article > div { margin-top: auto; padding-bottom: 36px; display: grid; gap: 3px; }
 .services article > div span { margin-bottom: 13px; color: var(--text-on-card); font-size: 20px; line-height: 1.4; }

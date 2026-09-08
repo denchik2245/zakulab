@@ -14,6 +14,8 @@
   font-family: "Manrope Variable", "Manrope", sans-serif;
   padding-bottom: 150px;
 }
+.page button { transition-property: color, background-color, border-color, opacity, transform; transition-duration: .35s; transition-timing-function: cubic-bezier(.22, .72, .24, 1); }
+.page button:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
 
 :global(body:has(.style-check-page)) { background: var(--style-bg, #fefefe); }
 :global(body:has(.style-check-page))::before { display: none; }
@@ -32,12 +34,32 @@
 .marks img { display: block; width: 20px; height: 20px; }
 .quiz { min-height: 936px; padding: 150px max(130px, calc((100vw - 1660px) / 2)); color: var(--style-white); background: var(--style-green); }
 .quizGrid { display: grid; grid-template-columns: 760px minmax(0, 820px); gap: 80px; align-items: start; }
-.previewFrame { position: relative; height: 636px; overflow: hidden; border-radius: var(--style-radius); background: #d9ddd9; }
-.referenceImage { object-fit: cover; object-position: top center; transition: transform .8s cubic-bezier(.22, .72, .24, 1); }
-.previewFrame:hover .referenceImage { transform: scale(1.018); }
+.galleryShell { position: relative; width: 760px; height: 636px; }
+.previewFrame { position: relative; height: 636px; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; border-radius: var(--style-radius); background: #d9ddd9; }
+.previewFrame::-webkit-scrollbar { display: none; }
+.referenceImage { display: block; width: 100%; height: auto; min-height: 100%; object-fit: cover; object-position: top center; }
 .syntheticPreview { height: 100%; }
+.scrollRail { position: absolute; top: 0; right: -20px; width: 10px; height: 636px; pointer-events: none; }
+.scrollRail i { display: block; width: 10px; border-radius: var(--style-radius); background: var(--style-card); transition: height .2s ease; }
+.fullscreenButton { position: absolute; z-index: 2; top: 20px; left: 20px; width: 52px; height: 52px; padding: 0; display: grid; place-items: center; border: 0; border-radius: var(--style-radius); background: rgba(5, 5, 5, .3); cursor: pointer; backdrop-filter: blur(2.5px); transition: background .25s ease, transform .25s ease; }
+.fullscreenButton img { filter: brightness(0) invert(1); }
+.fullscreenButton:hover { background: rgba(5, 5, 5, .55); transform: translateY(-2px); }
+.pagination { position: absolute; z-index: 2; left: 20px; bottom: 20px; min-width: 134px; height: 52px; padding: 0 12px; display: grid; grid-template-columns: 22px 1fr 22px; align-items: center; gap: 7px; color: var(--style-white); background: rgba(5, 5, 5, .3); border-radius: var(--style-radius); backdrop-filter: blur(2.5px); }
+.pagination button { width: 22px; height: 22px; padding: 0; display: grid; place-items: center; border: 0; background: transparent; cursor: pointer; }
+.pagination button:first-child img { transform: rotate(225deg); }
+.pagination button:last-child img { transform: rotate(45deg); }
+.pagination button:disabled { opacity: .35; cursor: default; }
+.pagination button:not(:disabled):hover { transform: scale(1.14); }
+.pagination button:not(:disabled):active { transform: scale(.94); }
+.pagination b { font-size: 18px; line-height: 1; text-align: center; }
+.fullscreenOverlay { position: fixed; inset: 0; z-index: 1200; padding: 60px; display: grid; place-items: center; background: rgba(5, 5, 5, .92); }
+.fullscreenClose { position: fixed; z-index: 1; top: 24px; right: 24px; width: 48px; height: 48px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.3); border-radius: var(--style-radius); background: rgba(255,255,255,.08); cursor: pointer; }
+.fullscreenClose:hover { background: rgba(255,255,255,.18); transform: translateY(-2px); }
+.fullscreenClose img { filter: brightness(0) invert(1); }
+.fullscreenImage { width: min(1180px, 100%); height: calc(100svh - 120px); overflow: auto; overscroll-behavior: contain; border-radius: var(--style-radius); background: #fff; scrollbar-color: var(--style-card) transparent; }
+.fullscreenImage > img { display: block; width: 100%; height: auto; }
+.fullscreenImage > :global(.style-preview) { min-height: 100%; }
 .question { position: relative; min-height: 636px; padding-top: 10px; }
-.question::before { content: ""; position: absolute; left: -70px; top: 0; width: 10px; height: 160px; border-radius: var(--style-radius); background: var(--style-card); }
 .category { display: block; color: var(--style-on-green); font-size: 16px; font-weight: 600; line-height: 1; }
 .question h2 { margin: 20px 0; font-size: 48px; font-weight: 500; line-height: 1.2; letter-spacing: -.03em; }
 .description { margin: 0; color: var(--style-on-green); font-size: 20px; line-height: 1.4; }
@@ -48,6 +70,7 @@
 .voteButtons button { display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--style-white); background: var(--style-card); }
 .voteButtons button:nth-child(2) { background: transparent; border-color: var(--style-green-line); }
 .voteButtons button:hover, .navButtons button:hover { transform: translateY(-2px); }
+.voteButtons button:active, .navButtons button:not(:disabled):active, .resultActions > button:active { transform: translateY(0) scale(.985); }
 .voteButtons button:hover { background: #537366; }
 .voteButtons button:nth-child(2):hover { background: var(--style-card); border-color: var(--style-card); }
 .voteButtons button[data-active="true"] { color: var(--style-ink); background: var(--style-white); border-color: var(--style-white); }
@@ -67,7 +90,23 @@
 .navButtons .next { color: var(--style-ink); background: var(--style-white); }
 .navButtons button:disabled { cursor: not-allowed; opacity: .45; transform: none; }
 .validation { margin: -110px 0 35px 840px; color: #ffe0a0; font-size: 16px; }
-.resultShell { min-height: 820px; padding: 100px max(130px, calc((100vw - 1660px) / 2)); color: var(--style-white); background: var(--style-green); }
+.resultShell { min-height: 802px; padding: 150px max(130px, calc((100vw - 1660px) / 2)) 110px; color: var(--style-white); background: var(--style-green); }
+.resultHeading { display: flex; align-items: center; justify-content: space-between; gap: 40px; }
+.resultHeading h2 { margin: 0; font-size: 48px; font-weight: 500; line-height: 1.2; letter-spacing: -.03em; }
+.resultActions { display: flex; gap: 10px; }
+.resultActions > button { min-height: 57px; padding: 16px 50px; color: var(--style-white); background: var(--style-card); border: 0; border-radius: var(--style-radius); cursor: pointer; font-size: 18px; font-weight: 700; line-height: 1; transition: transform .25s ease, background .25s ease; }
+.resultActions > button:hover { transform: translateY(-2px); background: #537366; }
+.resultActions .sendResult { color: var(--style-ink); background: var(--style-white); }
+.resultActions .sendResult:hover { background: #eef1ef; }
+.resultColumns { margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; }
+.resultColumns article h3 { margin: 0 0 36px; display: flex; align-items: center; gap: 16px; font-size: 28px; font-weight: 500; line-height: 1.2; }
+.resultColumns ul { margin: 0; padding: 0; list-style: none; }
+.resultColumns li { min-height: 66px; padding: 0 0 24px; margin-top: 24px; display: flex; align-items: center; justify-content: space-between; gap: 24px; border-bottom: 1px solid var(--style-green-line); }
+.resultColumns li:first-child { margin-top: 0; }
+.resultColumns li strong { font-size: 24px; font-weight: 500; line-height: 1.2; }
+.resultColumns li span { max-width: 520px; color: var(--style-on-green); font-size: 20px; line-height: 1.4; text-align: right; }
+.resultColumns .emptyResult { justify-content: flex-start; color: var(--style-on-green); font-size: 18px; }
+.emptyState { margin: 0; font-size: 28px; }
 
 @media (max-width: 1500px) {
   .intro { width: calc(100% - 160px); }
@@ -78,6 +117,7 @@
   .hints p { font-size: 17px; }
   .quiz { padding-inline: 80px; }
   .quizGrid { grid-template-columns: minmax(0, 1fr) minmax(480px, .95fr); gap: 70px; }
+  .galleryShell { width: 100%; }
 }
 
 @media (max-width: 959px) {
@@ -89,11 +129,15 @@
   .hints article, .hints article + article { min-height: 0; padding: 28px 0; border-left: 0; border-top: 1px solid var(--style-line); }
   .quiz { min-height: 0; padding: 80px 40px; }
   .quizGrid { grid-template-columns: 1fr; gap: 55px; }
-  .previewFrame { height: min(76vw, 636px); }
+  .galleryShell { width: calc(100% - 20px); height: min(76vw, 636px); }
+  .previewFrame, .scrollRail { height: min(76vw, 636px); }
   .question { min-height: 0; }
-  .question::before { left: 0; top: -25px; width: 120px; height: 8px; }
   .navButtons { position: static; margin-top: 48px; }
-  .validation { margin: 0 0 30px; }
+  .resultShell { padding: 80px 40px; }
+  .resultHeading { align-items: flex-start; flex-direction: column; }
+  .resultActions { width: 100%; }
+  .resultActions > button { flex: 1; padding-inline: 20px; }
+  .resultColumns { grid-template-columns: 1fr; gap: 64px; }
 }
 
 @media (max-width: 600px) {
@@ -105,7 +149,11 @@
   .hints h2 { font-size: 22px; }
   .hints p { margin-top: 14px; font-size: 16px; }
   .quiz { padding: 64px 20px; }
-  .previewFrame { height: 74vw; min-height: 300px; }
+  .galleryShell, .previewFrame, .scrollRail { height: 74vw; min-height: 300px; }
+  .fullscreenButton { top: 12px; left: 12px; width: 44px; height: 44px; }
+  .pagination { left: 12px; bottom: 12px; height: 46px; }
+  .fullscreenOverlay { padding: 70px 12px 12px; }
+  .fullscreenImage { height: calc(100svh - 82px); }
   .question h2 { font-size: 38px; }
   .description { font-size: 17px; }
   .voteButtons { grid-template-columns: 1fr; gap: 10px; }
@@ -113,6 +161,14 @@
   .reasonOptions { gap: 18px 22px; }
   .reasonOptions label { font-size: 17px; }
   .navButtons { grid-template-columns: 1fr; }
+  .resultShell { padding: 64px 20px; }
+  .resultHeading h2 { font-size: 40px; }
+  .resultActions { flex-direction: column; }
+  .resultActions > button { width: 100%; }
+  .resultColumns { gap: 52px; }
+  .resultColumns li { align-items: flex-start; flex-direction: column; gap: 8px; }
+  .resultColumns li span { font-size: 17px; text-align: left; }
+  .resultColumns li strong { font-size: 21px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

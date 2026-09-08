@@ -80,6 +80,8 @@ export type SiteSettings = {
   maxUrl: string;
   kworkUrl: string;
   flUrl: string;
+  styleChoice: StyleChoiceSettings;
+  popups: PopupSettings;
 };
 
 export const defaultSiteSettings: SiteSettings = {
@@ -180,5 +182,40 @@ export const defaultSiteSettings: SiteSettings = {
   maxUrl: "https://max.ru/",
   kworkUrl: "https://kwork.ru/",
   flUrl: "https://fl.ru/",
+  styleChoice: structuredClone(defaultStyleChoiceSettings),
+  popups: {
+    serviceTitlePrefix: "Заказать",
+    serviceDescription: "Выберите удобный способ — отвечу, обсудим задачу и подскажу, с чего начать.",
+    services: {
+      landing: {
+        title: "Заказать одностраничный сайт",
+        description: "Выберите удобный способ — отвечу, обсудим задачу и подскажу, с чего начать.",
+      },
+      corporate: {
+        title: "Заказать многостраничный сайт",
+        description: "Выберите удобный способ — отвечу, обсудим задачу и подскажу, с чего начать.",
+      },
+      commerce: {
+        title: "Заказать интернет-магазин",
+        description: "Выберите удобный способ — отвечу, обсудим задачу и подскажу, с чего начать.",
+      },
+    },
+    styleResultTitle: "Отправить результаты выбора стиля",
+    styleResultDescription: "Выберите удобный способ — результат теста уже сохранён, останется только отправить его мне.",
+  },
 };
 import type { CaseStudy } from "@/lib/cases";
+import { defaultStyleChoiceSettings, type StyleChoiceSettings } from "@/lib/style-references";
+
+export type PopupSettings = {
+  serviceTitlePrefix: string;
+  serviceDescription: string;
+  services: Record<string, PopupCopy>;
+  styleResultTitle: string;
+  styleResultDescription: string;
+};
+
+export type PopupCopy = {
+  title: string;
+  description: string;
+};

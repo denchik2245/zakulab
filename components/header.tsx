@@ -43,7 +43,7 @@ export function Header() {
 
         <nav className={styles.secondaryNav} aria-label="Дополнительное">
           <Link href="/#contact">Обсудить проект</Link>
-          <Link href="/style-check">Аудит дизайна</Link>
+          <Link href="/style-check">Выбор стиля</Link>
         </nav>
 
         <SocialLinks />
@@ -52,7 +52,7 @@ export function Header() {
           <summary>Меню</summary>
           <nav aria-label="Мобильное меню">
             {navigation.map(([label, href]) => <Link href={href} key={href}>{label}</Link>)}
-            <Link href="/style-check">Аудит дизайна</Link>
+            <Link href="/style-check">Выбор стиля</Link>
           </nav>
         </details>
       </div>

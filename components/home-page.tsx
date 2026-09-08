@@ -7,6 +7,7 @@ import { navigation } from "@/lib/navigation";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { ReviewsSlider } from "@/components/reviews-slider";
+import { ServiceOrderButton } from "@/components/service-order-button";
 import styles from "./home-page.module.css";
 
 function ArrowIcon({ light = false }: { light?: boolean }) {
@@ -182,11 +183,11 @@ export function HomePage({ site, reviews }: { site: SiteSettings; reviews: Verif
         <div className={styles.shell}>
           <div className={styles.priceHeading}><SectionTitle eyebrow="Стоимость"><span id="price-title">{typographic(site.servicesTitle)}</span></SectionTitle><p>{typographic(site.servicesText)}</p></div>
           <div className={styles.services}>
-            {site.services.map((service) => <article key={service.id}><h3>{typographic(service.title)}<ArrowIcon light /></h3><p>{typographic(service.text)}</p><div><span>{typographic(service.time)}</span><strong>{typographic(service.price)}</strong><strong>{typographic(service.priceSecondary)}</strong></div></article>)}
+            {site.services.map((service) => <article key={service.id}><h3><ServiceOrderButton serviceTitle={service.title} telegramUrl={site.telegramUrl} maxUrl={site.maxUrl} vkUrl={site.vkUrl} popupTitlePrefix={site.popups.serviceTitlePrefix} popupTitle={site.popups.services[service.id]?.title} popupDescription={site.popups.services[service.id]?.description || site.popups.serviceDescription} /></h3><p>{typographic(service.text)}</p><div><span>{typographic(service.time)}</span><strong>{typographic(service.price)}</strong><strong>{typographic(service.priceSecondary)}</strong></div></article>)}
           </div>
           <h2 className={styles.smallTasksTitle}>{typographic(site.smallTasksTitle)}</h2>
           <div className={styles.smallTasks}>
-            {site.smallTasks.map((task) => <article key={task.id}><h3>{typographic(task.title)}<ArrowIcon light /></h3><p>{typographic(task.text)}</p><div><h4>{typographic("Что вы получите")}</h4><p>{typographic(task.deliverable)}</p></div><footer><span>{typographic(task.time)}</span><strong>{typographic(task.price)}</strong></footer></article>)}
+            {site.smallTasks.map((task) => <article key={task.id}><h3><ServiceOrderButton serviceTitle={task.title} telegramUrl={site.telegramUrl} maxUrl={site.maxUrl} vkUrl={site.vkUrl} popupTitlePrefix={site.popups.serviceTitlePrefix} popupDescription={site.popups.serviceDescription} /></h3><p>{typographic(task.text)}</p><div><h4>{typographic("Что вы получите")}</h4><p>{typographic(task.deliverable)}</p></div><footer><span>{typographic(task.time)}</span><strong>{typographic(task.price)}</strong></footer></article>)}
           </div>
         </div>
       </section>

@@ -121,6 +121,27 @@ function mergeWithDefaults(value: Partial<AdminContent>): AdminContent {
         smallTasks: Array.isArray(incomingSite?.smallTasks)
           ? incomingSite.smallTasks
           : seed.site.smallTasks,
+        styleChoice: {
+          ...seed.site.styleChoice,
+          ...(incomingSite.styleChoice ?? {}),
+          styles: Array.isArray(incomingSite.styleChoice?.styles)
+            ? incomingSite.styleChoice.styles.map((style, index) => ({
+                ...(seed.site.styleChoice.styles.find((item) => item.id === style.id) ?? seed.site.styleChoice.styles[index] ?? seed.site.styleChoice.styles[0]),
+                ...style,
+                images: Array.isArray(style.images) ? style.images : [],
+                active: style.active ?? true,
+                order: Number.isFinite(style.order) ? style.order : (index + 1) * 10,
+              }))
+            : seed.site.styleChoice.styles,
+        },
+        popups: {
+          ...seed.site.popups,
+          ...(incomingSite.popups ?? {}),
+          services: {
+            ...seed.site.popups.services,
+            ...(incomingSite.popups?.services ?? {}),
+          },
+        },
       };
   const hasLegacyReviewPlacements = Array.isArray(value.reviews) && value.reviews.some((review) => typeof review.showOnHome !== "boolean" || typeof review.showOnReviewsPage !== "boolean");
   const reviews = Array.isArray(value.reviews)

@@ -48,7 +48,7 @@
   .primaryNav a, .secondaryNav a { transition-duration: var(--header-hover-speed) !important; }
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1400px) {
   .headerInner { width: calc(100% - 80px); }
   .primaryNav { padding-left: 0; }
   .primaryNav, .secondaryNav { gap: 20px; font-size: 15px; }

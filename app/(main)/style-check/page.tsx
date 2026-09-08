@@ -3,9 +3,12 @@ import Image from "next/image";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { StyleQuiz } from "@/components/style-quiz";
 import styles from "@/components/style-check.module.css";
+import { readContent } from "@/lib/content-store";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Выбрать стиль",
+  title: "Выбор стиля",
   description: "Выберите визуальные направления, которые подходят для будущего сайта.",
   alternates: { canonical: "/style-check" },
 };
@@ -28,7 +31,9 @@ const hints = [
   },
 ] as const;
 
-export default function StyleCheckPage() {
+export default async function StyleCheckPage() {
+  const { site } = await readContent();
+
   return (
     <div className={`style-check-page ${styles.page}`} id="top">
       <section className={styles.intro} aria-labelledby="style-page-title">
@@ -57,7 +62,7 @@ export default function StyleCheckPage() {
         </div>
       </section>
 
-      <StyleQuiz />
+      <StyleQuiz settings={site.styleChoice} popups={site.popups} socialLinks={{ telegramUrl: site.telegramUrl, maxUrl: site.maxUrl, vkUrl: site.vkUrl }} />
     </div>
   );
 }

@@ -8,8 +8,9 @@ import type { CaseStudy } from "@/lib/cases";
 import { externalUrl } from "@/lib/external-url";
 import type { VerifiedReview } from "@/lib/reviews";
 import type { PortfolioFilter, PortfolioProject, SiteSettings } from "@/lib/site-settings";
+import type { StyleReference } from "@/lib/style-references";
 
-type Tab = "site" | "portfolio" | "reviews";
+type Tab = "site" | "portfolio" | "reviews" | "styles" | "popups";
 
 const portfolioFilterOptions: { id: PortfolioFilter; label: string }[] = [
   { id: "landing", label: "Одностраничный" },
@@ -76,6 +77,22 @@ function formatDate(value: string) {
   return new Intl.DateTimeFormat("ru-RU", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(value));
 }
 
+function blankStyle(count: number): StyleReference {
+  return {
+    id: `style-${Date.now()}`,
+    number: String(count + 1).padStart(2, "0"),
+    title: "Новый стиль",
+    category: "",
+    description: "Опишите настроение, композицию и характер этого направления.",
+    traits: [],
+    preview: "editorial",
+    axes: { space: 0, energy: 0, expression: 0, emotion: 0 },
+    images: [],
+    active: true,
+    order: (count + 1) * 10,
+  };
+}
+
 function formatReviewDate(value: string) {
   return new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "long", year: "numeric" }).format(new Date(value)).replace(" г.", "");
 }
@@ -86,6 +103,8 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
   const [tab, setTab] = useState<Tab>("site");
   const [selectedReview, setSelectedReview] = useState<string | null>(null);
   const [selectedPortfolio, setSelectedPortfolio] = useState<string | null>(null);
+  const [selectedStyle, setSelectedStyle] = useState<string | null>(null);
+  const [selectedPopup, setSelectedPopup] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [notice, setNotice] = useState("");
   const [loginError, setLoginError] = useState("");
@@ -93,6 +112,14 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
   const pendingReviews = content?.reviews.filter((item) => item.status === "pending").length ?? 0;
   const activeReview = content?.reviews.find((item) => item.id === selectedReview) ?? content?.reviews[1] ?? content?.reviews[0] ?? null;
   const activePortfolio = content?.site.portfolioProjects.find((item) => item.id === selectedPortfolio) ?? content?.site.portfolioProjects[0] ?? null;
+  const activeStyle = content?.site.styleChoice.styles.find((item) => item.id === selectedStyle) ?? content?.site.styleChoice.styles[0] ?? null;
+  const popupItems = content?.site.services.map((service) => ({
+    id: service.id,
+    fallbackTitle: `${content.site.popups.serviceTitlePrefix} ${service.title.toLocaleLowerCase("ru-RU")}`,
+    title: content.site.popups.services[service.id]?.title || `${content.site.popups.serviceTitlePrefix} ${service.title.toLocaleLowerCase("ru-RU")}`,
+    description: content.site.popups.services[service.id]?.description || content.site.popups.serviceDescription,
+  })) ?? [];
+  const activePopup = popupItems.find((item) => item.id === selectedPopup) ?? popupItems[1] ?? popupItems[0] ?? null;
 
   async function login(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -237,6 +264,42 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
     patchSite({ [key]: values });
   }
 
+  function patchStyle(id: string, patch: Partial<StyleReference>) {
+    if (!content) return;
+    patchSite({ styleChoice: { ...content.site.styleChoice, styles: content.site.styleChoice.styles.map((item) => item.id === id ? { ...item, ...patch } : item) } });
+  }
+
+  function createStyle() {
+    if (!content) return;
+    const style = blankStyle(content.site.styleChoice.styles.length);
+    patchSite({ styleChoice: { ...content.site.styleChoice, styles: [...content.site.styleChoice.styles, style] } });
+    setSelectedStyle(style.id);
+    setTab("styles");
+  }
+
+  function deleteStyle(id: string) {
+    if (!content || !window.confirm("Удалить стиль и все загруженные для него примеры?")) return;
+    setSelectedStyle(null);
+    patchSite({ styleChoice: { ...content.site.styleChoice, styles: content.site.styleChoice.styles.filter((item) => item.id !== id) } });
+  }
+
+  function patchServicePopup(id: string, patch: { title?: string; description?: string }) {
+    if (!content) return;
+    const current = content.site.popups.services[id] ?? {
+      title: popupItems.find((item) => item.id === id)?.fallbackTitle ?? "",
+      description: content.site.popups.serviceDescription,
+    };
+    patchSite({
+      popups: {
+        ...content.site.popups,
+        services: {
+          ...content.site.popups.services,
+          [id]: { ...current, ...patch },
+        },
+      },
+    });
+  }
+
   if (!isAuthenticated || !content) {
     return (
       <section className="admin-login shell">
@@ -261,6 +324,8 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
             ["site", "Главная страница", "01"],
             ["portfolio", "Портфолио", String(content.site.portfolioProjects.length).padStart(2, "0")],
             ["reviews", "Отзывы", String(pendingReviews).padStart(2, "0")],
+            ["styles", "Выбор стиля", String(content.site.styleChoice.styles.length).padStart(2, "0")],
+            ["popups", "Поп-ап окна", "02"],
           ] as const).map(([id, label, count]) => (
             <button className={tab === id ? "is-active" : ""} onClick={() => setTab(id)} key={id}><span>{label}</span><i>{count}</i></button>
           ))}
@@ -273,6 +338,61 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
       </aside>
 
       <main className="admin-main">
+        {tab === "styles" && (
+          <div className="admin-view admin-style-view">
+            <div className="admin-portfolio-heading"><h1>Выбор стиля</h1><button className="admin-add-button" type="button" onClick={createStyle}>Новый стиль</button></div>
+            <div className="admin-style-layout">
+              <div className="admin-style-list">
+                {[...content.site.styleChoice.styles].sort((a, b) => a.order - b.order).map((item) => (
+                  <button className={activeStyle?.id === item.id ? "is-active" : ""} type="button" onClick={() => setSelectedStyle(item.id)} key={item.id}>
+                    <span><strong>{item.title}</strong><small>{item.images.length} {item.images.length === 1 ? "пример" : "примеров"}</small></span>
+                  </button>
+                ))}
+              </div>
+              {activeStyle ? (
+                <div className="admin-style-editor">
+                  <div className="admin-portfolio-editor-head"><h2>{activeStyle.title}</h2><button type="button" aria-label="Удалить стиль" onClick={() => deleteStyle(activeStyle.id)}><Image src="/assets/figma/portfolio-admin-7.svg" width={28} height={28} alt="" /></button></div>
+                  <div className="admin-style-visible"><label><input type="checkbox" checked={activeStyle.active} onChange={(event) => patchStyle(activeStyle.id, { active: event.target.checked })} /><span>Показывать в тесте</span></label></div>
+                  <div className="admin-style-order"><Field label="Порядок"><input type="number" value={activeStyle.order} onChange={(event) => patchStyle(activeStyle.id, { order: Number(event.target.value) })} /></Field></div>
+                  <div className="admin-style-fields">
+                    <Field label="Название стиля"><input value={activeStyle.title} onChange={(event) => patchStyle(activeStyle.id, { title: event.target.value })} /></Field>
+                    <Field label="Описание стиля"><textarea rows={4} value={activeStyle.description} onChange={(event) => patchStyle(activeStyle.id, { description: event.target.value })} /></Field>
+                  </div>
+                  <section className="admin-style-gallery-section">
+                    <h3>Примеры стиля</h3>
+                    <div className="admin-style-gallery">
+                      {activeStyle.images.map((image, imageIndex) => (
+                        <GalleryMediaField key={imageIndex} className="is-style-image" isSlider label={`Пример ${imageIndex + 1}`} value={image} emptyLabel="Загрузить пример" onChange={(value) => patchStyle(activeStyle.id, { images: activeStyle.images.map((item, index) => index === imageIndex ? value : item) })} onDelete={() => patchStyle(activeStyle.id, { images: activeStyle.images.filter((_, index) => index !== imageIndex) })} />
+                      ))}
+                      <GalleryMediaField className="is-style-image is-style-add" label="Добавить изображение" value="" emptyLabel="" onChange={(value) => patchStyle(activeStyle.id, { images: [...activeStyle.images, value] })} />
+                    </div>
+                  </section>
+                </div>
+              ) : <div className="admin-empty-panel"><p>Добавьте первый стиль.</p></div>}
+            </div>
+          </div>
+        )}
+
+        {tab === "popups" && (
+          <div className="admin-view admin-popup-view">
+            <div className="admin-portfolio-heading"><h1>Поп-ап окна</h1></div>
+            <div className="admin-popup-layout">
+              <div className="admin-popup-list">
+                {popupItems.map((item) => <button className={activePopup?.id === item.id ? "is-active" : ""} type="button" onClick={() => setSelectedPopup(item.id)} key={item.id}>{item.title}</button>)}
+              </div>
+              {activePopup ? (
+                <div className="admin-popup-editor">
+                  <div className="admin-popup-editor-head"><h2>{activePopup.title}</h2></div>
+                  <div className="admin-popup-fields">
+                    <Field label="Название"><input value={activePopup.title} onChange={(event) => patchServicePopup(activePopup.id, { title: event.target.value })} /></Field>
+                    <Field label="Описание"><textarea rows={4} value={activePopup.description} onChange={(event) => patchServicePopup(activePopup.id, { description: event.target.value })} /></Field>
+                  </div>
+                </div>
+              ) : <div className="admin-empty-panel"><p>Добавьте услугу на главной странице.</p></div>}
+            </div>
+          </div>
+        )}
+
         {tab === "portfolio" && (
           <div className="admin-view admin-portfolio-view">
             <div className="admin-portfolio-heading"><h1>Портфолио</h1><button className="admin-add-button" onClick={createPortfolioProject}>Новая работа</button></div>

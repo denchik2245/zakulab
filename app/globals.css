@@ -535,10 +535,6 @@ body:has(.figma-portfolio-page) { background: #fefefe; }
   .admin-site-editor > .admin-editor-actions { padding: 20px 16px; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
-}
-
 /* Admin studio — aligned with the current home page */
 body:has(.admin-studio),
 body:has(.admin-login) {
@@ -838,6 +834,66 @@ body:has(.admin-login) {
   .admin-editor { margin-top: 16px; padding: 22px 16px; border: 0; }
   .admin-site-editor > .admin-editor-section { padding: 24px 16px; }
   .admin-editor-section { gap: 18px; }
+}
+
+/* Style choice and popup editors */
+.admin-style-view,
+.admin-popup-view { max-width: 1500px; }
+.admin-portfolio-heading > div > p { max-width: 680px; margin: 12px 0 0; color: #727272; font-size: 14px; line-height: 1.5; }
+.admin-style-layout { margin-top: 40px; display: grid; grid-template-columns: minmax(250px, 360px) minmax(520px, 1fr); gap: 20px; align-items: start; }
+.admin-style-list { overflow: hidden; background: #eaeaea; border-radius: 5px; }
+.admin-style-list > button { width: 100%; min-height: 78px; padding: 18px; display: flex; align-items: center; justify-content: space-between; gap: 14px; color: #050505; background: transparent; border: 0; border-bottom: 1px solid #b8b8b8; cursor: pointer; text-align: left; }
+.admin-style-list > button:last-child { border-bottom: 0; }
+.admin-style-list > button:hover { background: #dededb; }
+.admin-style-list > button.is-active { background: #fefefe; box-shadow: inset 4px 0 #304e41; }
+.admin-style-list span { min-width: 0; display: grid; gap: 5px; }
+.admin-style-list strong { overflow: hidden; font-size: 15px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+.admin-style-list small { color: #727272; font-size: 11px; }
+.admin-style-list i { flex: none; color: #727272; font-size: 10px; font-style: normal; }
+.admin-style-editor { padding: 36px; background: #eaeaea; border-radius: 5px; }
+.admin-style-editor .admin-portfolio-editor-head { margin-bottom: 28px; }
+.admin-style-status { padding: 18px 0; display: flex; align-items: end; justify-content: space-between; gap: 24px; border-block: 1px solid #b8b8b8; }
+.admin-style-status > label:first-child { display: flex; align-items: center; gap: 9px; font-size: 13px; }
+.admin-style-status input[type="checkbox"] { width: auto; accent-color: #304e41; }
+.admin-style-status > label:last-child { width: 130px; }
+.admin-style-fields { padding: 28px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.admin-style-fields > label:last-child { grid-column: 1 / -1; }
+.admin-style-fields label,
+.admin-popup-grid label { display: grid; gap: 7px; }
+.admin-style-fields label > span,
+.admin-popup-grid label > span { color: #727272; font-size: 11px; font-weight: 600; }
+.admin-style-gallery-head { margin-bottom: 20px; display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; }
+.admin-style-gallery-head h3 { margin: 0 0 8px; font-size: 22px; font-weight: 600; }
+.admin-style-gallery-head p { max-width: 600px; margin: 0; color: #555b58; font-size: 13px; line-height: 1.5; }
+.admin-style-gallery-head button,
+.admin-style-empty { padding: 12px 16px; color: #fefefe; background: #304e41; border: 0; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: 650; }
+.admin-style-gallery { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.admin-style-gallery .is-style-image { aspect-ratio: 4 / 5; }
+.admin-style-gallery .is-style-image > label { height: 100%; }
+.admin-style-gallery .is-style-image .admin-gallery-image { object-position: top; }
+.admin-style-empty { min-height: 180px; grid-column: 1 / -1; color: #304e41; background: #fefefe; border: 1px dashed #9da49f; }
+.admin-popup-grid { margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+.admin-popup-grid .admin-site-card { margin: 0; }
+.admin-popup-grid .admin-site-card > div { display: grid; gap: 22px; }
+.admin-popup-note { margin: 0; color: #727272; font-size: 12px; line-height: 1.5; }
+
+@media (max-width: 1000px) {
+  .admin-style-layout { grid-template-columns: 250px minmax(440px, 1fr); }
+  .admin-style-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 700px) {
+  .admin-sidebar nav { grid-template-columns: repeat(5, 1fr); }
+  .admin-sidebar nav button span { font-size: 8px; }
+  .admin-style-layout { display: block; }
+  .admin-style-list { max-height: 290px; overflow: auto; }
+  .admin-style-editor { margin-top: 16px; padding: 22px 16px; }
+  .admin-style-fields,
+  .admin-popup-grid { grid-template-columns: 1fr; }
+  .admin-style-fields > label:last-child { grid-column: 1; }
+  .admin-style-status,
+  .admin-style-gallery-head { align-items: stretch; flex-direction: column; }
+  .admin-style-gallery { grid-template-columns: 1fr 1fr; }
 }
 
 /* Main page editor — Figma node 620:658 */
@@ -1599,4 +1655,235 @@ body:has(.admin-login) {
   .admin-review-profile-fields { grid-template-columns: 1fr; }
   .admin-gallery-field.is-review-image > label { height: min(72vw, 420px); }
   .admin-gallery-field.is-review-image .admin-gallery-hover b { font-size: 20px; }
+}
+
+/* Style choice editor — Figma node 846:910 */
+.admin-style-view,
+.admin-popup-view {
+  width: 100%;
+  max-width: 1650px;
+  padding: 80px;
+}
+
+.admin-style-layout,
+.admin-popup-layout {
+  display: grid;
+  grid-template-columns: 584px minmax(0, 886px);
+  gap: 20px;
+  align-items: start;
+}
+
+.admin-style-list,
+.admin-popup-list {
+  height: 958px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #eaeaea;
+  border-radius: 5px;
+  scrollbar-width: thin;
+  scrollbar-color: #b8b8b8 transparent;
+}
+
+.admin-style-list > button,
+.admin-popup-list > button {
+  position: relative;
+  width: 100%;
+  min-height: 117px;
+  padding: 28px 32px;
+  display: flex;
+  align-items: flex-start;
+  color: #050505;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #b8b8b8;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color .35s ease;
+}
+
+.admin-style-list > button:hover,
+.admin-popup-list > button:hover { background: #f4f4f2; }
+.admin-style-list > button.is-active,
+.admin-popup-list > button.is-active { background: #fefefe; }
+.admin-style-list > button.is-active::before,
+.admin-popup-list > button.is-active::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: #304e41;
+}
+
+.admin-style-list > button > span { min-width: 0; display: grid; gap: 10px; }
+.admin-style-list strong,
+.admin-popup-list > button {
+  overflow: hidden;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+}
+.admin-style-list strong { white-space: nowrap; }
+.admin-style-list small { color: #727272; font-size: 16px; font-weight: 400; line-height: 1.4; }
+
+.admin-style-editor,
+.admin-popup-editor {
+  min-width: 0;
+  padding: 0;
+  overflow: hidden;
+  color: #050505;
+  background: #eaeaea;
+  border-radius: 5px;
+}
+.admin-style-editor { min-height: 1606px; }
+.admin-popup-editor { min-height: 454px; }
+
+.admin-style-editor .admin-portfolio-editor-head,
+.admin-popup-editor-head {
+  height: 98px;
+  margin: 0;
+  padding: 32px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  border-bottom: 1px solid #b8b8b8;
+}
+.admin-style-editor .admin-portfolio-editor-head h2,
+.admin-popup-editor-head h2 { margin: 0; font-size: 28px; font-weight: 500; line-height: 1.2; }
+
+.admin-style-visible {
+  height: 69px;
+  padding: 27px 32px 17px;
+}
+.admin-style-visible label { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+.admin-style-visible input {
+  width: 25px;
+  height: 25px;
+  margin: 0;
+  flex: 0 0 auto;
+  accent-color: #304e41;
+}
+.admin-style-visible span { font-size: 16px; font-weight: 600; line-height: 1; }
+
+.admin-style-order {
+  height: 127px;
+  padding: 12px 32px 30px;
+  border-bottom: 1px solid #b8b8b8;
+}
+.admin-style-fields {
+  height: 356px;
+  padding: 32px;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-content: start;
+  gap: 28px;
+}
+.admin-popup-fields { padding: 32px; display: grid; gap: 28px; }
+
+.admin-style-order label,
+.admin-style-fields label,
+.admin-popup-fields label { display: grid; gap: 10px; }
+.admin-style-order label > span,
+.admin-style-fields label > span,
+.admin-popup-fields label > span { color: #727272; font-size: 16px; font-weight: 600; line-height: 1; }
+.admin-style-order input,
+.admin-style-fields input,
+.admin-style-fields textarea,
+.admin-popup-fields input,
+.admin-popup-fields textarea {
+  width: 100%;
+  min-height: 50px;
+  padding: 13px 16px;
+  color: #050505;
+  background: #fefefe;
+  border: 1px solid #babcaf;
+  border-radius: 5px;
+  outline: 0;
+  font: 500 16px/1.4 "Manrope Variable", "Manrope", sans-serif;
+}
+.admin-style-fields textarea,
+.admin-popup-fields textarea { height: 150px; resize: vertical; }
+.admin-style-order input:focus,
+.admin-style-fields input:focus,
+.admin-style-fields textarea:focus,
+.admin-popup-fields input:focus,
+.admin-popup-fields textarea:focus { border-color: #304e41; box-shadow: 0 0 0 1px #304e41; }
+
+.admin-style-gallery-section { padding: 32px; border-top: 1px solid #b8b8b8; }
+.admin-style-gallery-section h3 { margin: 0 0 28px; font-size: 24px; font-weight: 500; line-height: 1.2; }
+.admin-style-gallery {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+.admin-style-gallery .admin-gallery-field.is-style-image { aspect-ratio: auto; }
+.admin-style-gallery .admin-gallery-field.is-style-image > label {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 261 / 408;
+  border-radius: 5px;
+}
+.admin-style-gallery .admin-gallery-field.is-style-image > label { background: #fefefe; }
+.admin-style-gallery .admin-gallery-image { object-fit: cover; object-position: top center; }
+.admin-style-gallery .admin-gallery-field.is-style-add .admin-gallery-empty {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 36px;
+  height: 36px;
+  color: #fefefe !important;
+  background: #babcaf;
+  border-radius: 50%;
+  font-size: 25px !important;
+  line-height: 1;
+  transform: translate(-50%, -50%);
+  transition: background-color .35s ease, transform .35s ease;
+}
+.admin-style-gallery .admin-gallery-field.is-style-add .admin-gallery-hover { display: none; }
+.admin-style-gallery .admin-gallery-field.is-style-add > label { transition: background-color .35s ease, transform .35s ease; }
+.admin-style-gallery .admin-gallery-field.is-style-add > label:hover { background: #f6f6f4; transform: translateY(-2px); }
+.admin-style-gallery .admin-gallery-field.is-style-add > label:hover .admin-gallery-empty { background: #304e41; transform: translate(-50%, -50%) scale(1.06); }
+
+/* Popup editor — Figma node 846:1220 */
+.admin-popup-view .admin-portfolio-heading { justify-content: flex-start; }
+.admin-popup-list > button { align-items: center; white-space: normal; }
+
+@media (max-width: 1500px) {
+  .admin-style-view,
+  .admin-popup-view { padding-inline: 40px; }
+  .admin-style-layout,
+  .admin-popup-layout { grid-template-columns: minmax(340px, .8fr) minmax(560px, 1.2fr); }
+}
+
+@media (max-width: 1050px) {
+  .admin-style-view,
+  .admin-popup-view { padding: 52px 28px 80px; }
+  .admin-style-layout,
+  .admin-popup-layout { grid-template-columns: minmax(260px, .7fr) minmax(470px, 1.3fr); }
+  .admin-style-list > button,
+  .admin-popup-list > button { padding-inline: 22px; }
+  .admin-style-list strong,
+  .admin-popup-list > button { font-size: 20px; }
+  .admin-style-list small { font-size: 14px; }
+}
+
+@media (max-width: 760px) {
+  .admin-unified-sidebar nav { grid-template-columns: repeat(5, 1fr); }
+  .admin-style-view,
+  .admin-popup-view { padding: 38px 14px 72px; }
+  .admin-style-layout,
+  .admin-popup-layout { display: block; }
+  .admin-style-list,
+  .admin-popup-list { height: 360px; margin-bottom: 16px; }
+  .admin-style-editor,
+  .admin-popup-editor { min-height: 0; }
+  .admin-style-editor .admin-portfolio-editor-head,
+  .admin-popup-editor-head,
+  .admin-style-visible,
+  .admin-style-order,
+  .admin-style-fields { height: auto; padding-inline: 18px; }
+  .admin-style-gallery-section,
+  .admin-popup-fields { padding: 24px 18px; }
+  .admin-style-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 }
