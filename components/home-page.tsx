@@ -4,8 +4,6 @@ import type { SiteSettings } from "@/lib/site-settings";
 import type { VerifiedReview } from "@/lib/reviews";
 import { typographic } from "@/lib/typographic";
 import { navigation } from "@/lib/navigation";
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
 import { ReviewsSlider } from "@/components/reviews-slider";
 import { ServiceOrderButton } from "@/components/service-order-button";
 import styles from "./home-page.module.css";
@@ -55,8 +53,6 @@ export function HomePage({ site, reviews }: { site: SiteSettings; reviews: Verif
   return (
     <div className={styles.stage}>
       <div className={`figma-home-page ${styles.page}`} id="top">
-      <Header />
-
       <section className={styles.hero} aria-labelledby="hero-title">
         <div className={styles.heroTop}>
           <h1 id="hero-title">— {typographic(site.heroTitle)}</h1>
@@ -191,8 +187,6 @@ export function HomePage({ site, reviews }: { site: SiteSettings; reviews: Verif
           </div>
         </div>
       </section>
-
-      <Footer site={site} />
       </div>
     </div>
   );

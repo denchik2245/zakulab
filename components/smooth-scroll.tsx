@@ -69,7 +69,14 @@ export function SmoothScroll() {
       lastTime = 0;
     };
 
+    const isLocked = () => root.style.overflow === "hidden" || document.body.style.overflow === "hidden";
+
     const tick = (time: number) => {
+      if (isLocked()) {
+        stop();
+        return;
+      }
+
       const deltaTime = lastTime ? Math.min(time - lastTime, 64) : 16;
       lastTime = time;
 
@@ -108,6 +115,7 @@ export function SmoothScroll() {
 
     const animateTo = (destination: number) => {
       stop();
+      if (isLocked()) return;
       updateMaxScroll();
 
       const from = window.scrollY;
@@ -117,6 +125,11 @@ export function SmoothScroll() {
       isRunning = true;
 
       const step = (time: number) => {
+        if (isLocked()) {
+          stop();
+          return;
+        }
+
         const progress = Math.min((time - startedAt) / SMOOTH_SCROLL.anchorDuration, 1);
         const eased = 1 - Math.pow(1 - progress, 3);
         const position = Math.round(from + distance * eased);
@@ -138,6 +151,10 @@ export function SmoothScroll() {
 
     const onWheel = (event: WheelEvent) => {
       if (window.innerWidth < SMOOTH_SCROLL.mobileBreakpoint) return;
+      if (isLocked()) {
+        stop();
+        return;
+      }
       if (event.ctrlKey || event.metaKey || Math.abs(event.deltaX) > Math.abs(event.deltaY)) return;
       if (hasScrollableParent(event.target, event.deltaY)) return;
 

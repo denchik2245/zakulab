@@ -50,12 +50,15 @@ function StyleGallery({ reference }: { reference: StyleReference }) {
 
   useEffect(() => {
     if (!isFullscreen) return;
-    const previousOverflow = document.body.style.overflow;
+    const previousBodyOverflow = document.body.style.overflow;
+    const previousHtmlOverflow = document.documentElement.style.overflow;
     document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
     const onKeyDown = (event: KeyboardEvent) => { if (event.key === "Escape") setIsFullscreen(false); };
     document.addEventListener("keydown", onKeyDown);
     return () => {
-      document.body.style.overflow = previousOverflow;
+      document.body.style.overflow = previousBodyOverflow;
+      document.documentElement.style.overflow = previousHtmlOverflow;
       document.removeEventListener("keydown", onKeyDown);
     };
   }, [isFullscreen]);
@@ -94,9 +97,22 @@ function StyleGallery({ reference }: { reference: StyleReference }) {
       )}
 
       {isFullscreen && (
-        <div className={styles.fullscreenOverlay} role="dialog" aria-modal="true" aria-label={`Полноэкранный просмотр: ${reference.title}`} onMouseDown={(event) => { if (event.target === event.currentTarget) setIsFullscreen(false); }}>
+        <div
+          className={styles.fullscreenOverlay}
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Полноэкранный просмотр: ${reference.title}`}
+          data-smooth-scroll-prevent
+          onWheel={(event) => {
+            const scrollable = (event.target as HTMLElement)?.closest?.(`.${styles.fullscreenImage}`);
+            if (!scrollable) {
+              event.preventDefault();
+            }
+          }}
+          onMouseDown={(event) => { if (event.target === event.currentTarget) setIsFullscreen(false); }}
+        >
           <button type="button" className={styles.fullscreenClose} onClick={() => setIsFullscreen(false)} aria-label="Закрыть полноэкранный просмотр"><Image src="/assets/figma/cross-popup.svg" width={20} height={20} alt="" /></button>
-          <div className={styles.fullscreenImage}>{activeImage ? <img src={activeImage} alt={`Пример стиля «${reference.title}»`} /> : <StylePreview reference={reference} />}</div>
+          <div className={styles.fullscreenImage} data-smooth-scroll-prevent tabIndex={0}>{activeImage ? <img src={activeImage} alt={`Пример стиля «${reference.title}»`} /> : <StylePreview reference={reference} />}</div>
         </div>
       )}
     </div>
@@ -153,12 +169,7 @@ export function StyleQuiz({ settings, popups, socialLinks }: { settings: StyleCh
   }
 
   function goNext() {
-    if (!current) return;
-    if (!currentResponse) {
-      const nextResponses = { ...responses, [current.id]: { vote: "skip" as const, reasons: [] } };
-      moveForward(nextResponses);
-      return;
-    }
+    if (!current || !hasVoted) return;
     moveForward();
   }
 
@@ -196,6 +207,8 @@ export function StyleQuiz({ settings, popups, socialLinks }: { settings: StyleCh
   }
 
   const requiresReason = Boolean(currentResponse && currentResponse.vote !== "skip");
+  const hasVoted = Boolean(currentResponse && (currentResponse.vote === "like" || currentResponse.vote === "dislike"));
+  const canGoBack = index > 0;
 
   return (
     <section className={styles.quiz} id="visual-style-test" aria-live="polite">
@@ -225,8 +238,24 @@ export function StyleQuiz({ settings, popups, socialLinks }: { settings: StyleCh
           </fieldset>
 
           <div className={styles.navButtons}>
-            <button type="button" onClick={() => setIndex((value) => Math.max(0, value - 1))} disabled={index === 0}>Назад</button>
-            <button type="button" className={styles.next} onClick={goNext}>{index === references.length - 1 ? "Показать результат" : "Далее"}</button>
+            <button
+              type="button"
+              className={styles.prevButton}
+              data-active={canGoBack}
+              onClick={() => setIndex((value) => Math.max(0, value - 1))}
+              disabled={!canGoBack}
+            >
+              Назад
+            </button>
+            <button
+              type="button"
+              className={`${styles.nextButton} ${styles.next}`}
+              data-active={hasVoted}
+              onClick={goNext}
+              disabled={!hasVoted}
+            >
+              {index === references.length - 1 ? "Показать результат" : "Далее"}
+            </button>
           </div>
         </div>
       </div>
