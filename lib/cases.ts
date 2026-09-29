@@ -1,3 +1,42 @@
+export type CaseBlockSpacing = "compact" | "large";
+
+export type CaseBlockItem = {
+  id: string;
+  label: string;
+  text: string;
+};
+
+export type CaseBlock =
+  | {
+      id: string;
+      type: "image";
+      image: string;
+      alt: string;
+      caption: string;
+      spacing: CaseBlockSpacing;
+    }
+  | {
+      id: string;
+      type: "gallery";
+      images: { id: string; image: string; alt: string }[];
+      spacing: CaseBlockSpacing;
+    }
+  | {
+      id: string;
+      type: "text";
+      title: string;
+      body: string;
+      listStyle: "none" | "bullet" | "numbered" | "labeled";
+      items: CaseBlockItem[];
+      spacing: CaseBlockSpacing;
+    }
+  | {
+      id: string;
+      type: "callout";
+      text: string;
+      spacing: CaseBlockSpacing;
+    };
+
 export type CaseStudy = {
   slug: string;
   index: string;
@@ -14,6 +53,8 @@ export type CaseStudy = {
   featured: boolean;
   createdAt: string;
   updatedAt: string;
+  whatDone?: string;
+  blocks?: CaseBlock[];
   verified: string[];
   draft: {
     challenge: string;
@@ -22,6 +63,22 @@ export type CaseStudy = {
     result: string;
   };
 };
+
+export function createLegacyCaseBlocks(caseStudy: Pick<CaseStudy, "slug" | "draft">, previewImage = ""): CaseBlock[] {
+  const decisions = caseStudy.draft.decisions.map((decision, index) => ({
+    id: `${caseStudy.slug}-decision-${index + 1}`,
+    label: decision.title,
+    text: decision.text,
+  }));
+
+  return [
+    ...(previewImage ? [{ id: `${caseStudy.slug}-cover`, type: "image" as const, image: previewImage, alt: "", caption: "", spacing: "large" as const }] : []),
+    { id: `${caseStudy.slug}-context`, type: "text", title: "Контекст задачи", body: caseStudy.draft.challenge, listStyle: "none", items: [], spacing: "large" },
+    { id: `${caseStudy.slug}-approach`, type: "text", title: "Подход", body: caseStudy.draft.approach, listStyle: "none", items: [], spacing: "large" },
+    { id: `${caseStudy.slug}-decisions`, type: "text", title: "Ключевые решения", body: "", listStyle: "labeled", items: decisions, spacing: "large" },
+    { id: `${caseStudy.slug}-result`, type: "text", title: "Результат", body: caseStudy.draft.result, listStyle: "none", items: [], spacing: "large" },
+  ];
+}
 
 export const cases: CaseStudy[] = [
   {

@@ -3,7 +3,7 @@ import "server-only";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { getStore } from "@netlify/blobs";
-import { cases as seedCases, type CaseStudy } from "@/lib/cases";
+import { cases as seedCases, createLegacyCaseBlocks, type CaseBlock, type CaseStudy } from "@/lib/cases";
 import { verifiedReviews as seedReviews, type VerifiedReview } from "@/lib/reviews";
 import { defaultSiteSettings, type SiteSettings } from "@/lib/site-settings";
 
@@ -22,13 +22,25 @@ function seedContent(): AdminContent {
   site.portfolioProjects = site.portfolioProjects.map((project) => {
     const caseSlug = project.url.match(/^\/cases\/([^/?#]+)/)?.[1] ?? project.id;
     const caseStudy = seedCases.find((item) => item.slug === caseSlug);
-    return caseStudy ? { ...project, caseStudy: structuredClone(caseStudy) } : project;
+    return caseStudy ? { ...project, caseStudy: normalizeCaseStudy(structuredClone(caseStudy), project.image) } : project;
   });
   return {
     version: 1,
     updatedAt: new Date().toISOString(),
     reviews: structuredClone(seedReviews),
     site,
+  };
+}
+
+function normalizeCaseStudy(caseStudy: CaseStudy, previewImage = ""): CaseStudy {
+  const blocks = Array.isArray(caseStudy.blocks) && caseStudy.blocks.length > 0
+    ? caseStudy.blocks.filter((block): block is CaseBlock => Boolean(block && typeof block.id === "string" && typeof block.type === "string"))
+    : createLegacyCaseBlocks(caseStudy, previewImage);
+
+  return {
+    ...caseStudy,
+    whatDone: caseStudy.whatDone?.trim() || caseStudy.summary,
+    blocks,
   };
 }
 
@@ -111,7 +123,9 @@ function mergeWithDefaults(value: Partial<AdminContent>): AdminContent {
         stats: Array.isArray(incomingSite?.stats)
           ? incomingSite.stats
           : seed.site.stats,
-        portfolioProjects,
+        portfolioProjects: portfolioProjects.map((project) => project.caseStudy
+          ? { ...project, caseStudy: normalizeCaseStudy(project.caseStudy, project.image) }
+          : project),
         process: Array.isArray(incomingSite?.process)
           ? incomingSite.process
           : seed.site.process,

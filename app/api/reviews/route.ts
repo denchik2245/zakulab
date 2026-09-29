@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { readContent, writeContent } from "@/lib/content-store";
 import type { VerifiedReview } from "@/lib/reviews";
+import { externalUrl } from "@/lib/external-url";
 
 function field(formData: FormData, name: string) {
   return String(formData.get(name) ?? "").trim();
@@ -24,23 +25,13 @@ export async function POST(request: Request) {
   if (field(formData, "bot-field")) return new NextResponse(null, { status: 204 });
 
   const name = field(formData, "name");
-  const company = field(formData, "company");
   const role = field(formData, "role");
-  const projectName = field(formData, "project-name");
-  const projectUrl = field(formData, "project-url");
-  const profileNetwork = field(formData, "profile-network") as VerifiedReview["profile"]["network"];
   const profileUrl = field(formData, "public-profile");
   const text = field(formData, "review");
-  const hasConsent = formData.has("publication-consent") && formData.has("public-contact-awareness") && formData.has("privacy-consent");
+  const safeProfileUrl = publicUrl(externalUrl(profileUrl));
 
-  const allowedNetworks: VerifiedReview["profile"]["network"][] = ["Telegram", "MAX", "VK", "LinkedIn", "Другая сеть"];
-  const safeProjectUrl = publicUrl(projectUrl);
-  const safeProfileUrl = profileUrl.startsWith("@") && profileNetwork === "Telegram"
-    ? `https://t.me/${profileUrl.slice(1)}`
-    : publicUrl(profileUrl);
-
-  if (!name || !company || !role || !projectName || !safeProjectUrl || !safeProfileUrl || !allowedNetworks.includes(profileNetwork) || text.length < 20 || !hasConsent) {
-    return NextResponse.json({ error: "Заполните обязательные поля и подтвердите согласия" }, { status: 400 });
+  if (!name || !role || !safeProfileUrl || text.length < 20) {
+    return NextResponse.json({ error: "Заполните все поля. Текст отзыва должен быть не короче 20 символов." }, { status: 400 });
   }
 
   const now = new Date().toISOString();
@@ -53,13 +44,14 @@ export async function POST(request: Request) {
     showOnReviewsPage: false,
     order: Date.now(),
     text: text.slice(0, 4000),
-    author: { name: name.slice(0, 120), initials: initials(name), role: role.slice(0, 120), company: company.slice(0, 120) },
-    project: { name: projectName.slice(0, 160), url: safeProjectUrl.slice(0, 500) },
-    profile: { network: profileNetwork, label: profileUrl.slice(0, 180), url: safeProfileUrl.slice(0, 500) },
+    author: { name: name.slice(0, 120), initials: initials(name), role: role.slice(0, 120), company: "" },
+    project: { name: "", url: "" },
+    profile: { network: "Другая сеть", label: "", url: safeProfileUrl.slice(0, 500) },
   };
 
   const content = await readContent();
   content.reviews.unshift(review);
   await writeContent(content);
+  if (field(formData, "response") === "json") return NextResponse.json({ ok: true }, { status: 201 });
   return NextResponse.redirect(new URL("/success?form=review", request.url), 303);
 }

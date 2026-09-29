@@ -26,7 +26,7 @@ export function Footer({ site }: FooterProps = {}) {
       </div>
       <div className={styles.legal}>
         <Link href="/privacy">Политика обработки ПД</Link>
-        <Link href="/privacy">Согласие на обработку ПД</Link>
+        <Link href="/consent">Согласие на обработку ПД</Link>
       </div>
       <Image className={styles.mark} src="/assets/figma/logo1.svg" width={500} height={500} alt="" />
     </footer>

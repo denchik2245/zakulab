@@ -46,7 +46,7 @@ export function Header() {
           <Link href="/style-check">Выбор стиля</Link>
         </nav>
 
-        <SocialLinks />
+        <SocialLinks className={styles.socials} />
 
         <details className={styles.mobileMenu}>
           <summary>Меню</summary>

@@ -1,0 +1,152 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  padding: 20px;
+  display: grid;
+  place-items: center;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, .5);
+  animation: overlayReveal .3s cubic-bezier(.22, .72, .24, 1) both;
+}
+
+.dialog {
+  --popup-scale: 1;
+  --hover-speed: .4s;
+  --hover-easing: cubic-bezier(.22, .72, .24, 1);
+  width: min(820px, 100%);
+  min-height: 813px;
+  padding: 50px;
+  position: relative;
+  color: #050505;
+  background: #fefefe;
+  border-radius: 5px;
+  font-family: "Manrope Variable", "Manrope", sans-serif;
+  transform-origin: center;
+  transform: scale(var(--popup-scale)) translateY(21px);
+  animation: dialogReveal .4s cubic-bezier(.22, .72, .24, 1) both;
+}
+
+.isClosing {
+  pointer-events: none;
+  animation: overlayHide .3s cubic-bezier(.4, 0, .8, .2) both;
+}
+
+.isClosing .dialog {
+  animation: dialogHide .4s cubic-bezier(.4, 0, .8, .2) both;
+}
+
+.close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  transition: opacity var(--hover-speed) var(--hover-easing);
+}
+
+.close img { width: 20px; height: 20px; display: block; }
+.dialog > header { text-align: center; }
+.dialog > header h2 { margin: 0; font-size: 48px; font-weight: 500; line-height: 1.2; letter-spacing: -.03em; }
+.dialog > header p { width: min(524px, 100%); margin: 21px auto 0; font-size: 20px; line-height: 1.4; }
+
+.form { margin-top: 50px; display: grid; gap: 24px; }
+.row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.form label { min-width: 0; display: grid; gap: 10px; }
+.form label > span { font-size: 16px; font-weight: 600; line-height: normal; }
+.form input,
+.form textarea {
+  width: 100%;
+  padding: 15px 16px 16px;
+  color: #050505;
+  background: #fefefe;
+  border: 1px solid #babcaf;
+  border-radius: 5px;
+  outline: 0;
+  font: 600 14px/1 "Manrope Variable", "Manrope", sans-serif;
+  transition: border-color var(--hover-speed) var(--hover-easing), box-shadow var(--hover-speed) var(--hover-easing);
+}
+.form input { height: 50px; }
+.form textarea { height: 200px; resize: vertical; line-height: 1.4; }
+.form input::placeholder,
+.form textarea::placeholder { color: #727272; opacity: 1; }
+.form input:focus,
+.form textarea:focus { border-color: #304e41; box-shadow: 0 0 0 1px #304e41; }
+.honeypot { position: absolute !important; left: -10000px !important; width: 1px !important; height: 1px !important; opacity: 0; }
+.submit,
+.success > button {
+  width: 100%;
+  padding: 16px 50px;
+  color: #fefefe;
+  background: #304e41;
+  border: 0;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: normal;
+  transition: background-color var(--hover-speed) var(--hover-easing), opacity var(--hover-speed) var(--hover-easing);
+}
+.submit:disabled { cursor: wait; opacity: .65; }
+.error { margin: -8px 0 -6px; color: #9a493e; font-size: 14px; line-height: 1.4; }
+.success { min-height: 713px; display: grid; place-items: center; align-content: center; gap: 24px; text-align: center; }
+.success > span { width: 64px; height: 64px; display: grid; place-items: center; color: #fefefe; background: #304e41; border-radius: 50%; font-size: 28px; }
+.success h2 { margin: 0; font-size: 48px; font-weight: 500; line-height: 1.2; letter-spacing: -.03em; }
+.success p { max-width: 524px; margin: 0; font-size: 20px; line-height: 1.4; }
+.success > button { width: auto; margin-top: 12px; }
+
+.close:focus-visible,
+.submit:focus-visible,
+.success > button:focus-visible { outline: 2px solid #304e41; outline-offset: 3px; }
+
+@keyframes overlayReveal { from { opacity: 0; } to { opacity: 1; } }
+@keyframes dialogReveal {
+  from { opacity: 0; transform: scale(calc(var(--popup-scale) * .975)) translateY(37px); }
+  to { opacity: 1; transform: scale(var(--popup-scale)) translateY(21px); }
+}
+@keyframes overlayHide { from { opacity: 1; } to { opacity: 0; } }
+@keyframes dialogHide {
+  from { opacity: 1; transform: scale(var(--popup-scale)) translateY(21px); }
+  to { opacity: 0; transform: scale(calc(var(--popup-scale) * .985)) translateY(33px); }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .close:hover { opacity: .55; }
+  .submit:not(:disabled):hover,
+  .success > button:hover { background-color: #446255; }
+}
+
+@media (max-width: 1200px) {
+  .dialog { max-width: 760px; }
+}
+
+@media (max-width: 960px) {
+  .dialog { width: min(720px, 100%); min-height: 0; }
+}
+
+@media (max-width: 768px) {
+  .overlay { padding: 12px; align-items: center; }
+  .dialog { width: 100%; max-height: calc(100svh - 24px); padding: 48px 24px 24px; overflow-y: auto; transform: none; }
+  .dialog > header h2, .success h2 { font-size: 38px; }
+  .dialog > header p, .success p { font-size: 17px; }
+  .form { margin-top: 36px; }
+  .row { grid-template-columns: 1fr; }
+  .success { min-height: 520px; }
+}
+
+@media (max-width: 360px) {
+  .overlay { padding: 8px; }
+  .dialog { max-height: calc(100svh - 16px); padding: 44px 16px 16px; }
+  .close { top: 16px; right: 16px; }
+  .dialog > header h2, .success h2 { font-size: 32px; }
+  .dialog > header p, .success p { margin-top: 16px; font-size: 15px; }
+  .form { margin-top: 28px; gap: 18px; }
+  .form textarea { height: 160px; }
+  .submit, .success > button { padding-inline: 20px; }
+}

@@ -28,11 +28,15 @@
 
 .current { color: #727272; }
 
-@media (max-width: 600px) {
-  .breadcrumbs { font-size: 13px; }
-  .separator { font-size: 18px; }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .breadcrumbs a { transition-duration: .01ms; }
+}
+
+@media (max-width: 768px) {
+  .breadcrumbs { max-width: 100%; flex-wrap: wrap; row-gap: 4px; font-size: 14px; white-space: normal; }
+}
+
+@media (max-width: 360px) {
+  .breadcrumbs { gap: 6px; font-size: 12px; }
+  .separator { width: 12px; font-size: 17px; }
 }

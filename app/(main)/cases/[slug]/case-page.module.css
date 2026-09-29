@@ -1,0 +1,74 @@
+.page { padding: 104px 0 150px; color: #050505; background: #fefefe; font-family: "Manrope Variable", "Manrope", sans-serif; }
+.layout { width: min(1380px, calc(100% - 260px)); margin-left: max(130px, calc((100vw - 1660px) / 2)); display: grid; grid-template-columns: 460px 820px; gap: 100px; align-items: start; }
+.sidebar { position: sticky; top: 112px; align-self: start; }
+.heading { display: grid; gap: 28px; }
+.breadcrumbs { display: flex; align-items: center; gap: 8px; font-size: 16px; line-height: 1.4; white-space: nowrap; }
+.breadcrumbs a { transition: color .35s cubic-bezier(.22, .72, .24, 1); }
+.breadcrumbs a:hover { color: #809e91; }
+.breadcrumbs > span:not(:last-child) { width: 16px; text-align: center; font-size: 21px; line-height: 16px; }
+.breadcrumbs > span:last-child { overflow: hidden; color: #727272; text-overflow: ellipsis; }
+.heading h1 { margin: 0; font-size: 48px; font-weight: 500; line-height: 1.2; letter-spacing: -.03em; }
+.whatDone { width: 100%; margin: 48px 0 0; font-size: 20px; line-height: 1.4; }
+.content { min-width: 0; width: 820px; }
+.block { width: 100%; margin: 0 0 70px; }
+.block[data-spacing="compact"] { margin-bottom: 28px; }
+.content > .block:last-child { margin-bottom: 0; }
+.image { display: block; width: 100%; height: 469px; object-fit: cover; border-radius: 5px; }
+figure.block figcaption { margin-bottom: 20px; font-size: 20px; font-weight: 500; line-height: 1.2; }
+.gallery { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; }
+.gallery img { display: block; width: 100%; height: auto; aspect-ratio: 396 / 350; object-fit: cover; border-radius: 5px; }
+.textBlock header { display: grid; gap: 20px; }
+.textBlock h2 { margin: 0; font-size: 28px; font-weight: 500; line-height: 1.2; }
+.textBlock header span { width: 100%; height: 1px; background: #babcaf; }
+.body { margin: 28px 0 0; font-size: 20px; line-height: 1.4; white-space: pre-line; }
+.list { margin: 28px 0 0; padding: 0; display: grid; gap: 16px; list-style: none; }
+.body + .list { margin-top: 24px; }
+.list li { display: flex; align-items: flex-start; gap: 16px; font-size: 20px; line-height: 1.4; }
+.list li > img { width: 8px; height: 18px; margin-top: 5px; flex: 0 0 auto; }
+.list li > div { min-width: 0; flex: 1; }
+.list p { margin: 0; white-space: pre-line; }
+.list[data-style="labeled"] { gap: 24px; }
+.list[data-style="labeled"] li { display: block; }
+.itemLabel { display: block; margin-bottom: 8px; color: #babcaf; }
+.number { min-width: 28px; padding-top: 2px; color: #809e91; font-size: 16px; font-weight: 600; line-height: 1.4; }
+.callout { min-height: 64px; padding: 20px 24px; display: flex; align-items: center; gap: 16px; color: #fefefe; background: #446255; border-radius: 5px; }
+.callout img { width: 24px; height: 24px; flex: 0 0 auto; }
+.callout p { margin: 0; font-size: 20px; font-weight: 500; line-height: 1.2; }
+
+@media (max-width: 1200px) {
+  .layout { width: calc(100% - 80px); margin-inline: auto; grid-template-columns: 360px minmax(0, 1fr); gap: 56px; }
+  .content { width: 100%; }
+  .heading h1 { font-size: 44px; }
+  .image { height: auto; aspect-ratio: 820 / 469; }
+}
+
+@media (max-width: 960px) {
+  .page { padding: 88px 0 120px; }
+  .layout { width: calc(100% - 64px); grid-template-columns: 300px minmax(0, 1fr); gap: 40px; }
+  .heading h1 { font-size: 38px; }
+  .whatDone, .body, .list li, .callout p { font-size: 18px; }
+  .gallery { gap: 18px; }
+}
+
+@media (max-width: 768px) {
+  .page { padding: 60px 0 96px; }
+  .layout { width: calc(100% - 40px); grid-template-columns: 1fr; gap: 64px; }
+  .sidebar { position: static; }
+  .heading { gap: 22px; }
+  .heading h1 { font-size: 42px; }
+  .whatDone { max-width: 620px; margin-top: 28px; }
+  .block { margin-bottom: 52px; }
+  .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 360px) {
+  .page { padding: 44px 0 72px; }
+  .layout { width: calc(100% - 28px); gap: 48px; }
+  .breadcrumbs { gap: 6px; flex-wrap: wrap; font-size: 12px; white-space: normal; }
+  .heading h1 { font-size: 34px; }
+  .whatDone, .body, .list li, .callout p { font-size: 16px; }
+  .gallery { grid-template-columns: 1fr; gap: 14px; }
+  .textBlock h2 { font-size: 24px; }
+  .block { margin-bottom: 44px; }
+  .callout { padding: 16px; align-items: flex-start; }
+}

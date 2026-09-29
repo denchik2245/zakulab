@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Breadcrumbs } from "@/components/breadcrumbs";
-import { CaseVisual } from "@/components/case-visual";
-import { LabMark, Arrow } from "@/components/marks";
-import { getPublishedCase, getPublishedCases } from "@/lib/content-store";
+import type { CaseBlock } from "@/lib/cases";
+import { createLegacyCaseBlocks } from "@/lib/cases";
+import { getPublishedCase } from "@/lib/content-store";
+import styles from "./case-page.module.css";
 
 export const dynamic = "force-dynamic";
 
@@ -19,73 +20,81 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
+function CaseContentBlock({ block }: { block: CaseBlock }) {
+  if (block.type === "image") {
+    if (!block.image) return null;
+    return (
+      <figure className={styles.block} data-spacing={block.spacing}>
+        {block.caption && <figcaption>{block.caption}</figcaption>}
+        <img className={styles.image} src={block.image} alt={block.alt} />
+      </figure>
+    );
+  }
+
+  if (block.type === "gallery") {
+    const images = block.images.filter((item) => item.image);
+    if (images.length === 0) return null;
+    return (
+      <div className={`${styles.block} ${styles.gallery}`} data-spacing={block.spacing}>
+        {images.map((item) => <img key={item.id} src={item.image} alt={item.alt} />)}
+      </div>
+    );
+  }
+
+  if (block.type === "callout") {
+    if (!block.text) return null;
+    return (
+      <aside className={`${styles.block} ${styles.callout}`} data-spacing={block.spacing}>
+        <Image src="/assets/figma/case-callout-icon.svg" width={24} height={24} alt="" />
+        <p>{block.text}</p>
+      </aside>
+    );
+  }
+
+  return (
+    <section className={`${styles.block} ${styles.textBlock}`} data-spacing={block.spacing}>
+      {block.title && <header><h2>{block.title}</h2><span /></header>}
+      {block.body && <p className={styles.body}>{block.body}</p>}
+      {block.listStyle !== "none" && block.items.length > 0 && (
+        <ol className={styles.list} data-style={block.listStyle}>
+          {block.items.map((item, index) => (
+            <li key={item.id}>
+              {block.listStyle === "bullet" && <Image src="/assets/figma/case-list-marker.svg" width={8} height={18} alt="" />}
+              {block.listStyle === "numbered" && <span className={styles.number}>{String(index + 1).padStart(2, "0")}</span>}
+              <div>{item.label && <span className={styles.itemLabel}>{item.label}</span>}<p>{item.text}</p></div>
+            </li>
+          ))}
+        </ol>
+      )}
+    </section>
+  );
+}
+
 export default async function CasePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const item = await getPublishedCase(slug);
   if (!item) notFound();
-  const cases = await getPublishedCases();
-  const next = cases[(cases.findIndex((entry) => entry.slug === slug) + 1) % cases.length];
+  const blocks = item.blocks?.length ? item.blocks : createLegacyCaseBlocks(item);
 
   return (
-    <article className="case-page">
-      <section className="case-hero shell">
-        <Breadcrumbs homeHref="/projects" homeLabel="Все проекты" current={item.index} />
-        <div className="case-title-row">
-          <div><LabMark>{item.eyebrow.toUpperCase()}</LabMark><h1>{item.title}</h1></div>
-          <p>{item.summary}</p>
+    <article className={styles.page}>
+      <div className={styles.layout}>
+        <aside className={styles.sidebar}>
+          <div className={styles.heading}>
+            <nav className={styles.breadcrumbs} aria-label="Хлебные крошки">
+              <Link href="/">Главная</Link><span aria-hidden="true">›</span>
+              <Link href="/projects">Портфолио</Link><span aria-hidden="true">›</span>
+              <span aria-current="page">{item.title}</span>
+            </nav>
+            <h1>{item.title}</h1>
+          </div>
+          <p className={styles.whatDone}>{item.whatDone || item.summary}</p>
+        </aside>
+
+        <div className={styles.content}>
+          {blocks.map((block) => <CaseContentBlock key={block.id} block={block} />)}
         </div>
-        <CaseVisual item={item} />
-        <div className="case-facts">
-          <div><span>Роль</span><strong>{item.role}</strong></div>
-          <div><span>Год</span><strong>{item.year}</strong></div>
-          <a href={item.url} target="_blank" rel="noreferrer"><span>Сайт</span><strong>Открыть проект <Arrow diagonal /></strong></a>
-        </div>
-      </section>
-
-      <section className="case-story section shell">
-        <div className="case-story-label"><LabMark>01 / CONTEXT</LabMark><span>Исходная задача</span></div>
-        <div className="case-story-copy"><h2>Сначала —<br /><em>понять проблему</em></h2><p>{item.draft.challenge}</p></div>
-      </section>
-
-      <section className="case-proof section">
-        <div className="shell proof-grid">
-          <div><LabMark>VERIFIED / FACTS</LabMark><h2>Что сделано</h2></div>
-          <ol>{item.verified.map((fact) => <li key={fact}>{fact}</li>)}</ol>
-        </div>
-      </section>
-
-      <section className="case-story section shell">
-        <div className="case-story-label"><LabMark>02 / LOGIC</LabMark><span>Подход</span></div>
-        <div className="case-story-copy"><h2>Структура до<br /><em>визуального слоя</em></h2><p>{item.draft.approach}</p></div>
-      </section>
-
-      <section className="decision-section section shell">
-        <div className="section-kicker"><LabMark>03 / DECISIONS</LabMark><span>Ключевые решения</span></div>
-        <div className="decision-grid">
-          {item.draft.decisions.map((decision, index) => (
-            <article key={decision.title}><span>0{index + 1}</span><h3>{decision.title}</h3><p>{decision.text}</p></article>
-          ))}
-        </div>
-      </section>
-
-      <section className={`case-spread case-${item.accent}`}>
-        <div className="shell">
-          <p>DESIGN SYSTEM / {item.title.toUpperCase()}</p>
-          <strong>{item.slug === "alts" ? "Ясность для сложной отрасли" : item.slug === "ashanti" ? "Большой выбор без перегруза" : "Аргументы вместо обещаний"}</strong>
-          <div className="spread-grid"><span /><span /><span /><span /></div>
-        </div>
-      </section>
-
-      <section className="case-result section shell">
-        <LabMark>04 / RESULT</LabMark>
-        <h2>Результат</h2>
-        <p>{item.draft.result}</p>
-        <span className="draft-note">Перед публикацией заменить все фрагменты [УТОЧНИТЬ] на подтверждённые данные.</span>
-      </section>
-
-      <Link className="next-case" href={`/cases/${next.slug}`}>
-        <span>Следующий кейс</span><strong>{next.title}</strong><Arrow diagonal />
-      </Link>
+      </div>
     </article>
   );
 }

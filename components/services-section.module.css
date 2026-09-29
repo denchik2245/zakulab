@@ -1,0 +1,116 @@
+.section {
+  --background-primary: #fefefe;
+  --surface-card: #eaeaea;
+  --text-primary: #050505;
+  --text-muted: #727272;
+  --border: #babcaf;
+  --border-card: #b8b8b8;
+  padding-block: 150px;
+  color: var(--text-primary);
+  background: var(--background-primary);
+  font-family: "Manrope Variable", "Manrope", sans-serif;
+}
+
+.section h2,
+.section h3,
+.section h4,
+.section p { margin-top: 0; }
+
+.shell {
+  width: min(1660px, calc(100% - 260px));
+  min-height: 1276px;
+  margin-inline: auto;
+}
+
+.heading {
+  height: 100px;
+  display: grid;
+  grid-template-columns: 850px 650px;
+  gap: 130px;
+}
+
+.title { width: 100%; }
+.title > span { color: var(--text-muted); font-size: 16px; line-height: 1.4; }
+.title h2 { margin: 20px 0 0; font-size: 48px; font-weight: 500; line-height: 1.2; letter-spacing: -.03em; }
+.heading p { margin: 50px 0 0; font-size: 20px; line-height: 1.4; }
+
+.services {
+  height: 360px;
+  margin-top: 184px;
+  display: grid;
+  grid-template-columns: 550px 560px 550px;
+  border-bottom: 1px solid var(--border);
+}
+
+.services article { padding-right: 36px; display: flex; flex-direction: column; }
+.services article + article { padding-left: 35px; border-left: 1px solid var(--border); }
+.services article:last-child { padding-right: 0; }
+.services h3,
+.smallTasks h3 { margin: 0; font-size: 28px; font-weight: 500; line-height: 1.2; }
+.services article > p { margin: 28px 0 0; font-size: 16px; line-height: 1.4; }
+
+.terms { margin-top: auto; padding-bottom: 36px; display: grid; gap: 3px; }
+.terms span { margin-bottom: 13px; color: var(--text-muted); font-size: 20px; line-height: 1.4; }
+.terms strong { font-size: 24px; font-weight: 500; line-height: 1.2; }
+
+.section .smallTasksTitle { margin: 100px 0 0; font-size: 48px; font-weight: 500; line-height: 1.2; letter-spacing: -.03em; }
+.smallTasks { height: 424px; margin-top: 50px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.smallTasks article { min-width: 0; position: relative; padding: 36px; border-radius: 5px; background: var(--surface-card); }
+.smallTasks article > p { width: 756px; margin: 28px 0 0; font-size: 16px; line-height: 1.4; }
+.deliverable { position: absolute; top: 148px; left: 0; right: 0; padding: 27px 28px 0 36px; border-top: 1px solid var(--border-card); }
+.deliverable h4 { margin: 0 0 16px; font-size: 24px; font-weight: 500; line-height: 1.2; }
+.deliverable p { margin: 0; font-size: 16px; line-height: 1.4; }
+.taskTerms { position: absolute; left: 36px; bottom: 36px; display: grid; gap: 16px; }
+.taskTerms span { color: var(--text-muted); font-size: 20px; line-height: 1.4; }
+.taskTerms strong { font-size: 24px; font-weight: 500; line-height: 1.2; }
+
+@media (max-width: 1200px) {
+  .section { padding-block: 120px; }
+  .shell { width: calc(100% - 80px); }
+  .heading { grid-template-columns: minmax(0, 1fr) minmax(360px, .8fr); gap: 60px; }
+  .services { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .services article { padding-right: 24px; }
+  .services article + article { padding-left: 24px; }
+  .smallTasks article > p { width: auto; }
+}
+
+@media (max-width: 960px) {
+  .section { padding-block: 104px; }
+  .shell { width: calc(100% - 64px); }
+  .heading { grid-template-columns: 1fr; gap: 18px; }
+  .heading p { max-width: 620px; margin-top: 0; }
+  .services { height: auto; margin-top: 76px; grid-template-columns: 1fr; border-top: 1px solid var(--border); }
+  .services article, .services article + article { min-height: 280px; padding: 32px 0; border-left: 0; border-bottom: 1px solid var(--border); }
+  .terms { padding-bottom: 0; }
+  .smallTasks { height: auto; }
+  .smallTasks article { min-height: 424px; }
+  .smallTasks article > p { width: auto; }
+}
+
+@media (max-width: 768px) {
+  .section { padding-block: 88px; }
+  .shell { width: calc(100% - 40px); }
+  .title h2, .section .smallTasksTitle { font-size: 38px; }
+  .heading p { font-size: 18px; }
+  .services { margin-top: 60px; }
+  .services article, .services article + article { min-height: 250px; }
+  .section .smallTasksTitle { margin-top: 80px; }
+  .smallTasks { grid-template-columns: 1fr; gap: 16px; }
+  .smallTasks article { min-height: 420px; padding: 28px; }
+  .deliverable { padding-inline: 28px; }
+  .taskTerms { left: 28px; bottom: 28px; }
+}
+
+@media (max-width: 360px) {
+  .section { padding-block: 72px; }
+  .shell { width: calc(100% - 28px); }
+  .title h2, .section .smallTasksTitle { font-size: 34px; }
+  .heading p { font-size: 16px; }
+  .services h3, .smallTasks h3 { font-size: 24px; }
+  .services article, .services article + article { min-height: 230px; padding-block: 28px; }
+  .terms span, .taskTerms span { font-size: 17px; }
+  .terms strong, .taskTerms strong { font-size: 21px; }
+  .smallTasks article { min-height: 0; padding: 22px; }
+  .deliverable { position: static; margin: 24px -22px 0; padding: 22px 22px 0; }
+  .taskTerms { position: static; margin-top: 32px; }
+}

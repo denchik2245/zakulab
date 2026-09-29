@@ -59,9 +59,13 @@ export function ContactPopupButton({ children, title, description, telegramUrl, 
   useEffect(() => {
     if (!isOpen) return;
     const previousOverflow = document.body.style.overflow;
-    const page = document.querySelector<HTMLElement>(".figma-home-page, .style-check-page");
+    const previousPaddingRight = document.body.style.paddingRight;
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    const bodyPaddingRight = Number.parseFloat(window.getComputedStyle(document.body).paddingRight) || 0;
+    const page = document.querySelector<HTMLElement>(".figma-home-page, .figma-portfolio-page, .style-check-page");
     const pageWasInert = page?.inert ?? false;
     document.body.style.overflow = "hidden";
+    if (scrollbarWidth > 0) document.body.style.paddingRight = `${bodyPaddingRight + scrollbarWidth}px`;
     if (page) page.inert = true;
     closeButtonRef.current?.focus();
 
@@ -83,6 +87,7 @@ export function ContactPopupButton({ children, title, description, telegramUrl, 
     document.addEventListener("keydown", onKeyDown);
     return () => {
       document.body.style.overflow = previousOverflow;
+      document.body.style.paddingRight = previousPaddingRight;
       if (page) page.inert = pageWasInert;
       document.removeEventListener("keydown", onKeyDown);
       triggerRef.current?.focus();

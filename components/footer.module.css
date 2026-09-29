@@ -30,21 +30,40 @@
 .legal { position: absolute; z-index: 1; left: 130px; top: 594px; width: 700px; display: grid; grid-template-columns: 361px 1fr; color: var(--footer-muted); font-size: 18px; font-weight: 600; line-height: 1; }
 .mark { position: absolute; right: -50px; bottom: -80px; }
 
-@media (max-width: 959px) {
-  .footer { height: auto; min-height: 650px; padding-inline: 40px; }
-  .columns { position: relative; top: auto; left: auto; right: auto; margin-top: 60px; grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 1200px) {
+  .footer { padding: 84px 40px 30px; }
+  .columns { left: 40px; right: 40px; grid-template-columns: 30% 34% 1fr; }
   .legal { left: 40px; }
 }
 
-@media (max-width: 700px) {
-  .footer { padding: 70px 20px 30px; }
-  .top { flex-wrap: wrap; gap: 20px; }
-  .top h2 { width: 100%; font-size: 36px; }
-  .discuss, .toTop { margin-left: 0; }
-  .columns { margin-top: 60px; grid-template-columns: 1fr 1fr; gap: 40px 20px; }
-  .columns > div { font-size: 17px; }
-  .legal { position: relative; left: auto; top: auto; width: auto; margin-top: 60px; grid-template-columns: 1fr; gap: 14px; font-size: 15px; }
-  .mark { width: 260px; height: 260px; right: -80px; bottom: -40px; }
+@media (max-width: 960px) {
+  .footer { height: auto; min-height: 650px; }
+  .columns { position: relative; top: auto; left: auto; right: auto; margin-top: 64px; grid-template-columns: repeat(3, 1fr); }
+  .legal { left: 40px; top: auto; bottom: 30px; }
 }
 
+@media (max-width: 768px) {
+  .footer { min-height: 0; padding: 64px 20px 30px; }
+  .top { flex-wrap: wrap; gap: 18px; }
+  .top h2 { width: 100%; font-size: 36px; }
+  .discuss, .toTop { margin-left: 0; }
+  .columns { margin-top: 56px; grid-template-columns: 1fr 1fr; gap: 40px 20px; }
+  .columns > div { font-size: 17px; }
+  .legal { position: relative; left: auto; top: auto; bottom: auto; width: auto; margin-top: 56px; grid-template-columns: 1fr; gap: 14px; font-size: 15px; }
+  .mark { width: 260px; height: 260px; right: -80px; bottom: -40px; opacity: .5; }
+}
 
+@media (max-width: 360px) {
+  .footer { padding: 56px 14px 24px; }
+  .top h2 { font-size: 32px; }
+  .discuss { width: calc(100% - 72px); padding-inline: 20px; justify-content: center; }
+  .toTop { width: 56px; }
+  .columns { grid-template-columns: 1fr; gap: 30px; }
+  .columns > div > span { margin-bottom: 6px; font-size: 15px; }
+  .legal { margin-top: 44px; font-size: 14px; }
+  .mark { width: 220px; height: 220px; right: -92px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .footer * { transition-duration: .01ms !important; }
+}

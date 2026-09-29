@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Breadcrumbs } from "@/components/breadcrumbs";
+import { ServicesSection } from "@/components/services-section";
 import type { PortfolioFilter, SiteSettings } from "@/lib/site-settings";
 import styles from "./portfolio-page.module.css";
 
@@ -45,10 +46,6 @@ export function PortfolioPage({ site }: { site: SiteSettings }) {
       </div>
     </section>
 
-    <section className={styles.price} id="price">
-      <div className={styles.priceIntro}><div className={styles.sectionTitle}><span>{`{Стоимость}`}</span><h2>{site.servicesTitle}</h2></div><p>{site.servicesText}</p></div>
-      <div className={styles.services}>{site.services.map((service) => <article key={service.id}><div className={styles.serviceCopy}><h3>{service.title}<Arrow /></h3><p>{service.text}</p></div><div className={styles.serviceTerms}><span>{service.time}</span><strong>{service.price}</strong><strong>{service.priceSecondary}</strong></div></article>)}</div>
-      <div className={styles.smallTasks}><h2>{site.smallTasksTitle}</h2><div className={styles.taskGrid}>{site.smallTasks.map((task) => <article key={task.id}><div className={styles.taskHead}><h3>{task.title}<Arrow /></h3><p>{task.text}</p></div><div className={styles.deliverable}><h4>Что вы получите</h4><p>{task.deliverable}</p></div><div className={styles.taskTerms}><span>{task.time}</span><strong>{task.price}</strong></div></article>)}</div></div>
-    </section>
+    <ServicesSection site={site} />
   </div>;
 }

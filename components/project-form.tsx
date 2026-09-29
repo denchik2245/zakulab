@@ -79,7 +79,7 @@ export function ProjectForm() {
       <label className="consent field-wide">
         <input type="checkbox" name="consent" required />
         <span>
-          Я соглашаюсь с <a href="/privacy" target="_blank">обработкой персональных данных</a>
+          Я соглашаюсь с <a href="/consent" target="_blank">обработкой персональных данных</a>
         </span>
       </label>
       <button type="submit" className="button button-light field-wide">

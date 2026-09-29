@@ -199,7 +199,17 @@ export const defaultSiteSettings: SiteSettings = {
         title: "Заказать интернет-магазин",
         description: "Выберите удобный способ — отвечу, обсудим задачу и подскажу, с чего начать.",
       },
+      audit: {
+        title: "Заказать аудит сайта",
+        description: "Выберите удобный способ — отвечу, обсудим задачу и подскажу, с чего начать.",
+      },
+      structure: {
+        title: "Заказать структуру главной страницы",
+        description: "Выберите удобный способ — отвечу, обсудим задачу и подскажу, с чего начать.",
+      },
     },
+    reviewFormTitle: "Оставить отзыв",
+    reviewFormDescription: "Выберите удобный способ — отвечу, обсудим задачу и подскажу, с чего начать.",
     styleResultTitle: "Отправить результаты выбора стиля",
     styleResultDescription: "Выберите удобный способ — результат теста уже сохранён, останется только отправить его мне.",
   },
@@ -211,6 +221,8 @@ export type PopupSettings = {
   serviceTitlePrefix: string;
   serviceDescription: string;
   services: Record<string, PopupCopy>;
+  reviewFormTitle: string;
+  reviewFormDescription: string;
   styleResultTitle: string;
   styleResultDescription: string;
 };

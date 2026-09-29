@@ -4,7 +4,7 @@ import { ChangeEvent, FormEvent, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { AdminContent } from "@/lib/content-store";
-import type { CaseStudy } from "@/lib/cases";
+import type { CaseBlock, CaseStudy } from "@/lib/cases";
 import { externalUrl } from "@/lib/external-url";
 import type { VerifiedReview } from "@/lib/reviews";
 import type { PortfolioFilter, PortfolioProject, SiteSettings } from "@/lib/site-settings";
@@ -23,6 +23,14 @@ function blankPortfolioProject(count: number): PortfolioProject {
   return { id: `portfolio-${Date.now()}`, title: "Новая работа", description: "Короткое описание проекта", image: "", url: "#", platform: "", tags: ["", ""], filters: [], homePlacement: "hidden", portfolioPlacement: "archive", published: true, order: (count + 1) * 10 };
 }
 
+function blankCaseBlock(type: CaseBlock["type"]): CaseBlock {
+  const id = `case-${type}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+  if (type === "image") return { id, type, image: "", alt: "", caption: "", spacing: "large" };
+  if (type === "gallery") return { id, type, images: [{ id: `${id}-1`, image: "", alt: "" }, { id: `${id}-2`, image: "", alt: "" }], spacing: "large" };
+  if (type === "callout") return { id, type, text: "Ключевой результат проекта", spacing: "large" };
+  return { id, type, title: "Название раздела", body: "Текст раздела", listStyle: "none", items: [], spacing: "large" };
+}
+
 function blankCase(count: number, title = "Новый проект"): CaseStudy {
   const now = new Date().toISOString();
   return {
@@ -31,6 +39,7 @@ function blankCase(count: number, title = "Новый проект"): CaseStudy 
     title,
     eyebrow: "Сфера · формат сайта",
     summary: "Короткое описание проекта для каталога.",
+    whatDone: "Коротко опишите, что было сделано и какой результат получил проект.",
     role: "Структура, UX/UI-дизайн",
     year: String(new Date().getFullYear()),
     url: "https://",
@@ -41,6 +50,7 @@ function blankCase(count: number, title = "Новый проект"): CaseStudy 
     featured: false,
     createdAt: now,
     updatedAt: now,
+    blocks: [blankCaseBlock("image"), blankCaseBlock("text")],
     verified: ["Что сделано в проекте", "Второй подтверждённый факт", "Третий подтверждённый факт"],
     draft: {
       challenge: "Опишите исходную задачу клиента.",
@@ -113,13 +123,41 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
   const activeReview = content?.reviews.find((item) => item.id === selectedReview) ?? content?.reviews[1] ?? content?.reviews[0] ?? null;
   const activePortfolio = content?.site.portfolioProjects.find((item) => item.id === selectedPortfolio) ?? content?.site.portfolioProjects[0] ?? null;
   const activeStyle = content?.site.styleChoice.styles.find((item) => item.id === selectedStyle) ?? content?.site.styleChoice.styles[0] ?? null;
-  const popupItems = content?.site.services.map((service) => ({
-    id: service.id,
-    fallbackTitle: `${content.site.popups.serviceTitlePrefix} ${service.title.toLocaleLowerCase("ru-RU")}`,
-    title: content.site.popups.services[service.id]?.title || `${content.site.popups.serviceTitlePrefix} ${service.title.toLocaleLowerCase("ru-RU")}`,
-    description: content.site.popups.services[service.id]?.description || content.site.popups.serviceDescription,
-  })) ?? [];
-  const activePopup = popupItems.find((item) => item.id === selectedPopup) ?? popupItems[1] ?? popupItems[0] ?? null;
+  const popupItems = content ? [
+    ...content.site.services.map((service) => ({
+      id: `service:${service.id}`,
+      storageId: service.id,
+      kind: "service" as const,
+      fallbackTitle: `${content.site.popups.serviceTitlePrefix} ${service.title.toLocaleLowerCase("ru-RU")}`,
+      title: content.site.popups.services[service.id]?.title || `${content.site.popups.serviceTitlePrefix} ${service.title.toLocaleLowerCase("ru-RU")}`,
+      description: content.site.popups.services[service.id]?.description || content.site.popups.serviceDescription,
+    })),
+    ...content.site.smallTasks.map((task) => ({
+      id: `task:${task.id}`,
+      storageId: task.id,
+      kind: "service" as const,
+      fallbackTitle: `${content.site.popups.serviceTitlePrefix} ${task.title.toLocaleLowerCase("ru-RU")}`,
+      title: content.site.popups.services[task.id]?.title || `${content.site.popups.serviceTitlePrefix} ${task.title.toLocaleLowerCase("ru-RU")}`,
+      description: content.site.popups.services[task.id]?.description || content.site.popups.serviceDescription,
+    })),
+    {
+      id: "review-form",
+      storageId: "review-form",
+      kind: "review-form" as const,
+      fallbackTitle: content.site.popups.reviewFormTitle,
+      title: content.site.popups.reviewFormTitle,
+      description: content.site.popups.reviewFormDescription,
+    },
+    {
+      id: "style-result",
+      storageId: "style-result",
+      kind: "style-result" as const,
+      fallbackTitle: content.site.popups.styleResultTitle,
+      title: content.site.popups.styleResultTitle,
+      description: content.site.popups.styleResultDescription,
+    },
+  ] : [];
+  const activePopup = popupItems.find((item) => item.id === selectedPopup) ?? popupItems[0] ?? null;
 
   async function login(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -168,17 +206,79 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
     patchPortfolio(projectId, { caseStudy: { ...project.caseStudy, ...patch } });
   }
 
-  function updateCaseArray(projectId: string, key: "verified" | "decisions", index: number, value: string, subKey?: "title" | "text") {
+  function patchCaseBlocks(projectId: string, blocks: CaseBlock[]) {
+    patchCaseStudy(projectId, { blocks });
+  }
+
+  function patchCaseBlock(projectId: string, blockId: string, patch: Partial<CaseBlock>) {
     const caseStudy = content?.site.portfolioProjects.find((item) => item.id === projectId)?.caseStudy;
     if (!caseStudy) return;
-    if (key === "verified") {
-      const verified = [...caseStudy.verified];
-      verified[index] = value;
-      patchCaseStudy(projectId, { verified });
-      return;
-    }
-    const decisions = caseStudy.draft.decisions.map((item, itemIndex) => itemIndex === index ? { ...item, [subKey ?? "text"]: value } : item);
-    patchCaseStudy(projectId, { draft: { ...caseStudy.draft, decisions } });
+    patchCaseBlocks(projectId, (caseStudy.blocks ?? []).map((block) => block.id === blockId ? { ...block, ...patch } as CaseBlock : block));
+  }
+
+  function addCaseBlock(projectId: string, type: CaseBlock["type"]) {
+    const caseStudy = content?.site.portfolioProjects.find((item) => item.id === projectId)?.caseStudy;
+    if (!caseStudy) return;
+    patchCaseBlocks(projectId, [...(caseStudy.blocks ?? []), blankCaseBlock(type)]);
+  }
+
+  function removeCaseBlock(projectId: string, blockId: string) {
+    const caseStudy = content?.site.portfolioProjects.find((item) => item.id === projectId)?.caseStudy;
+    if (!caseStudy) return;
+    patchCaseBlocks(projectId, (caseStudy.blocks ?? []).filter((block) => block.id !== blockId));
+  }
+
+  function moveCaseBlock(projectId: string, blockId: string, direction: -1 | 1) {
+    const caseStudy = content?.site.portfolioProjects.find((item) => item.id === projectId)?.caseStudy;
+    if (!caseStudy) return;
+    const blocks = [...(caseStudy.blocks ?? [])];
+    const index = blocks.findIndex((block) => block.id === blockId);
+    const nextIndex = index + direction;
+    if (index < 0 || nextIndex < 0 || nextIndex >= blocks.length) return;
+    [blocks[index], blocks[nextIndex]] = [blocks[nextIndex], blocks[index]];
+    patchCaseBlocks(projectId, blocks);
+  }
+
+  function addCaseBlockItem(projectId: string, blockId: string) {
+    const caseStudy = content?.site.portfolioProjects.find((item) => item.id === projectId)?.caseStudy;
+    const block = caseStudy?.blocks?.find((item) => item.id === blockId);
+    if (!block || block.type !== "text") return;
+    patchCaseBlock(projectId, blockId, { items: [...block.items, { id: `${blockId}-item-${Date.now()}`, label: "", text: "Новый пункт" }] });
+  }
+
+  function patchCaseBlockItem(projectId: string, blockId: string, itemId: string, patch: { label?: string; text?: string }) {
+    const caseStudy = content?.site.portfolioProjects.find((item) => item.id === projectId)?.caseStudy;
+    const block = caseStudy?.blocks?.find((item) => item.id === blockId);
+    if (!block || block.type !== "text") return;
+    patchCaseBlock(projectId, blockId, { items: block.items.map((item) => item.id === itemId ? { ...item, ...patch } : item) });
+  }
+
+  function removeCaseBlockItem(projectId: string, blockId: string, itemId: string) {
+    const caseStudy = content?.site.portfolioProjects.find((item) => item.id === projectId)?.caseStudy;
+    const block = caseStudy?.blocks?.find((item) => item.id === blockId);
+    if (!block || block.type !== "text") return;
+    patchCaseBlock(projectId, blockId, { items: block.items.filter((item) => item.id !== itemId) });
+  }
+
+  function patchCaseGalleryImage(projectId: string, blockId: string, imageId: string, patch: { image?: string; alt?: string }) {
+    const caseStudy = content?.site.portfolioProjects.find((item) => item.id === projectId)?.caseStudy;
+    const block = caseStudy?.blocks?.find((item) => item.id === blockId);
+    if (!block || block.type !== "gallery") return;
+    patchCaseBlock(projectId, blockId, { images: block.images.map((image) => image.id === imageId ? { ...image, ...patch } : image) });
+  }
+
+  function addCaseGalleryImage(projectId: string, blockId: string) {
+    const caseStudy = content?.site.portfolioProjects.find((item) => item.id === projectId)?.caseStudy;
+    const block = caseStudy?.blocks?.find((item) => item.id === blockId);
+    if (!block || block.type !== "gallery") return;
+    patchCaseBlock(projectId, blockId, { images: [...block.images, { id: `${blockId}-image-${Date.now()}`, image: "", alt: "" }] });
+  }
+
+  function removeCaseGalleryImage(projectId: string, blockId: string, imageId: string) {
+    const caseStudy = content?.site.portfolioProjects.find((item) => item.id === projectId)?.caseStudy;
+    const block = caseStudy?.blocks?.find((item) => item.id === blockId);
+    if (!block || block.type !== "gallery") return;
+    patchCaseBlock(projectId, blockId, { images: block.images.filter((image) => image.id !== imageId) });
   }
 
   function toggleCaseStudy(projectId: string, enabled: boolean) {
@@ -283,10 +383,32 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
     patchSite({ styleChoice: { ...content.site.styleChoice, styles: content.site.styleChoice.styles.filter((item) => item.id !== id) } });
   }
 
-  function patchServicePopup(id: string, patch: { title?: string; description?: string }) {
+  function patchPopup(id: string, patch: { title?: string; description?: string }) {
     if (!content) return;
-    const current = content.site.popups.services[id] ?? {
-      title: popupItems.find((item) => item.id === id)?.fallbackTitle ?? "",
+    const item = popupItems.find((popup) => popup.id === id);
+    if (!item) return;
+    if (item.kind === "review-form") {
+      patchSite({
+        popups: {
+          ...content.site.popups,
+          reviewFormTitle: patch.title ?? content.site.popups.reviewFormTitle,
+          reviewFormDescription: patch.description ?? content.site.popups.reviewFormDescription,
+        },
+      });
+      return;
+    }
+    if (item.kind === "style-result") {
+      patchSite({
+        popups: {
+          ...content.site.popups,
+          styleResultTitle: patch.title ?? content.site.popups.styleResultTitle,
+          styleResultDescription: patch.description ?? content.site.popups.styleResultDescription,
+        },
+      });
+      return;
+    }
+    const current = content.site.popups.services[item.storageId] ?? {
+      title: item.fallbackTitle,
       description: content.site.popups.serviceDescription,
     };
     patchSite({
@@ -294,7 +416,7 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
         ...content.site.popups,
         services: {
           ...content.site.popups.services,
-          [id]: { ...current, ...patch },
+          [item.storageId]: { ...current, ...patch },
         },
       },
     });
@@ -325,7 +447,7 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
             ["portfolio", "Портфолио", String(content.site.portfolioProjects.length).padStart(2, "0")],
             ["reviews", "Отзывы", String(pendingReviews).padStart(2, "0")],
             ["styles", "Выбор стиля", String(content.site.styleChoice.styles.length).padStart(2, "0")],
-            ["popups", "Поп-ап окна", "02"],
+            ["popups", "Поп-ап окна", String(popupItems.length).padStart(2, "0")],
           ] as const).map(([id, label, count]) => (
             <button className={tab === id ? "is-active" : ""} onClick={() => setTab(id)} key={id}><span>{label}</span><i>{count}</i></button>
           ))}
@@ -384,11 +506,11 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
                 <div className="admin-popup-editor">
                   <div className="admin-popup-editor-head"><h2>{activePopup.title}</h2></div>
                   <div className="admin-popup-fields">
-                    <Field label="Название"><input value={activePopup.title} onChange={(event) => patchServicePopup(activePopup.id, { title: event.target.value })} /></Field>
-                    <Field label="Описание"><textarea rows={4} value={activePopup.description} onChange={(event) => patchServicePopup(activePopup.id, { description: event.target.value })} /></Field>
+                    <Field label="Название"><input value={activePopup.title} onChange={(event) => patchPopup(activePopup.id, { title: event.target.value })} /></Field>
+                    <Field label="Описание"><textarea rows={4} value={activePopup.description} onChange={(event) => patchPopup(activePopup.id, { description: event.target.value })} /></Field>
                   </div>
                 </div>
-              ) : <div className="admin-empty-panel"><p>Добавьте услугу на главной странице.</p></div>}
+              ) : <div className="admin-empty-panel"><p>На сайте пока нет поп-ап окон.</p></div>}
             </div>
           </div>
         )}
@@ -437,17 +559,24 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
                         <Field label="Цвет"><select value={activePortfolio.caseStudy.accent} onChange={(event) => patchCaseStudy(activePortfolio.id, { accent: event.target.value as CaseStudy["accent"] })}><option value="green">Зелёный</option><option value="orange">Оранжевый</option><option value="coral">Коралловый</option></select></Field>
                         <Field wide label="Подпись формата"><input value={activePortfolio.caseStudy.eyebrow} onChange={(event) => patchCaseStudy(activePortfolio.id, { eyebrow: event.target.value })} /></Field>
                         <Field wide label="Короткое описание кейса"><textarea rows={3} value={activePortfolio.caseStudy.summary} onChange={(event) => patchCaseStudy(activePortfolio.id, { summary: event.target.value })} /></Field>
+                        <Field wide label="Что сделал — текст в закреплённой колонке"><textarea rows={4} value={activePortfolio.caseStudy.whatDone ?? activePortfolio.caseStudy.summary} onChange={(event) => patchCaseStudy(activePortfolio.id, { whatDone: event.target.value })} /></Field>
                         <Field wide label="Задача для каталога"><textarea rows={3} value={activePortfolio.caseStudy.catalogTask} onChange={(event) => patchCaseStudy(activePortfolio.id, { catalogTask: event.target.value })} /></Field>
                         <Field wide label="Моя роль"><input value={activePortfolio.caseStudy.role} onChange={(event) => patchCaseStudy(activePortfolio.id, { role: event.target.value })} /></Field>
                         <Field wide label="Ссылка на живой сайт"><input type="url" value={activePortfolio.caseStudy.url} onChange={(event) => patchCaseStudy(activePortfolio.id, { url: event.target.value })} /></Field>
                       </div>
-                      <EditorSection title="Что сделано" code="FACTS / 03">{activePortfolio.caseStudy.verified.map((fact, index) => <input key={index} value={fact} onChange={(event) => updateCaseArray(activePortfolio.id, "verified", index, event.target.value)} />)}</EditorSection>
-                      <EditorSection title="Разбор проекта" code="STORY / LONG">
-                        <Field label="Исходная задача"><textarea rows={5} value={activePortfolio.caseStudy.draft.challenge} onChange={(event) => patchCaseStudy(activePortfolio.id, { draft: { ...activePortfolio.caseStudy!.draft, challenge: event.target.value } })} /></Field>
-                        <Field label="Подход"><textarea rows={5} value={activePortfolio.caseStudy.draft.approach} onChange={(event) => patchCaseStudy(activePortfolio.id, { draft: { ...activePortfolio.caseStudy!.draft, approach: event.target.value } })} /></Field>
-                        {activePortfolio.caseStudy.draft.decisions.map((decision, index) => <div className="admin-decision-fields" key={index}><input value={decision.title} onChange={(event) => updateCaseArray(activePortfolio.id, "decisions", index, event.target.value, "title")} /><textarea rows={3} value={decision.text} onChange={(event) => updateCaseArray(activePortfolio.id, "decisions", index, event.target.value, "text")} /></div>)}
-                        <Field label="Результат"><textarea rows={5} value={activePortfolio.caseStudy.draft.result} onChange={(event) => patchCaseStudy(activePortfolio.id, { draft: { ...activePortfolio.caseStudy!.draft, result: event.target.value } })} /></Field>
-                      </EditorSection>
+                      <CaseBuilder
+                        blocks={activePortfolio.caseStudy.blocks ?? []}
+                        onAdd={(type) => addCaseBlock(activePortfolio.id, type)}
+                        onPatch={(blockId, patch) => patchCaseBlock(activePortfolio.id, blockId, patch)}
+                        onMove={(blockId, direction) => moveCaseBlock(activePortfolio.id, blockId, direction)}
+                        onRemove={(blockId) => removeCaseBlock(activePortfolio.id, blockId)}
+                        onAddItem={(blockId) => addCaseBlockItem(activePortfolio.id, blockId)}
+                        onPatchItem={(blockId, itemId, patch) => patchCaseBlockItem(activePortfolio.id, blockId, itemId, patch)}
+                        onRemoveItem={(blockId, itemId) => removeCaseBlockItem(activePortfolio.id, blockId, itemId)}
+                        onPatchGalleryImage={(blockId, imageId, patch) => patchCaseGalleryImage(activePortfolio.id, blockId, imageId, patch)}
+                        onAddGalleryImage={(blockId) => addCaseGalleryImage(activePortfolio.id, blockId)}
+                        onRemoveGalleryImage={(blockId, imageId) => removeCaseGalleryImage(activePortfolio.id, blockId, imageId)}
+                      />
                   </div></details>}
                 </div>
               ) : <div className="admin-empty-panel"><p>Добавьте первую работу.</p></div>}
@@ -463,7 +592,7 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
                 {[...content.reviews].sort((a, b) => a.order - b.order).map((item) => (
                   <button className={activeReview?.id === item.id ? "is-active" : ""} onClick={() => setSelectedReview(item.id)} key={item.id}>
                     <strong>{item.author.name}</strong>
-                    <small><span>{item.author.company}</span><i />{formatReviewDate(item.submittedAt)}</small>
+                    <small><span>{item.author.company || item.author.role || "Без компании"}</span><i />{formatReviewDate(item.submittedAt)}</small>
                   </button>
                 ))}
               </div>
@@ -565,8 +694,95 @@ function Field({ label, wide = false, children }: { label: string; wide?: boolea
   return <label className={wide ? "is-wide" : ""}><span>{label}</span>{children}</label>;
 }
 
-function EditorSection({ title, code, children }: { title: string; code: string; children: React.ReactNode }) {
-  return <section className="admin-editor-section"><div><span>{code}</span><h3>{title}</h3></div><div>{children}</div></section>;
+function CaseBuilder({
+  blocks,
+  onAdd,
+  onPatch,
+  onMove,
+  onRemove,
+  onAddItem,
+  onPatchItem,
+  onRemoveItem,
+  onPatchGalleryImage,
+  onAddGalleryImage,
+  onRemoveGalleryImage,
+}: {
+  blocks: CaseBlock[];
+  onAdd: (type: CaseBlock["type"]) => void;
+  onPatch: (blockId: string, patch: Partial<CaseBlock>) => void;
+  onMove: (blockId: string, direction: -1 | 1) => void;
+  onRemove: (blockId: string) => void;
+  onAddItem: (blockId: string) => void;
+  onPatchItem: (blockId: string, itemId: string, patch: { label?: string; text?: string }) => void;
+  onRemoveItem: (blockId: string, itemId: string) => void;
+  onPatchGalleryImage: (blockId: string, imageId: string, patch: { image?: string; alt?: string }) => void;
+  onAddGalleryImage: (blockId: string) => void;
+  onRemoveGalleryImage: (blockId: string, imageId: string) => void;
+}) {
+  const typeLabels: Record<CaseBlock["type"], string> = { image: "Изображение", gallery: "Галерея", text: "Текстовая секция", callout: "Акцентная плашка" };
+
+  return (
+    <section className="admin-case-builder">
+      <div className="admin-case-builder-head">
+        <div><span>PAGE / BLOCKS</span><h3>Конструктор страницы</h3><p>Добавляйте блоки и меняйте их порядок. Компактный отступ связывает несколько блоков в одну смысловую секцию.</p></div>
+        <div className="admin-case-add-buttons">
+          <button type="button" onClick={() => onAdd("image")}>+ Изображение</button>
+          <button type="button" onClick={() => onAdd("gallery")}>+ Галерея</button>
+          <button type="button" onClick={() => onAdd("text")}>+ Текст</button>
+          <button type="button" onClick={() => onAdd("callout")}>+ Плашка</button>
+        </div>
+      </div>
+
+      {blocks.length === 0 && <p className="admin-case-builder-empty">Добавьте первый блок страницы.</p>}
+
+      <div className="admin-case-blocks">
+        {blocks.map((block, index) => (
+          <article className="admin-case-block" key={block.id}>
+            <header>
+              <div><span>{String(index + 1).padStart(2, "0")}</span><strong>{typeLabels[block.type]}</strong></div>
+              <div className="admin-case-block-actions">
+                <button type="button" disabled={index === 0} onClick={() => onMove(block.id, -1)} aria-label="Переместить блок выше">↑</button>
+                <button type="button" disabled={index === blocks.length - 1} onClick={() => onMove(block.id, 1)} aria-label="Переместить блок ниже">↓</button>
+                <button type="button" className="is-danger" onClick={() => onRemove(block.id)}>Удалить</button>
+              </div>
+            </header>
+
+            <label className="admin-case-spacing"><span>Отступ после блока</span><select value={block.spacing} onChange={(event) => onPatch(block.id, { spacing: event.target.value as CaseBlock["spacing"] })}><option value="large">Большой — 70 px</option><option value="compact">Компактный — 28 px</option></select></label>
+
+            {block.type === "image" && <div className="admin-case-image-fields">
+              <GalleryMediaField className="is-case-block-image" label="Изображение" value={block.image} emptyLabel="Загрузить изображение" onChange={(image) => onPatch(block.id, { image })} />
+              <div><Field label="Подпись над изображением"><input value={block.caption} onChange={(event) => onPatch(block.id, { caption: event.target.value })} /></Field><Field label="Alt-текст"><input value={block.alt} onChange={(event) => onPatch(block.id, { alt: event.target.value })} /></Field></div>
+            </div>}
+
+            {block.type === "gallery" && <div className="admin-case-gallery-fields">
+              <div className="admin-case-gallery-grid">{block.images.map((image, imageIndex) => <div key={image.id}>
+                <GalleryMediaField className="is-case-gallery-image" isSlider label={`Изображение ${imageIndex + 1}`} value={image.image} emptyLabel="Загрузить" onChange={(value) => onPatchGalleryImage(block.id, image.id, { image: value })} onDelete={() => onRemoveGalleryImage(block.id, image.id)} />
+                <input aria-label={`Alt-текст изображения ${imageIndex + 1}`} placeholder="Alt-текст" value={image.alt} onChange={(event) => onPatchGalleryImage(block.id, image.id, { alt: event.target.value })} />
+              </div>)}</div>
+              <button className="admin-case-inline-add" type="button" onClick={() => onAddGalleryImage(block.id)}>+ Добавить изображение</button>
+            </div>}
+
+            {block.type === "text" && <div className="admin-case-text-fields">
+              <Field label="Заголовок"><input value={block.title} onChange={(event) => onPatch(block.id, { title: event.target.value })} /></Field>
+              <Field label="Обычный текст"><textarea rows={5} value={block.body} onChange={(event) => onPatch(block.id, { body: event.target.value })} /></Field>
+              <Field label="Формат списка"><select value={block.listStyle} onChange={(event) => onPatch(block.id, { listStyle: event.target.value as typeof block.listStyle })}><option value="none">Без списка</option><option value="bullet">Маркированный</option><option value="numbered">Нумерованный</option><option value="labeled">Пункты с подписями</option></select></Field>
+              {block.listStyle !== "none" && <div className="admin-case-items">
+                {block.items.map((item, itemIndex) => <div className="admin-case-item" key={item.id}>
+                  <span>{String(itemIndex + 1).padStart(2, "0")}</span>
+                  {block.listStyle === "labeled" && <input aria-label={`Подпись пункта ${itemIndex + 1}`} placeholder="Подпись" value={item.label} onChange={(event) => onPatchItem(block.id, item.id, { label: event.target.value })} />}
+                  <textarea aria-label={`Текст пункта ${itemIndex + 1}`} rows={3} placeholder="Текст пункта" value={item.text} onChange={(event) => onPatchItem(block.id, item.id, { text: event.target.value })} />
+                  <button type="button" onClick={() => onRemoveItem(block.id, item.id)} aria-label={`Удалить пункт ${itemIndex + 1}`}>×</button>
+                </div>)}
+                <button className="admin-case-inline-add" type="button" onClick={() => onAddItem(block.id)}>+ Добавить пункт</button>
+              </div>}
+            </div>}
+
+            {block.type === "callout" && <Field label="Текст плашки"><textarea rows={3} value={block.text} onChange={(event) => onPatch(block.id, { text: event.target.value })} /></Field>}
+          </article>
+        ))}
+      </div>
+    </section>
+  );
 }
 
 function PortfolioRadioGroup({ name, value, options, onChange }: { name: string; value: string; options: [string, string][]; onChange: (value: string) => void }) {
