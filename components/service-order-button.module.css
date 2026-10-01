@@ -28,6 +28,11 @@
   transition: opacity .4s ease, transform .4s ease;
 }
 
+@media (max-width: 960px) {
+  :global(body:has(.figma-home-page)) .trigger { gap: 5px; }
+  :global(body:has(.figma-home-page)) .triggerArrow { width: 16px; height: 16px; margin-top: 0; opacity: 1; transform: none; }
+}
+
 .trigger:focus-visible {
   outline: 2px solid #304e41;
   outline-offset: 5px;

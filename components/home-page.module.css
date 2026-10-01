@@ -42,6 +42,9 @@
 .page *, .page *::before, .page *::after { box-sizing: border-box; }
 .page h1, .page h2, .page h3, .page h4, .page p { margin-top: 0; }
 .page img { display: block; }
+.page .desktopText, .page .mobileText { font: inherit; color: inherit; letter-spacing: inherit; }
+.page .desktopText { display: inline; }
+.page .mobileText, .mobileTag { display: none; }
 
 .shell,
 .heroTop,
@@ -234,6 +237,7 @@
 .reviewsTexture { position: absolute; left: 0; right: 0; bottom: 0; height: 531px; pointer-events: none; opacity: .2; mix-blend-mode: multiply; background: url("/assets/figma/image44.png") top left / 567px 567px repeat; transform: scaleY(-1); }
 .reviewsCopy, .reviewCard { position: relative; z-index: 1; }
 .reviews .sectionTitle > span { color: var(--text-on-primary); }
+.reviewsEyebrowMobile { display: none; }
 .reviews .sectionTitle h2 { font-size: 48px; }
 .reviewsCopy > p { width: 600px; margin: 28px 0 0; color: var(--text-on-primary); font-size: 20px; line-height: 1.4; }
 .reviewControls { position: absolute; left: 0; right: 0; bottom: 76px; display: flex; align-items: center; justify-content: space-between; }
@@ -386,113 +390,135 @@
 }
 
 @media (max-width: 960px) {
-  .shell, .heroTop, .about, .portfolioInner { width: calc(100% - 64px); }
-  .hero { padding: 96px 0 48px; }
-  .heroTop { height: auto; display: grid; gap: 40px; }
-  .heroTop h1 { width: 100%; font-size: 48px; }
-  .profileCard { position: static; width: 400px; }
-  .heroGalleryWrapper { margin-top: 48px; }
-  .heroImage { width: 360px; height: 204px; flex-basis: 360px; }
-  .heroGallery { height: 204px; }
+  :global(html:has(.figma-home-page)) { scrollbar-width: none; }
+  :global(html:has(.figma-home-page))::-webkit-scrollbar { display: none; }
+  .stage, .page { width: 100%; min-width: 0; height: auto; }
+  .page { transform: none; }
+  .shell, .heroTop, .about, .portfolioInner { width: calc(100% - 40px); max-width: 640px; }
 
-  .about { padding-block: 104px; grid-template-columns: 1fr; grid-template-rows: auto; gap: 30px; }
-  .about h2, .about > p, .stats { grid-column: 1; grid-row: auto; }
-  .about > p { max-width: 680px; }
-  .stats { margin-top: 32px; grid-template-columns: 1fr; border-top: 1px solid var(--border-on-bg); }
-  .stats article, .stats article:not(:first-child) { min-height: 144px; padding-left: 0; border-right: 0; border-bottom: 1px solid var(--border-on-bg); }
-  .stats strong { font-size: 60px; }
+  .hero { padding-top: 60px; }
+  .heroTop { height: auto; }
+  .heroTop h1 { width: 100%; font-size: 28px; font-weight: 500; line-height: 1.1; letter-spacing: -.03em; }
+  .profileCard { position: relative; top: auto; right: auto; width: 100%; height: 87px; margin-top: 29px; padding: 0 19px 0 0; grid-template-columns: 87px 1fr; gap: 20px; }
+  .portrait { width: 87px; height: 87px; border-radius: 5px; }
+  .profileCard > div:last-child { gap: 3px; }
+  .profileCard strong { font-size: 18px; line-height: 1.2; }
+  .profileCard span { font-size: 16px; line-height: 1.4; }
+  .heroGalleryWrapper { width: 100%; margin-top: 28px; padding-left: 20px; overflow-x: auto; scrollbar-width: none; }
+  .heroGalleryWrapper::-webkit-scrollbar { display: none; }
+  .heroGallery { height: 141px; gap: 10px; animation: none; }
+  .heroImage { width: 250px; height: 141px; flex-basis: 250px; }
+  .heroImage img { object-position: top left; }
 
-  .portfolioInner { padding-block: 104px; }
-  .processSection { padding-block: 104px; }
-  .processSection .sectionTitle { width: 100%; height: auto; }
-  .processStep, .processStep:nth-child(n) { min-height: 0; grid-template-columns: 48px 1fr; row-gap: 34px; }
-  .stepMedia { grid-column: 2; width: 100%; height: 360px !important; }
-  .processOptions { margin-top: 40px; }
+  .page .desktopText, .featuredTags .desktopTag { display: none; }
+  .page .mobileText { display: inline; }
+  .featuredTags .mobileTag { display: block; }
 
-  .reviews { padding: 88px 32px; grid-template-columns: 1fr; }
-  .reviewsCopy { min-height: 420px; }
-  .reviewCard { width: 100%; height: 600px; }
-  .reviewBody { grid-template-columns: 300px 1fr; }
-}
+  .about { height: auto; margin-top: 80px; padding: 0; display: block; }
+  .about > .eyebrow { color: var(--border-on-bg); }
+  .eyebrow, .sectionTitle > span { display: block; font-size: 14px; font-weight: 600; line-height: 19px; }
+  .about h2, .sectionTitle h2, .reviews .sectionTitle h2 { margin: 12px 0 0; font-size: 26px; font-weight: 500; line-height: 31px; letter-spacing: -.03em; }
+  .about > p { max-width: none; margin: 20px 0 0; font-size: 16px; line-height: 22px; }
+  .stats { margin-top: 36px; display: grid; grid-template-columns: 1fr; border: 0; }
+  .stats article, .stats article:not(:first-child) { min-height: 0; height: 110px; padding: 0; border: 0; }
+  .stats article:last-child { height: 86px; }
+  .stats article::after { content: ""; position: absolute; top: 86px; left: 0; right: 0; border-bottom: 1px solid var(--border-on-bg); }
+  .stats strong { font-size: 36px; line-height: 1.1; }
+  .stats > article > span, .stats article:last-child > span { position: static; display: block; margin-top: 8px; max-width: none; font-size: 16px; line-height: 1.4; white-space: normal; text-align: left; }
+  .stats i, .stats article:last-child i { top: 12px; right: 0; gap: 8px; }
+  .stats i img { width: 16px; height: 16px; }
 
-@media (max-width: 768px) {
-  .shell, .heroTop, .about, .portfolioInner { width: calc(100% - 40px); }
-  .hero { padding-top: 72px; }
-  .heroTop h1 { font-size: 40px; line-height: 1.05; }
-  .profileCard { width: min(100%, 400px); }
-  .heroGallery { height: 190px; }
-  .heroImage { width: 320px; height: 190px; flex-basis: 320px; }
-
-  .about { padding-block: 88px; }
-  .about h2, .sectionTitle h2, .reviews .sectionTitle h2 { font-size: 38px; }
-  .about > p, .reviewsCopy > p { font-size: 17px; }
-  .portfolioInner { padding-block: 88px; }
-  .portfolioGallery { margin-top: 52px; gap: 14px; }
-  .projectRows { margin-top: 60px; gap: 34px; }
-  .projectRows > a { min-height: 88px; grid-template-columns: 1fr 36px; gap: 10px 16px; padding-bottom: 20px; }
-  .projectRows strong { font-size: 23px; }
-  .projectRows span { grid-column: 1 / -1; grid-row: 2; padding-right: 48px; font-size: 16px; }
-  .projectRows .platformIcon { grid-column: 2; grid-row: 1; }
-
-  .processSection { padding-block: 88px; }
-  .processBoard { margin-top: 52px; padding-inline: 20px; }
-  .processStep, .processStep:nth-child(n) { padding-block: 36px; grid-template-columns: 1fr; }
-  .stepNumber, .stepCopy, .stepMedia { grid-column: 1; }
-  .stepMedia { height: 280px !important; }
-  .stepMedia:has(> div + div) { height: 570px !important; grid-template-columns: 1fr; grid-template-rows: repeat(2, 1fr); }
-
-  .reviews { padding: 80px 20px; }
-  .reviewsCopy { min-height: 460px; }
-  .reviewCard { height: 680px; }
-  .reviewBody { height: 500px; grid-template-columns: 1fr; grid-template-rows: auto 1fr 174px; }
-  .reviewLinks { grid-column: 1; grid-template-columns: 1fr; }
-  .reviewLinks a { padding: 14px 20px; }
-  .reviewLinks a + a { border-left: 0; border-top: 1px solid var(--border-on-bg); }
-}
-
-@media (max-width: 360px) {
-  .shell, .heroTop, .about, .portfolioInner { width: calc(100% - 28px); }
-  .hero { padding-top: 56px; }
-  .heroTop { gap: 30px; }
-  .heroTop h1 { font-size: 34px; }
-  .profileCard { height: 90px; padding: 5px 10px 5px 5px; grid-template-columns: 80px 1fr; gap: 14px; }
-  .portrait { width: 80px; height: 80px; }
-  .profileCard strong { font-size: 20px; }
-  .profileCard span { font-size: 16px; }
-  .heroGallery, .heroImage { height: 174px; }
-  .heroImage { width: 292px; flex-basis: 292px; }
-
-  .about { padding-block: 72px; }
-  .about h2, .sectionTitle h2, .reviews .sectionTitle h2 { font-size: 34px; }
-  .stats strong { font-size: 54px; }
-  .stats > article > span { max-width: 46%; white-space: normal; text-align: right; }
-
-  .portfolioInner { padding-block: 72px; }
+  .portfolio { height: auto; margin-top: 80px; }
+  .greenTexture { height: 250px; background-size: 360px 360px; }
+  .greenTexture::after { top: auto; bottom: -1874px; height: 250px; }
+  .portfolioInner { height: auto; padding: 80px 0; }
   .portfolio .sectionTitle { width: 100%; }
-  .portfolioGallery { grid-template-columns: 1fr; }
-  .portfolioGallery > a { aspect-ratio: 1; }
-  .featuredLabel { top: 14px; left: 14px; }
-  .featuredTags { left: 14px; bottom: 14px; gap: 6px; }
-  .featuredTags small { padding-inline: 9px; font-size: 12px; }
-  .featuredArrow { right: 14px; bottom: 14px; }
-  .allProjects { width: 100%; justify-content: center; padding-inline: 20px; }
+  .portfolioGallery { position: static; width: 100%; height: auto; margin-top: 36px; display: grid; grid-template-columns: 1fr; grid-template-rows: none; gap: 10px; }
+  .portfolioGallery > a { min-height: 0; height: auto; aspect-ratio: 320 / 300; }
+  .portfolioGallery > a::after { display: none; }
+  .portfolioGallery > a .featuredLabel, .portfolioGallery > a .featuredTags { opacity: 1; }
+  .featuredLabel { top: 10px; left: 10px; }
+  .featuredTags { left: 10px; bottom: 10px; gap: 10px; }
+  .featuredTags { will-change: auto; }
+  .featuredTags small { -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+  .featuredArrow { display: none; }
+  .projectRows { position: static; margin-top: 50px; gap: 40px; }
+  .projectRows > a { display: block; min-height: 0; height: 54px; padding: 0; }
+  .projectRows > a:nth-child(n + 3) { height: 76px; }
+  .projectRows > a::after { left: calc((100% - 100vw) / 2); right: calc((100% - 100vw) / 2); bottom: -20px; }
+  .projectRows > a:last-child::after { display: none; }
+  .projectRows strong { width: 100%; align-items: flex-start; font-size: 20px; line-height: 24px; }
+  .projectRows strong .arrowIcon { opacity: 1; transform: none; }
+  .projectRows .projectDescription { display: block; margin-top: 8px; padding: 0; font-size: 16px; line-height: 22px; }
+  .projectRows .platformIcon { display: none; }
+  .allProjects { position: static; width: 100%; height: 54px; margin: 36px auto 0; padding: 16px 20px; display: flex; transform: none; font-size: 16px; line-height: 1; }
+  .allProjects small, .reviewButton small { font-size: 14px; }
 
-  .processSection { padding-block: 72px; }
-  .processBoard { padding-inline: 14px; }
-  .stepCopy h3 { font-size: 24px; }
-  .stepCopy p, .processOption p { font-size: 15px; }
-  .processOption h4 { align-items: flex-start; font-size: 21px; }
-  .stepMedia { height: 220px !important; }
-  .stepMedia:has(> div + div) { height: 454px !important; }
+  .processSection { padding: 80px 0; }
+  .processSection .sectionTitle { width: 100%; height: auto; }
+  .processBoard { height: auto; margin-top: 36px; padding: 0; overflow: hidden; }
+  .processStep, .processStep:nth-child(n) { height: auto; min-height: 0; padding: 20px; display: flex; flex-direction: column; gap: 0; border-bottom: 0; box-shadow: inset 0 -1px var(--border-on-card); }
+  .processStep:nth-child(1) { min-height: 435px; }
+  .processStep:nth-child(2) { min-height: 444px; }
+  .processStep:nth-child(3) { min-height: 441px; }
+  .processStep:nth-child(4) { min-height: 923px; }
+  .processStep:nth-child(5) { min-height: 468px; }
+  .processStep:first-child { padding-top: 26px; }
+  .processStep:last-child { border-bottom: 0; box-shadow: none; }
+  .stepNumber { padding: 0; font-size: 14px; font-weight: 600; line-height: 19px; }
+  .processStep:not(:last-child) .stepCopy, .processStep:not(:last-child) .stepCopy > p { width: auto; max-width: none; }
+  .stepCopy h3 { margin: 12px 0; font-size: 20px; line-height: 1.2; }
+  .stepCopy p, .processOption p { max-width: none; font-size: 14px; line-height: 20px; }
+  .stepMedia, .processStep:nth-child(n) .stepMedia { width: 100%; height: auto !important; margin: 20px 0 0; display: grid; grid-template-columns: 1fr; gap: 10px; }
+  .stepMedia > div { width: 100%; height: auto; aspect-ratio: 280 / 162; }
+  .processStep:nth-child(2) .stepMedia > div { aspect-ratio: 280 / 133; }
+  .processStep:nth-child(3) .stepMedia > div { aspect-ratio: 280 / 150; }
+  .processStep:nth-child(4) .stepMedia > div { aspect-ratio: 280 / 169; }
+  .processStep:nth-child(5) .stepMedia > div { aspect-ratio: 280 / 169; }
+  .processStep:nth-child(1) .stepMedia img { left: 24.02% !important; width: 52% !important; object-fit: fill; }
+  .stepMedia img { object-fit: cover; }
+  .processOptions { position: static; width: 100%; margin-top: 20px; display: grid; gap: 20px; }
+  .processOption, .processOption:first-child, .processOption:last-child { position: static; width: 100%; }
+  .processOption h4 { margin: 0 0 10px; align-items: center; gap: 10px; font-size: 18px; line-height: 1.2; }
+  .processOption h4 img { width: 24px; height: 24px; flex-basis: 24px; }
+  .stepParagraphs { gap: 12px; }
 
-  .reviews { padding: 68px 14px; }
-  .reviewsCopy { min-height: 430px; }
-  .reviewControls { bottom: 72px; }
-  .reviewCard { height: 650px; }
-  .reviewBody { left: 14px; right: 14px; bottom: 14px; height: 492px; padding: 22px; grid-template-rows: auto 1fr 166px; }
-  .reviewAuthor strong { font-size: 21px; }
-  .reviewBody blockquote { font-size: 16px; }
-  .reviewLinks { margin: 0 -22px -22px; }
-  .reviewLinks strong { font-size: 16px; }
-  .reviewButton { height: 56px; }
+  .reviews { height: auto; padding: 80px 20px; display: grid; grid-template-columns: 1fr; gap: 0; }
+  .reviewsTexture { z-index: 0; }
+  .reviews .reviewsEyebrowDesktop { display: none; }
+  .reviews .reviewsEyebrowMobile { display: block; }
+  .reviewsCopy { display: contents; }
+  .reviews .sectionTitle { position: relative; z-index: 1; grid-row: 1; }
+  .reviewsCopy > p { position: relative; z-index: 1; grid-row: 2; width: 100%; margin: 20px 0 0; font-size: 16px; line-height: 22px; }
+  .reviewCard { grid-row: 3; width: 100%; height: 658px; margin-top: 28px; border-radius: 5px; }
+  .reviewSlide { position: absolute; inset: 0; }
+  .reviewPhoto { position: relative; height: 200px; }
+  .reviewPhoto::after { display: none; }
+  .reviewBody { position: relative; left: auto; right: auto; bottom: auto; width: 100%; height: 458px; padding: 18px 20px 0; display: flex; flex-direction: column; border-radius: 0; }
+  .reviewAuthor { gap: 5px; }
+  .reviewAuthor strong { font-size: 18px; font-weight: 500; line-height: 1.2; }
+  .reviewAuthor span { font-size: 14px; font-weight: 600; line-height: 19px; }
+  .reviewBody blockquote { margin-top: 20px; font-size: 16px; line-height: 22px; }
+  .reviewLinks { display: block; margin: auto -20px 0; border-top: 0; box-shadow: inset 0 1px var(--border-on-bg); }
+  .reviewLinks a { height: 78px; padding: 10px 20px; grid-template-columns: 36px 1fr 20px; gap: 12px; }
+  .reviewLinks a + a { border-left: 0; border-top: 1px solid var(--border-on-bg); }
+  .reviewLinks span { gap: 3px; font-size: 12px; font-weight: 600; line-height: 16px; }
+  .reviewLinks strong { font-size: 16px; font-weight: 500; line-height: 19px; }
+  .reviewControls { position: relative; z-index: 1; left: auto; right: auto; bottom: auto; grid-row: 4; margin-top: 28px; }
+  .reviewControls strong { font-size: 20px; line-height: 24px; }
+  .reviewButton { position: relative; z-index: 1; left: auto; right: auto; bottom: auto; grid-row: 5; width: 100%; height: 54px; margin-top: 20px; font-size: 16px; }
+}
+
+@media (max-width: 600px) {
+  .shell, .heroTop, .about, .portfolioInner { width: calc(100% - 40px); }
+  .portfolioGallery > a { aspect-ratio: 320 / 300; }
+}
+
+@media (max-width: 350px) {
+  .projectRows > a { height: auto; min-height: 54px; }
+  .projectRows > a:nth-child(n + 3) { height: auto; min-height: 76px; }
+  .reviewCard { height: auto; }
+  .reviewSlide { position: relative; }
+  .reviewBody { height: auto; }
+  .reviewLinks { margin-top: 20px; }
 }

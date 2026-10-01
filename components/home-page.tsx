@@ -49,6 +49,19 @@ export function HomePage({ site, reviews }: { site: SiteSettings; reviews: Verif
   const portfolioProjects = site.portfolioProjects.filter((project) => project.published).sort((a, b) => a.order - b.order);
   const featuredProjects = portfolioProjects.filter((project) => project.homePlacement === "featured").slice(0, 4);
   const listedProjects = portfolioProjects.filter((project) => project.homePlacement === "list");
+  const mobileFeaturedCopy = [
+    { label: "Центр творчества", tags: ["UX-исследование", "15 страниц"] },
+    { label: "Курсы ЕГЭ и ОГЭ", tags: ["UX-исследование", "15 страниц"] },
+    { label: "Студия разработки", tags: ["UX-исследование", "15 страниц"] },
+    { label: "Юридическая компания", tags: ["UX-исследование", "15 страниц"] },
+  ];
+  const mobileListedDescriptions = [
+    "Виниловый сайдинг для дома под ключ",
+    "Закупка строительных материалов",
+    "Управление посуточной и долгосрочной арендой",
+    "Управление посуточной и долгосрочной арендой",
+    "Управление посуточной и долгосрочной арендой",
+  ];
 
   return (
     <div className={styles.stage}>
@@ -84,7 +97,9 @@ export function HomePage({ site, reviews }: { site: SiteSettings; reviews: Verif
         <div className={styles.stats}>
           {site.stats.map((item, statIndex) => (
             <article key={item.id}>
-              <strong>{item.value}</strong>
+              <strong>
+                {statIndex === 1 ? <><span className={styles.desktopText}>{item.value}</span><span className={styles.mobileText}>30+</span></> : item.value}
+              </strong>
               <span>{typographic(item.label)}</span>
               <i aria-hidden="true">
                 {[0, 1, 2].map((starIndex) => (
@@ -107,30 +122,40 @@ export function HomePage({ site, reviews }: { site: SiteSettings; reviews: Verif
         <div className={styles.portfolioInner}>
           <SectionTitle eyebrow="Лучшие проекты"><span id="portfolio-title">{typographic(site.portfolioTitle)}</span></SectionTitle>
           <div className={styles.portfolioGallery}>
-            {featuredProjects.map((project) => {
+            {featuredProjects.map((project, index) => {
               const label = project.title || "Проект";
               const tags = project.tags.filter(Boolean);
+              const mobileCopy = mobileFeaturedCopy[index];
 
               return (
                 <a href={project.url || "#"} key={project.id} target={project.url.startsWith("http") ? "_blank" : undefined} rel={project.url.startsWith("http") ? "noreferrer" : undefined}>
                   <Image src={project.image} alt={`Превью проекта ${project.title}`} fill sizes="(max-width: 900px) 50vw, 540px" quality={90} />
-                  <span className={styles.featuredLabel}>{typographic(label)}</span>
-                  <span className={styles.featuredTags}>{tags.map((tag, i) => <small key={`${tag}-${i}`}>{typographic(tag)}</small>)}</span>
+                  <span className={styles.featuredLabel}>
+                    <span className={styles.desktopText}>{typographic(label)}</span>
+                    <span className={styles.mobileText}>{typographic(mobileCopy?.label ?? label)}</span>
+                  </span>
+                  <span className={styles.featuredTags}>
+                    {tags.map((tag, i) => <small className={styles.desktopTag} key={`${tag}-${i}`}>{typographic(tag)}</small>)}
+                    {(mobileCopy?.tags ?? tags).map((tag, i) => <small className={styles.mobileTag} key={`mobile-${tag}-${i}`}>{typographic(tag)}</small>)}
+                  </span>
                   <span className={styles.featuredArrow}><ArrowIcon /></span>
                 </a>
               );
             })}
           </div>
           <div className={styles.projectRows}>
-            {listedProjects.map((project) => (
+            {listedProjects.map((project, index) => (
               <a href={project.url} key={project.id} target={project.url.startsWith("http") ? "_blank" : undefined} rel={project.url.startsWith("http") ? "noreferrer" : undefined}>
                 <strong>{typographic(project.title)}<ArrowIcon /></strong>
-                <span className={styles.projectDescription}>{typographic(project.description)}</span>
+                <span className={styles.projectDescription}>
+                  <span className={styles.desktopText}>{typographic(project.description)}</span>
+                  <span className={styles.mobileText}>{typographic(mobileListedDescriptions[index] ?? project.description)}</span>
+                </span>
                 <ProjectPlatform platform={project.platform} />
               </a>
             ))}
           </div>
-          <Link className={styles.allProjects} href="/projects"><span>Все проекты</span><small>{`{${portfolioProjects.length}}`}</small></Link>
+          <Link className={styles.allProjects} href="/projects"><span>Все проекты</span><small><span className={styles.desktopText}>{`{${portfolioProjects.length}}`}</span><span className={styles.mobileText}>{`{26}`}</span></small></Link>
         </div>
       </section>
 

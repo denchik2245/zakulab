@@ -77,3 +77,21 @@
   .mobileMenu summary { padding-inline: 14px; font-size: 14px; }
   .mobileMenu nav { width: calc(100vw - 28px); padding: 18px; }
 }
+
+@media (max-width: 960px) {
+  :global(body:has(.figma-home-page)) .siteHeader { height: 88px; }
+  :global(body:has(.figma-home-page)) .headerInner { top: 20px; width: calc(100% - 40px); max-width: 640px; display: flex; gap: 0; }
+  :global(body:has(.figma-home-page)) .logo { flex: 0 0 48px; margin-right: 51px; }
+  :global(body:has(.figma-home-page)) .headerInner .socials { width: 169px; height: 48px; display: flex; flex: 0 0 169px; margin-right: 24px; }
+  :global(body:has(.figma-home-page)) .mobileMenu { width: 20px; height: 16px; flex: 0 0 20px; }
+  :global(body:has(.figma-home-page)) .mobileMenu summary { width: 20px; height: 16px; min-height: 0; padding: 0; display: block; overflow: hidden; border: 0; border-radius: 0; font-size: 0; background: linear-gradient(#050505,#050505) left top / 20px 1px no-repeat, linear-gradient(#050505,#050505) left center / 12px 1px no-repeat, linear-gradient(#050505,#050505) left bottom / 20px 1px no-repeat; }
+  :global(body:has(.figma-home-page)) .mobileMenu nav { top: 32px; right: 0; width: min(320px, calc(100vw - 40px)); }
+}
+
+@media (min-width: 361px) and (max-width: 960px) {
+  :global(body:has(.figma-home-page)) .logo { margin-right: auto; }
+}
+
+@media (max-width: 350px) {
+  :global(body:has(.figma-home-page)) .logo { margin-right: 19px; }
+}

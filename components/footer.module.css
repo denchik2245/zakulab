@@ -67,3 +67,22 @@
 @media (prefers-reduced-motion: reduce) {
   .footer * { transition-duration: .01ms !important; }
 }
+
+@media (max-width: 960px) {
+  :global(body:has(.figma-home-page)) .footer { height: 843px; min-height: 0; padding: 69px 20px 20px; }
+  :global(body:has(.figma-home-page)) .top { display: grid; grid-template-columns: minmax(0, 246px) 64px; column-gap: 10px; row-gap: 20px; }
+  :global(body:has(.figma-home-page)) .top h2 { grid-column: 1 / -1; width: 225px; font-size: 26px; line-height: 31px; }
+  :global(body:has(.figma-home-page)) .discuss { grid-column: 1; width: 100%; height: 54px; margin: 0; padding: 16px 20px; justify-content: center; font-size: 16px; }
+  :global(body:has(.figma-home-page)) .discuss small { font-size: 14px; }
+  :global(body:has(.figma-home-page)) .toTop { grid-column: 2; width: 64px; height: 54px; margin: 0; }
+  :global(body:has(.figma-home-page)) .columns { position: relative; top: auto; left: auto; right: auto; margin-top: 36px; display: flex; flex-direction: column; gap: 36px; }
+  :global(body:has(.figma-home-page)) .columns > div { gap: 8px; font-size: 18px; line-height: 25px; }
+  :global(body:has(.figma-home-page)) .columns > div > span { margin-bottom: 8px; font-size: 16px; line-height: 22px; }
+  :global(body:has(.figma-home-page)) .columns > div:not(:first-child) { font-size: 18px; line-height: 25px; }
+  :global(body:has(.figma-home-page)) .columns > div:first-child a[href="/#process"] { order: 1; }
+  :global(body:has(.figma-home-page)) .columns > div:first-child a[href="/reviews"] { order: 2; }
+  :global(body:has(.figma-home-page)) .columns > div:first-child a[href="/#price"] { order: 3; }
+  :global(body:has(.figma-home-page)) .legal { position: relative; top: auto; bottom: auto; left: auto; width: auto; margin-top: 36px; display: grid; grid-template-columns: 1fr; gap: 10px; font-size: 16px; line-height: 22px; }
+  :global(body:has(.figma-home-page)) .mark { display: none; }
+  :global(body:has(.figma-home-page)) .texture { height: 250px; background-size: 360px 360px; }
+}
