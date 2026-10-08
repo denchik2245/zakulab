@@ -1,9 +1,9 @@
-import type { SiteSettings } from "@/lib/site-settings";
+import type { ServicesContent } from "@/lib/public-content";
 import { typographic } from "@/lib/typographic";
 import { ServiceOrderButton } from "@/components/service-order-button";
 import styles from "./services-section.module.css";
 
-export function ServicesSection({ site }: { site: SiteSettings }) {
+export function ServicesSection({ site }: { site: ServicesContent }) {
   return (
     <section className={styles.section} id="price" aria-labelledby="price-title">
       <div className={styles.shell}>

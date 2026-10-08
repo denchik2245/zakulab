@@ -29,8 +29,8 @@
 }
 
 @media (max-width: 960px) {
-  :global(body:has(.figma-home-page)) .trigger { gap: 5px; }
-  :global(body:has(.figma-home-page)) .triggerArrow { width: 16px; height: 16px; margin-top: 0; opacity: 1; transform: none; }
+  :global(body:has(.site-mobile-layout)) .trigger { gap: 5px; }
+  :global(body:has(.site-mobile-layout)) .triggerArrow { width: 16px; height: 16px; margin-top: 0; opacity: 1; transform: none; }
 }
 
 .trigger:focus-visible {
@@ -211,3 +211,9 @@
   .socials > a { min-height: 72px; padding: 12px; grid-template-columns: 38px 1fr 20px; }
   .socials > a::before { font-size: 22px; }
 }
+.resultTransfer { display: grid; gap: 12px; width: 100%; }
+.resultTransfer textarea { width: 100%; min-height: 140px; padding: 12px; border: 1px solid #babcaf; border-radius: 5px; color: #050505; background: #fff; resize: vertical; font-size: 16px; }
+.resultTransfer button { padding: 12px 18px; border: 1px solid #809e91; border-radius: 5px; color: inherit; background: transparent; cursor: pointer; }
+.resultTransfer p { margin: 0; font-size: 14px; }
+.dialog:has(.resultTransfer) { height: auto; min-height: 522px; max-height: calc(100svh - 40px); overflow-y: auto; gap: 24px; }
+.dialog:has(.resultTransfer) .socials { flex: none; margin-top: 0; }

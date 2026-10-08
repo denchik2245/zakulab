@@ -115,11 +115,12 @@ export function ReviewForm({ title, description }: { title: string; description:
             <form className={styles.form} onSubmit={submit}>
               <input className={styles.honeypot} name="bot-field" tabIndex={-1} autoComplete="off" aria-hidden="true" />
               <div className={styles.row}>
-                <label><span>Имя и Фамилия</span><input name="name" required autoComplete="name" placeholder="Закусилов Денис" /></label>
-                <label><span>Должность</span><input name="role" required autoComplete="organization-title" placeholder="Руководитель маркетинга" /></label>
+                <label><span>Имя и Фамилия</span><input name="name" required maxLength={120} autoComplete="name" placeholder="Закусилов Денис" /></label>
+                <label><span>Должность</span><input name="role" required maxLength={120} autoComplete="organization-title" placeholder="Руководитель маркетинга" /></label>
               </div>
-              <label><span>Ссылка на ваш профиль в соц.сетях (Telegram, VK, MAX, ...)</span><input name="public-profile" required inputMode="url" placeholder="t.me/deniszak123" /></label>
-              <label><span>Текст отзыва</span><textarea name="review" required minLength={20} rows={7} placeholder="Отзыв" /></label>
+              <label><span>Ссылка на ваш профиль в соц.сетях (Telegram, VK, MAX, ...)</span><input name="public-profile" required maxLength={500} inputMode="url" placeholder="t.me/deniszak123" /></label>
+              <label><span>Текст отзыва</span><textarea name="review" required minLength={20} maxLength={4000} rows={7} placeholder="Отзыв" /></label>
+              <label className={styles.consent}><input type="checkbox" name="consent" value="yes" required /><span>Согласен с <a href="/privacy" target="_blank" rel="noreferrer">политикой обработки данных</a> и <a href="/consent" target="_blank" rel="noreferrer">условиями согласия</a>, разрешаю публикацию имени, должности, ссылки на профиль и текста отзыва на сайте.</span></label>
               {error && <p className={styles.error} role="alert">{error}</p>}
               <button className={styles.submit} type="submit" disabled={isSubmitting}>{isSubmitting ? "Отправляю…" : "Отправить"}</button>
             </form>

@@ -31,13 +31,13 @@
 /* Base gray icons */
 .iconBase, .tgPath {
   transition: opacity 0.4s ease !important;
-  opacity: 1;
+  opacity: var(--social-icon-base-opacity, 1);
 }
 
 /* Colorful hover icons */
 .iconHover, .tgHover, .maxHover, .vkHover {
   transition: opacity 0.4s ease !important;
-  opacity: 0;
+  opacity: var(--social-icon-color-opacity, 0);
 }
 
 @media (hover: hover) and (pointer: fine) {

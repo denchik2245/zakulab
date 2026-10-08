@@ -4,6 +4,7 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
 import { getStore } from "@netlify/blobs";
+import sharp from "sharp";
 
 const localMediaDirectory = path.join(process.cwd(), ".data", "media");
 const allowedTypes = new Map([
@@ -30,6 +31,13 @@ export async function saveMedia(file: File) {
 
   const key = `${randomUUID()}.${extension}`;
   const bytes = await file.arrayBuffer();
+  try {
+    const image = sharp(Buffer.from(bytes), { limitInputPixels: 40_000_000 });
+    const metadata = await image.metadata();
+    const expected = extension === "jpg" ? "jpeg" : extension;
+    if (metadata.format !== expected || !metadata.width || !metadata.height) throw new Error("Invalid image");
+    await image.stats();
+  } catch { throw new Error("UNSUPPORTED_MEDIA_TYPE"); }
 
   if (isNetlifyRuntime()) {
     await getStore("zakulab-media").set(key, bytes, {

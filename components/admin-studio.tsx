@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import type { AdminContent } from "@/lib/content-store";
 import type { CaseBlock, CaseStudy } from "@/lib/cases";
-import { externalUrl } from "@/lib/external-url";
 import type { VerifiedReview } from "@/lib/reviews";
 import type { PortfolioFilter, PortfolioProject, SiteSettings } from "@/lib/site-settings";
 import type { StyleReference } from "@/lib/style-references";
@@ -20,7 +19,7 @@ const portfolioFilterOptions: { id: PortfolioFilter; label: string }[] = [
 ];
 
 function blankPortfolioProject(count: number): PortfolioProject {
-  return { id: `portfolio-${Date.now()}`, title: "Новая работа", description: "Короткое описание проекта", image: "", url: "#", platform: "", tags: ["", ""], filters: [], homePlacement: "hidden", portfolioPlacement: "archive", published: true, order: (count + 1) * 10 };
+  return { id: `portfolio-${Date.now()}`, title: "Новая работа", description: "Короткое описание проекта", image: "", url: "", platform: "", tags: ["", ""], filters: [], homePlacement: "hidden", portfolioPlacement: "archive", published: false, order: (count + 1) * 10 };
 }
 
 function blankCaseBlock(type: CaseBlock["type"]): CaseBlock {
@@ -42,7 +41,7 @@ function blankCase(count: number, title = "Новый проект"): CaseStudy 
     whatDone: "Коротко опишите, что было сделано и какой результат получил проект.",
     role: "Структура, UX/UI-дизайн",
     year: String(new Date().getFullYear()),
-    url: "https://",
+    url: "",
     accent: "green",
     category: "corporate",
     catalogTask: "Какую задачу бизнеса решал проект.",
@@ -83,10 +82,6 @@ function blankReview(): VerifiedReview {
   };
 }
 
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat("ru-RU", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(value));
-}
-
 function blankStyle(count: number): StyleReference {
   return {
     id: `style-${Date.now()}`,
@@ -118,6 +113,7 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
   const [saving, setSaving] = useState(false);
   const [notice, setNotice] = useState("");
   const [loginError, setLoginError] = useState("");
+  const [hasConflict, setHasConflict] = useState(false);
 
   const pendingReviews = content?.reviews.filter((item) => item.status === "pending").length ?? 0;
   const activeReview = content?.reviews.find((item) => item.id === selectedReview) ?? content?.reviews[1] ?? content?.reviews[0] ?? null;
@@ -189,12 +185,15 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(next),
       });
-      if (!response.ok) throw new Error("save failed");
-      setContent(await response.json());
+      const result = await response.json();
+      if (response.status === 409) setHasConflict(true);
+      if (!response.ok) throw new Error([result.error, ...(result.details ?? [])].filter(Boolean).join(". ") || "Не удалось сохранить");
+      setContent(result);
+      setHasConflict(false);
       setNotice(message);
       window.setTimeout(() => setNotice(""), 3200);
-    } catch {
-      setNotice("Не удалось сохранить. Проверьте соединение и настройки хранилища.");
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Не удалось сохранить. Проверьте соединение и настройки хранилища.");
     } finally {
       setSaving(false);
     }
@@ -286,12 +285,12 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
     if (!project) return;
     if (!enabled) {
       if (!window.confirm("Отключить и удалить содержимое внутренней страницы кейса?")) return;
-      patchPortfolio(projectId, { caseStudy: undefined });
+      patchPortfolio(projectId, { caseStudy: undefined, url: project.url.startsWith("/cases/") ? project.caseStudy?.url || "" : project.url });
       return;
     }
     const caseStudy = blankCase(content?.site.portfolioProjects.filter((item) => item.caseStudy).length ?? 0, project.title);
     caseStudy.slug = project.id;
-    patchPortfolio(projectId, { caseStudy, url: `/cases/${caseStudy.slug}` });
+    patchPortfolio(projectId, { caseStudy });
   }
 
   async function setReviewStatus(id: string, status: VerifiedReview["status"]) {
@@ -453,6 +452,12 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
           ))}
         </nav>
         <div className="admin-sidebar-foot admin-site-actions">
+          <button type="button" onClick={logout}>Выйти</button>
+          {hasConflict && <button type="button" onClick={async () => {
+            if (!window.confirm("Загрузить актуальную версию? Несохранённые правки будут сброшены.")) return;
+            const response = await fetch("/api/admin/content", { cache: "no-store" });
+            if (response.ok) { setContent(await response.json()); setHasConflict(false); setNotice("Загружена актуальная версия"); }
+          }}>Загрузить актуальную версию</button>}
           <Link href="/" target="_blank">Открыть сайт <Image src="/assets/figma/admin-asset-3.svg" width={14} height={14} alt="" /></Link>
           <button className="admin-sidebar-save" disabled={saving} onClick={() => persist(content, "Изменения сохранены")}>{saving ? "Сохраняю…" : "Сохранить изменения"}</button>
           {notice && <span role="status">{notice}</span>}
@@ -538,6 +543,7 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
                   </section>
                   <section className="admin-placement-section">
                     <h3>Размещение в портфолио</h3>
+                    <fieldset><legend>Фильтры проектов</legend>{portfolioFilterOptions.map((filter) => <label key={filter.id}><input type="checkbox" checked={activePortfolio.filters.includes(filter.id)} onChange={(event) => togglePortfolioFilter(activePortfolio.id, filter.id, event.target.checked)} />{filter.label}</label>)}</fieldset>
                     <PortfolioRadioGroup name={`portfolio-${activePortfolio.id}`} value={activePortfolio.portfolioPlacement} onChange={(value) => patchPortfolio(activePortfolio.id, { portfolioPlacement: value as PortfolioProject["portfolioPlacement"] })} options={[["featured", "Избранное"], ["archive", "Другие"], ["hidden", "Не показывать"]]} />
                     <Field label="Порядок"><input type="number" value={activePortfolio.order} onChange={(event) => patchPortfolio(activePortfolio.id, { order: Number(event.target.value) })} /></Field>
                   </section>
@@ -552,7 +558,7 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
                     <div className="admin-case-settings-head"><div><span>CASE / INNER PAGE</span><h3>Внутренняя страница кейса</h3><p>Контент кейса хранится внутри этой же работы — отдельной записи больше нет.</p></div><label><input type="checkbox" checked={Boolean(activePortfolio.caseStudy)} onChange={(event) => toggleCaseStudy(activePortfolio.id, event.target.checked)} /><span>{activePortfolio.caseStudy ? "Подключена" : "Не подключена"}</span></label></div>
                       <div className="admin-publish-row"><label><input type="checkbox" checked={activePortfolio.caseStudy.status === "published"} onChange={(event) => patchCaseStudy(activePortfolio.id, { status: event.target.checked ? "published" : "draft" })} /><span>Опубликовать внутреннюю страницу</span></label></div>
                       <div className="admin-fields">
-                        <Field label="URL-адрес"><input value={activePortfolio.caseStudy.slug} onChange={(event) => { const slug = event.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-"); patchPortfolio(activePortfolio.id, { url: `/cases/${slug}`, caseStudy: { ...activePortfolio.caseStudy!, slug } }); }} /></Field>
+                        <Field label="URL-адрес"><input value={activePortfolio.caseStudy.slug} onChange={(event) => { const slug = event.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-"); patchCaseStudy(activePortfolio.id, { slug }); }} /></Field>
                         <Field label="Номер"><input value={activePortfolio.caseStudy.index} onChange={(event) => patchCaseStudy(activePortfolio.id, { index: event.target.value })} /></Field>
                         <Field label="Год"><input value={activePortfolio.caseStudy.year} onChange={(event) => patchCaseStudy(activePortfolio.id, { year: event.target.value })} /></Field>
                         <Field label="Категория"><select value={activePortfolio.caseStudy.category} onChange={(event) => patchCaseStudy(activePortfolio.id, { category: event.target.value as CaseStudy["category"] })}><option value="corporate">Корпоративный</option><option value="commerce">E-commerce</option></select></Field>
@@ -586,7 +592,7 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
 
         {tab === "reviews" && (
           <div className="admin-view admin-reviews-view">
-            <h1>Отзывы</h1>
+            <h1>Отзывы</h1><p>Новые отзывы поступают на проверку. Очередь ограничена 100 отзывами; необработанные отзывы хранятся 90 дней.</p><button type="button" className="admin-add-button" onClick={createReview}>Новый отзыв</button>
             <div className="admin-reviews-layout">
               <div className="admin-review-list">
                 {[...content.reviews].sort((a, b) => a.order - b.order).map((item) => (
@@ -599,6 +605,11 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
               {activeReview ? (
                 <div className="admin-review-editor">
                   <div className="admin-review-editor-head"><h2>{activeReview.author.name}</h2><button type="button" aria-label="Удалить отзыв" onClick={() => deleteReview(activeReview.id)}><Image src="/assets/figma/reviews-admin-trash.svg" width={28} height={28} alt="" /></button></div>
+                  <div className="admin-review-moderation">
+                    <button type="button" disabled={saving} onClick={saveReview}>Сохранить отзыв</button>
+                    <Field label="Статус модерации"><select value={activeReview.status} disabled={saving} onChange={(event) => setReviewStatus(activeReview.id, event.target.value as VerifiedReview["status"])}><option value="pending">На проверке</option><option value="published">Опубликован</option><option value="rejected">Отклонён</option><option value="demo">Демонстрационный</option></select></Field>
+                    <p>{activeReview.consent ? `Согласие получено ${formatReviewDate(activeReview.consent.acceptedAt)}` : "Перед публикацией получите согласие автора."}</p>
+                  </div>
                   <div className="admin-publish-row"><label><input type="checkbox" checked={activeReview.showOnHome} onChange={(event) => patchReview(activeReview.id, { showOnHome: event.target.checked })} /><span>Показывать на главной</span></label><label><input type="checkbox" checked={activeReview.showOnReviewsPage} onChange={(event) => patchReview(activeReview.id, { showOnReviewsPage: event.target.checked })} /><span>Показывать на странице отзывов</span></label></div>
                   <section className="admin-review-order"><Field label="Порядок"><input type="number" value={activeReview.order} onChange={(event) => patchReview(activeReview.id, { order: Number(event.target.value) })} /></Field></section>
                   <div className="admin-review-form">
@@ -895,40 +906,6 @@ function GalleryMediaField({
           </>
         )}
       </label>
-      {error && <small>{error}</small>}
-    </div>
-  );
-}
-
-function MediaField({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
-  const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState("");
-
-  async function upload(event: ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    setUploading(true);
-    setError("");
-    try {
-      const body = new FormData();
-      body.set("file", file);
-      const response = await fetch("/api/admin/media", { method: "POST", body });
-      const result = await response.json() as { url?: string; error?: string };
-      if (!response.ok || !result.url) throw new Error(result.error || "Не удалось загрузить изображение");
-      onChange(result.url);
-    } catch (uploadError) {
-      setError((uploadError as Error).message);
-    } finally {
-      setUploading(false);
-      event.target.value = "";
-    }
-  }
-
-  return (
-    <div className="admin-media-field">
-      <span>{label}</span>
-      <div className="admin-media-preview">{value ? <img src={value} alt="" /> : <i>Нет изображения</i>}</div>
-      <label className="admin-media-upload"><input type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={upload} disabled={uploading} /><span>{uploading ? "Загружаю…" : "Загрузить файл"}</span></label>
       {error && <small>{error}</small>}
     </div>
   );

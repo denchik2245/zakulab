@@ -1,0 +1,60 @@
+.card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 5px;
+  background: #446255;
+}
+.card > img { object-fit: cover; transform: scale(1); will-change: transform; transition: transform .45s cubic-bezier(.22,.72,.24,1); }
+.shade { position: absolute; inset: 0; z-index: 1; pointer-events: none; background: #0000004d; opacity: 0; transition: opacity .45s cubic-bezier(.22,.72,.24,1); }
+.label, .tags, .cardArrow { position: absolute; z-index: 2; opacity: 0; transition: opacity .45s cubic-bezier(.22,.72,.24,1); }
+.label, .tags small { padding: 5px 12px; border-radius: 3px; font-size: 14px; line-height: 1.4; }
+.label { top: 20px; left: 20px; color: #050505; background: #fefefe; }
+.tags { left: 20px; bottom: 20px; display: flex; gap: 10px; }
+.tags small { color: #fefefe; background: #fefefe4d; -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+.cardArrow { right: 20px; bottom: 20px; }
+.arrow { width: 20px; height: 20px; display: inline-block; position: relative; flex: 0 0 auto; }
+.desktopCopy { display: inline; }
+.mobileCopy { display: none; }
+
+.row { position: relative; display: grid; grid-template-columns: var(--project-columns, 540px 1fr 36px); column-gap: var(--project-column-gap, 20px); align-items: var(--project-align, center); padding-bottom: var(--project-row-padding, 28px); }
+.row::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: #628073; transition: background-color .45s cubic-bezier(.22,.72,.24,1); }
+.name { min-width: 0; display: flex; align-items: flex-start; gap: 10px; color: #fefefe; font-size: 28px; font-weight: 500; line-height: 1.2; text-decoration: underline; text-decoration-thickness: .05em; text-underline-offset: 3px; }
+.name .arrow { opacity: 0; transform: translate(-4px,4px); transition: opacity .4s ease, transform .4s ease; }
+.description { padding-top: var(--project-description-padding, 0px); color: #809e91; font-size: 20px; line-height: 1.4; transition: color .45s cubic-bezier(.22,.72,.24,1); }
+.platform { width: 36px; height: 36px; display: grid; place-items: center; }
+.allProjects { padding: 16px 50px; display: inline-flex; justify-content: center; align-items: center; gap: 8px; border: 0; border-radius: 5px; color: #050505; background: #fefefe; cursor: pointer; font-family: inherit; font-size: 18px; font-weight: 700; line-height: 1.4; transition: color .4s ease, background-color .4s ease; }
+.allProjects small { color: #809e91; font-size: 16px; font-weight: 600; }
+.card:focus-visible, .row:focus-visible, .allProjects:focus-visible { outline: 2px solid #809e91; outline-offset: 4px; }
+.card:focus-visible .shade, .card:focus-visible .label, .card:focus-visible .tags, .card:focus-visible .cardArrow { opacity: 1; }
+.row:focus-visible .arrow { opacity: 1; transform: none; }
+
+@media (hover: hover) and (pointer: fine) {
+  .card:hover > img { transform: scale(1.07); }
+  .card:hover .shade, .card:hover .label, .card:hover .tags, .card:hover .cardArrow { opacity: 1; }
+  .row:hover::after { background: #fefefe; }
+  .row:hover .description { color: #fefefe; }
+  .row:hover .arrow { opacity: 1; transform: none; }
+  .allProjects:hover { color: #809e91; background: #eff5f3; }
+}
+@media (hover: none), (pointer: coarse) {
+  .shade, .label, .tags, .cardArrow { opacity: 1; }
+  .name .arrow { opacity: 1; transform: none; }
+}
+@media (max-width: 960px) {
+  .card { min-height: 0; height: auto; aspect-ratio: 320 / 300; }
+  .shade, .cardArrow { display: none; }
+  .label, .tags { opacity: 1; }
+  .label { top: 10px; left: 10px; }
+  .label, .tags small { font-size: 12px; }
+  .tags { left: 10px; bottom: 10px; }
+  .desktopCopy { display: none; }
+  .mobileCopy { display: inline; }
+  .tags .mobileCopy { display: block; }
+  .row { display: block; min-height: 0; height: auto; padding: 0; }
+  .name { font-size: 20px; line-height: 24px; }
+  .name .arrow { opacity: 1; transform: none; }
+  .description { display: block; margin-top: 8px; padding: 0; font-size: 16px; line-height: 22px; }
+  .platform { display: none; }
+  .allProjects { width: 100%; height: 54px; padding: 16px 20px; font-size: 16px; line-height: 1; }
+  .allProjects small { font-size: 14px; }
+}

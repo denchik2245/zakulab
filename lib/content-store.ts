@@ -1,20 +1,22 @@
 import "server-only";
 
-import { promises as fs } from "node:fs";
-import path from "node:path";
-import { getStore } from "@netlify/blobs";
-import { cases as seedCases, createLegacyCaseBlocks, type CaseBlock, type CaseStudy } from "@/lib/cases";
+import { readJSON, compareAndSetJSON } from "@/lib/atomic-store";
+import { readReviewQueue, pendingReviewLifetime } from "@/lib/review-queue";
+import { cases as seedCases, createLegacyCaseBlocks, hasCasePlaceholders, type CaseBlock, type CaseStudy } from "@/lib/cases";
 import { verifiedReviews as seedReviews, type VerifiedReview } from "@/lib/reviews";
 import { defaultSiteSettings, type SiteSettings } from "@/lib/site-settings";
+import { normalizeContentUrl } from "@/lib/external-url";
 
 export type AdminContent = {
   version: 1;
   updatedAt: string;
   reviews: VerifiedReview[];
   site: SiteSettings;
+  revision?: string;
+  reviewSnapshotIds?: string[];
+  dismissedSubmissions?: string[];
 };
 
-const localFile = path.join(process.cwd(), ".data", "zakulab-content.json");
 const blobKey = "content-v1";
 
 function seedContent(): AdminContent {
@@ -26,26 +28,25 @@ function seedContent(): AdminContent {
   });
   return {
     version: 1,
-    updatedAt: new Date().toISOString(),
+    updatedAt: "2026-01-01T00:00:00.000Z",
     reviews: structuredClone(seedReviews),
     site,
   };
 }
 
 function normalizeCaseStudy(caseStudy: CaseStudy, previewImage = ""): CaseStudy {
-  const blocks = Array.isArray(caseStudy.blocks) && caseStudy.blocks.length > 0
+  const blocks = Array.isArray(caseStudy.blocks)
     ? caseStudy.blocks.filter((block): block is CaseBlock => Boolean(block && typeof block.id === "string" && typeof block.type === "string"))
     : createLegacyCaseBlocks(caseStudy, previewImage);
 
-  return {
+  const normalized: CaseStudy = {
     ...caseStudy,
+    url: normalizeContentUrl(caseStudy.url),
     whatDone: caseStudy.whatDone?.trim() || caseStudy.summary,
     blocks,
   };
-}
-
-function isNetlifyRuntime() {
-  return process.env.NETLIFY === "true" || process.env.NETLIFY_LOCAL === "true";
+  // Unfinished source copy must not become a public case page.
+  return hasCasePlaceholders(normalized) ? { ...normalized, status: "draft" } : normalized;
 }
 
 function mergeWithDefaults(value: Partial<AdminContent>): AdminContent {
@@ -64,6 +65,7 @@ function mergeWithDefaults(value: Partial<AdminContent>): AdminContent {
     ? incomingSite.portfolioProjects.map((project, index) => ({
         ...(seed.site.portfolioProjects.find((item) => item.id === project.id) ?? seed.site.portfolioProjects[index] ?? seed.site.portfolioProjects[0]),
         ...project,
+        url: normalizeContentUrl(project.url),
         tags: (Array.isArray(project.tags) ? [project.tags[0] ?? "", project.tags[1] ?? ""] : ["", ""]) as [string, string],
         filters: Array.isArray(project.filters) ? project.filters : [],
       }))
@@ -162,6 +164,8 @@ function mergeWithDefaults(value: Partial<AdminContent>): AdminContent {
     ? value.reviews.map((review, index) => ({
         ...seed.reviews.find((seedReview) => seedReview.id === review.id),
         ...review,
+        project: { ...review.project, url: normalizeContentUrl(review.project.url) },
+        profile: { ...review.profile, url: normalizeContentUrl(review.profile.url) },
         showOnHome: review.showOnHome ?? true,
         showOnReviewsPage: review.showOnReviewsPage ?? true,
         order: Number.isFinite(review.order) ? review.order : (index + 1) * 10,
@@ -177,36 +181,40 @@ function mergeWithDefaults(value: Partial<AdminContent>): AdminContent {
     updatedAt: typeof value.updatedAt === "string" ? value.updatedAt : seed.updatedAt,
     reviews,
     site,
+    dismissedSubmissions: value.dismissedSubmissions ?? [],
   };
 }
 
-export async function readContent(): Promise<AdminContent> {
-  if (isNetlifyRuntime()) {
-    const store = getStore("zakulab-cms");
-    const stored = await store.get(blobKey, { type: "json", consistency: "strong" }) as Partial<AdminContent> | null;
-    return stored ? mergeWithDefaults(stored) : seedContent();
+export async function readContent(includeSubmissions = false): Promise<AdminContent> {
+  const stored = await readJSON<Partial<AdminContent>>(blobKey);
+  const content = stored ? mergeWithDefaults(stored.data) : seedContent();
+  content.reviews = content.reviews.filter((review) => review.status !== "pending" || Date.parse(review.submittedAt) > Date.now() - pendingReviewLifetime);
+  content.revision = stored?.etag ?? "initial";
+  content.reviewSnapshotIds = [];
+  if (includeSubmissions) {
+    const submissions = (await readReviewQueue()).filter((entry) => entry && !content.dismissedSubmissions?.includes(entry.data.id));
+    content.reviewSnapshotIds = submissions.map((entry) => entry!.data.id);
+    const known = new Set(content.reviews.map((review) => review.id));
+    content.reviews.unshift(...submissions.map((entry) => entry!.data).filter((review) => !known.has(review.id)));
   }
-
-  try {
-    const raw = await fs.readFile(localFile, "utf8");
-    return mergeWithDefaults(JSON.parse(raw) as Partial<AdminContent>);
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
-    return seedContent();
-  }
+  return content;
 }
 
-export async function writeContent(value: AdminContent): Promise<AdminContent> {
-  const content = mergeWithDefaults({ ...value, updatedAt: new Date().toISOString() });
-  if (isNetlifyRuntime()) {
-    const store = getStore("zakulab-cms");
-    await store.setJSON(blobKey, content);
-    return content;
-  }
+export class ContentConflictError extends Error {}
 
-  await fs.mkdir(path.dirname(localFile), { recursive: true });
-  await fs.writeFile(localFile, JSON.stringify(content, null, 2), "utf8");
-  return content;
+export async function writeContent(value: AdminContent): Promise<AdminContent> {
+  const stored = await readJSON<Partial<AdminContent>>(blobKey);
+  if (value.revision !== (stored?.etag ?? "initial")) throw new ContentConflictError("Документ уже изменён. Обновите данные и повторите правки.");
+  const content = mergeWithDefaults({ ...value, updatedAt: new Date().toISOString() });
+  const queue = await readReviewQueue();
+  const queuedIds = new Set(queue.flatMap((entry) => entry ? [entry.data.id] : []));
+  const retainedIds = new Set(content.reviews.map((review) => review.id));
+  content.dismissedSubmissions = [...new Set([
+    ...(stored?.data.dismissedSubmissions ?? []),
+    ...(value.reviewSnapshotIds ?? []).filter((id) => !retainedIds.has(id)),
+  ])].filter((id) => queuedIds.has(id));
+  if (!await compareAndSetJSON(blobKey, content, stored?.etag ?? null)) throw new ContentConflictError("Документ уже изменён. Обновите данные и повторите правки.");
+  return readContent(true);
 }
 
 export async function getPublishedCases() {

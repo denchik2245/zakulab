@@ -7,7 +7,7 @@ import { navigation } from "@/lib/navigation";
 import styles from "./site-header.module.css";
 import { SocialLinks } from "./social-links";
 
-export function Header() {
+export function Header(links: { telegramUrl: string; maxUrl: string; vkUrl: string }) {
   const [isHidden, setIsHidden] = useState(false);
 
   useEffect(() => {
@@ -46,7 +46,7 @@ export function Header() {
           <Link href="/style-check">Выбор стиля</Link>
         </nav>
 
-        <SocialLinks className={styles.socials} />
+        <SocialLinks className={styles.socials} {...links} />
 
         <details className={styles.mobileMenu}>
           <summary>Меню</summary>

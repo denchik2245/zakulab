@@ -12,6 +12,6 @@ export const metadata: Metadata = {
 
 export default async function AdminPage() {
   const authenticated = await isAdminAuthenticated();
-  const content = authenticated ? await readContent() : null;
+  const content = authenticated ? await readContent(true) : null;
   return <AdminStudio authenticated={authenticated} initialContent={content} />;
 }

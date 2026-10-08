@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Image from "next/image";
+import { CmsImage as Image } from "@/components/cms-image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { CaseBlock } from "@/lib/cases";
@@ -74,7 +74,7 @@ export default async function CasePage({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const item = await getPublishedCase(slug);
   if (!item) notFound();
-  const blocks = item.blocks?.length ? item.blocks : createLegacyCaseBlocks(item);
+  const blocks = item.blocks ?? createLegacyCaseBlocks(item);
 
   return (
     <article className={styles.page}>

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { ContactPopupButton } from "@/components/contact-popup-button";
 import { StylePreview } from "@/components/style-preview";
 import { styleReasons, type StyleChoiceSettings, type StyleReference } from "@/lib/style-references";
@@ -13,6 +14,7 @@ type Response = { vote: Vote; reasons: string[] };
 type SocialLinks = { telegramUrl: string; maxUrl: string; vkUrl: string };
 
 function StyleGallery({ reference }: { reference: StyleReference }) {
+  const fullscreenRef = useRef<HTMLDialogElement>(null);
   const [imageIndex, setImageIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [thumb, setThumb] = useState({ top: 0, height: 160 });
@@ -50,16 +52,18 @@ function StyleGallery({ reference }: { reference: StyleReference }) {
 
   useEffect(() => {
     if (!isFullscreen) return;
+    const dialog = fullscreenRef.current;
+    const previousFocus = document.activeElement as HTMLElement | null;
     const previousBodyOverflow = document.body.style.overflow;
     const previousHtmlOverflow = document.documentElement.style.overflow;
     document.body.style.overflow = "hidden";
     document.documentElement.style.overflow = "hidden";
-    const onKeyDown = (event: KeyboardEvent) => { if (event.key === "Escape") setIsFullscreen(false); };
-    document.addEventListener("keydown", onKeyDown);
+    dialog?.showModal();
     return () => {
       document.body.style.overflow = previousBodyOverflow;
       document.documentElement.style.overflow = previousHtmlOverflow;
-      document.removeEventListener("keydown", onKeyDown);
+      dialog?.close();
+      previousFocus?.focus();
     };
   }, [isFullscreen]);
 
@@ -90,18 +94,20 @@ function StyleGallery({ reference }: { reference: StyleReference }) {
 
       {images.length > 0 && (
         <div className={styles.pagination}>
-          <button type="button" onClick={() => changeImage(imageIndex - 1)} disabled={images.length < 2} aria-label="Предыдущий пример"><Image src="/assets/figma/arrow.svg" width={20} height={20} alt="" /></button>
+          <button type="button" onClick={() => changeImage(imageIndex - 1)} disabled={images.length < 2} aria-label="Предыдущий пример"><picture><source media="(max-width: 960px)" srcSet="/assets/figma/style-gallery-arrow.svg" /><Image src="/assets/figma/arrow.svg" width={20} height={20} alt="" /></picture></button>
           <b>{imageIndex + 1} / {images.length}</b>
-          <button type="button" onClick={() => changeImage(imageIndex + 1)} disabled={images.length < 2} aria-label="Следующий пример"><Image src="/assets/figma/arrow.svg" width={20} height={20} alt="" /></button>
+          <button type="button" onClick={() => changeImage(imageIndex + 1)} disabled={images.length < 2} aria-label="Следующий пример"><picture><source media="(max-width: 960px)" srcSet="/assets/figma/style-gallery-arrow.svg" /><Image src="/assets/figma/arrow.svg" width={20} height={20} alt="" /></picture></button>
         </div>
       )}
 
-      {isFullscreen && (
-        <div
+      {isFullscreen && createPortal(
+        <dialog
+          ref={fullscreenRef}
           className={styles.fullscreenOverlay}
           role="dialog"
           aria-modal="true"
           aria-label={`Полноэкранный просмотр: ${reference.title}`}
+          onCancel={(event) => { event.preventDefault(); setIsFullscreen(false); }}
           data-smooth-scroll-prevent
           onWheel={(event) => {
             const scrollable = (event.target as HTMLElement)?.closest?.(`.${styles.fullscreenImage}`);
@@ -113,7 +119,7 @@ function StyleGallery({ reference }: { reference: StyleReference }) {
         >
           <button type="button" className={styles.fullscreenClose} onClick={() => setIsFullscreen(false)} aria-label="Закрыть полноэкранный просмотр"><Image src="/assets/figma/cross-popup.svg" width={20} height={20} alt="" /></button>
           <div className={styles.fullscreenImage} data-smooth-scroll-prevent tabIndex={0}>{activeImage ? <img src={activeImage} alt={`Пример стиля «${reference.title}»`} /> : <StylePreview reference={reference} />}</div>
-        </div>
+        </dialog>, document.body
       )}
     </div>
   );
@@ -195,7 +201,7 @@ export function StyleQuiz({ settings, popups, socialLinks }: { settings: StyleCh
           <h2>Результаты</h2>
           <div className={styles.resultActions}>
             <button type="button" onClick={resetQuiz}>Пройти тест еще раз</button>
-            <ContactPopupButton triggerClassName={styles.sendResult} title={popups.styleResultTitle} description={popups.styleResultDescription} {...socialLinks} onOpen={() => localStorage.setItem("zakulab-style-brief", summary)}>Отправить результат</ContactPopupButton>
+            <ContactPopupButton triggerClassName={styles.sendResult} title={popups.styleResultTitle} description="Скопируйте результат или скачайте файл, затем отправьте его в удобном мессенджере." {...socialLinks} message={summary}>Отправить результат</ContactPopupButton>
           </div>
         </div>
         <div className={styles.resultColumns}>
@@ -222,9 +228,9 @@ export function StyleQuiz({ settings, popups, socialLinks }: { settings: StyleCh
           <fieldset className={styles.voteFieldset}>
             <legend>Как вам этот стиль?</legend>
             <div className={styles.voteButtons}>
-              <button type="button" data-active={currentResponse?.vote === "dislike"} onClick={() => chooseVote("dislike")} aria-pressed={currentResponse?.vote === "dislike"}>Не нравится <span className={styles.voteIcon}><Image src="/assets/figma/minus.svg" alt="" fill sizes="20px" /></span></button>
-              <button type="button" onClick={() => chooseVote("skip")}>Пропустить</button>
-              <button type="button" data-active={currentResponse?.vote === "like"} onClick={() => chooseVote("like")} aria-pressed={currentResponse?.vote === "like"}>Нравится <span className={styles.voteIcon}><Image src="/assets/figma/plus.svg" alt="" fill sizes="20px" /></span></button>
+              <button type="button" className={styles.voteLike} data-active={currentResponse?.vote === "like"} onClick={() => chooseVote("like")} aria-pressed={currentResponse?.vote === "like"}>Нравится <span className={styles.voteIcon}><Image src="/assets/figma/plus.svg" alt="" fill sizes="20px" /></span></button>
+              <button type="button" className={styles.voteDislike} data-active={currentResponse?.vote === "dislike"} onClick={() => chooseVote("dislike")} aria-pressed={currentResponse?.vote === "dislike"}>Не нравится <span className={styles.voteIcon}><Image src="/assets/figma/minus.svg" alt="" fill sizes="20px" /></span></button>
+              <button type="button" className={styles.voteSkip} onClick={() => chooseVote("skip")}>Пропустить</button>
             </div>
           </fieldset>
 

@@ -15,13 +15,15 @@ type ContactPopupButtonProps = {
   vkUrl: string;
   triggerClassName?: string;
   onOpen?: () => void;
+  message?: string;
 };
 
 function getPopupScale() {
   return window.innerWidth >= 960 && window.innerWidth < 1920 ? window.innerWidth / 1920 : 1;
 }
 
-export function ContactPopupButton({ children, title, description, telegramUrl, maxUrl, vkUrl, triggerClassName, onOpen }: ContactPopupButtonProps) {
+export function ContactPopupButton({ children, title, description, telegramUrl, maxUrl, vkUrl, triggerClassName, onOpen, message }: ContactPopupButtonProps) {
+  const [copyStatus, setCopyStatus] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
@@ -72,7 +74,7 @@ export function ContactPopupButton({ children, title, description, telegramUrl, 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") closePopup();
       if (event.key !== "Tab" || !dialogRef.current) return;
-      const focusable = Array.from(dialogRef.current.querySelectorAll<HTMLElement>("button, a[href]"));
+      const focusable = Array.from(dialogRef.current.querySelectorAll<HTMLElement>("button, a[href], textarea"));
       const first = focusable[0];
       const last = focusable.at(-1);
       if (event.shiftKey && document.activeElement === first) {
@@ -104,6 +106,19 @@ export function ContactPopupButton({ children, title, description, telegramUrl, 
           <h2 id={titleId}>{title}</h2>
           <p id={descriptionId}>{description}</p>
         </div>
+        {message && <div className={styles.resultTransfer}>
+          <textarea aria-label="Результат выбора стиля" readOnly value={message} />
+          <button type="button" onClick={async () => {
+            try { await navigator.clipboard.writeText(message); setCopyStatus("Результат скопирован. Вставьте его в сообщение."); }
+            catch { setCopyStatus("Выделите текст и скопируйте вручную или скачайте файл."); }
+          }}>Скопировать результат</button>
+          <button type="button" onClick={() => {
+            const url = URL.createObjectURL(new Blob([message], { type: "text/plain;charset=utf-8" }));
+            const anchor = document.createElement("a"); anchor.href = url; anchor.download = "zakulab-style-result.txt";
+            anchor.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+          }}>Скачать .txt</button>
+          <p role="status">{copyStatus}</p>
+        </div>}
         <SocialLinks className={styles.socials} telegramUrl={telegramUrl} maxUrl={maxUrl} vkUrl={vkUrl} />
       </div>
     </div>

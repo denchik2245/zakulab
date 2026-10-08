@@ -18,7 +18,8 @@ export function isAdminConfigured() {
 }
 
 function sign(value: string) {
-  return createHmac("sha256", sessionSecret()).update(value).digest("base64url");
+  // Password rotation invalidates every previously issued cookie, including legacy cookies.
+  return createHmac("sha256", sessionSecret()).update(process.env.ADMIN_PASSWORD ?? "admin").update("\0").update(value).digest("base64url");
 }
 
 export function createAdminSession() {
@@ -27,8 +28,9 @@ export function createAdminSession() {
 }
 
 export function verifyAdminSession(token?: string) {
-  if (!token || !sessionSecret()) return false;
-  const [payload, signature] = token.split(".");
+  if (!token || !isAdminConfigured() || token.length > 2048) return false;
+  const [payload, signature, extra] = token.split(".");
+  if (extra !== undefined) return false;
   if (!payload || !signature) return false;
   const expected = Buffer.from(sign(payload));
   const received = Buffer.from(signature);

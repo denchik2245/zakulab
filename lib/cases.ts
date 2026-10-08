@@ -221,3 +221,8 @@ export const cases: CaseStudy[] = [
 export function getCase(slug: string) {
   return cases.find((item) => item.slug === slug);
 }
+
+export function hasCasePlaceholders(item: CaseStudy) {
+  return JSON.stringify([item.title, item.eyebrow, item.summary, item.whatDone, item.role, item.catalogTask,
+    item.verified, item.blocks ?? item.draft]).includes("[УТОЧНИТЬ]");
+}

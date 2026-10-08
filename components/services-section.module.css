@@ -116,28 +116,28 @@
 }
 
 @media (max-width: 960px) {
-  :global(body:has(.figma-home-page)) .section { padding: 80px 0; }
-  :global(body:has(.figma-home-page)) .shell { width: calc(100% - 40px); max-width: 640px; min-height: 0; }
-  :global(body:has(.figma-home-page)) .heading { height: auto; display: block; }
-  :global(body:has(.figma-home-page)) .title > span { display: block; color: #babcaf; font-size: 14px; font-weight: 600; line-height: 19px; }
-  :global(body:has(.figma-home-page)) .title h2 { margin: 12px 0 0; font-size: 26px; line-height: 31px; }
-  :global(body:has(.figma-home-page)) .heading p { max-width: none; margin: 20px 0 0; font-size: 16px; line-height: 22px; }
-  :global(body:has(.figma-home-page)) .services { height: auto; margin: 36px calc((100% - 100vw) / 2) 0; display: block; border-top: 0; border-bottom: 0; box-shadow: inset 0 1px var(--border); }
-  :global(body:has(.figma-home-page)) .services article, :global(body:has(.figma-home-page)) .services article + article { min-height: 0; height: 237px; padding: 20px max(20px, calc((100vw - 640px) / 2)) 23px; border: 0; border-bottom: 1px solid var(--border); }
-  :global(body:has(.figma-home-page)) .services h3 { font-size: 20px; line-height: 24px; }
-  :global(body:has(.figma-home-page)) .services article > p { margin: 12px 0 0; font-size: 14px; line-height: 20px; }
-  :global(body:has(.figma-home-page)) .terms { margin-top: auto; padding: 0; gap: 3px; }
-  :global(body:has(.figma-home-page)) .terms span { margin-bottom: 5px; font-size: 16px; line-height: 22px; }
-  :global(body:has(.figma-home-page)) .terms strong { font-size: 18px; line-height: 22px; }
-  :global(body:has(.figma-home-page)) .section .smallTasksTitle { margin: 36px 0 0; font-size: 26px; line-height: 31px; }
-  :global(body:has(.figma-home-page)) .smallTasks { height: auto; margin-top: 28px; display: grid; grid-template-columns: 1fr; gap: 10px; }
-  :global(body:has(.figma-home-page)) .smallTasks article { min-height: 0; padding: 20px; }
-  :global(body:has(.figma-home-page)) .smallTasks article > p { width: auto; margin: 12px 0 0; font-size: 14px; line-height: 20px; }
-  :global(body:has(.figma-home-page)) .smallTasks h3 { font-size: 20px; line-height: 1.2; }
-  :global(body:has(.figma-home-page)) .deliverable { position: static; margin: 20px -20px 0; padding: 20px 20px 0; border-top: 0; box-shadow: inset 0 1px var(--border-card); }
-  :global(body:has(.figma-home-page)) .deliverable h4 { margin-bottom: 8px; font-size: 18px; line-height: 22px; }
-  :global(body:has(.figma-home-page)) .deliverable p { font-size: 14px; line-height: 20px; }
-  :global(body:has(.figma-home-page)) .taskTerms { position: static; margin-top: 20px; gap: 5px; }
-  :global(body:has(.figma-home-page)) .taskTerms span { font-size: 16px; line-height: 1.4; }
-  :global(body:has(.figma-home-page)) .taskTerms strong { font-size: 18px; line-height: 1.2; }
+  :global(body:has(.site-mobile-layout)) .section { padding: 80px 0; }
+  :global(body:has(.site-mobile-layout)) .shell { width: calc(100% - 40px); max-width: 640px; min-height: 0; }
+  :global(body:has(.site-mobile-layout)) .heading { height: auto; display: block; }
+  :global(body:has(.site-mobile-layout)) .title > span { display: block; color: #babcaf; font-size: 14px; font-weight: 600; line-height: 19px; }
+  :global(body:has(.site-mobile-layout)) .title h2 { margin: 12px 0 0; font-size: 26px; line-height: 31px; }
+  :global(body:has(.site-mobile-layout)) .heading p { max-width: none; margin: 20px 0 0; font-size: 16px; line-height: 22px; }
+  :global(body:has(.site-mobile-layout)) .services { height: auto; margin: 36px calc((100% - 100vw) / 2) 0; display: block; border-top: 0; border-bottom: 0; box-shadow: inset 0 1px var(--border); }
+  :global(body:has(.site-mobile-layout)) .services article, :global(body:has(.site-mobile-layout)) .services article + article { min-height: 0; height: 237px; padding: 20px max(20px, calc((100vw - 640px) / 2)) 23px; border: 0; border-bottom: 1px solid var(--border); }
+  :global(body:has(.site-mobile-layout)) .services h3 { font-size: 20px; line-height: 24px; }
+  :global(body:has(.site-mobile-layout)) .services article > p { margin: 12px 0 0; font-size: 14px; line-height: 20px; }
+  :global(body:has(.site-mobile-layout)) .terms { margin-top: auto; padding: 0; gap: 3px; }
+  :global(body:has(.site-mobile-layout)) .terms span { margin-bottom: 5px; font-size: 16px; line-height: 22px; }
+  :global(body:has(.site-mobile-layout)) .terms strong { font-size: 18px; line-height: 22px; }
+  :global(body:has(.site-mobile-layout)) .section .smallTasksTitle { margin: 36px 0 0; font-size: 26px; line-height: 31px; }
+  :global(body:has(.site-mobile-layout)) .smallTasks { height: auto; margin-top: 28px; display: grid; grid-template-columns: 1fr; gap: 10px; }
+  :global(body:has(.site-mobile-layout)) .smallTasks article { min-height: 0; padding: 20px; }
+  :global(body:has(.site-mobile-layout)) .smallTasks article > p { width: auto; margin: 12px 0 0; font-size: 14px; line-height: 20px; }
+  :global(body:has(.site-mobile-layout)) .smallTasks h3 { font-size: 20px; line-height: 1.2; }
+  :global(body:has(.site-mobile-layout)) .deliverable { position: static; margin: 20px -20px 0; padding: 20px 20px 0; border-top: 0; box-shadow: inset 0 1px var(--border-card); }
+  :global(body:has(.site-mobile-layout)) .deliverable h4 { margin-bottom: 8px; font-size: 18px; line-height: 22px; }
+  :global(body:has(.site-mobile-layout)) .deliverable p { font-size: 14px; line-height: 20px; }
+  :global(body:has(.site-mobile-layout)) .taskTerms { position: static; margin-top: 20px; gap: 5px; }
+  :global(body:has(.site-mobile-layout)) .taskTerms span { font-size: 16px; line-height: 1.4; }
+  :global(body:has(.site-mobile-layout)) .taskTerms strong { font-size: 18px; line-height: 1.2; }
 }

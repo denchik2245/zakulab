@@ -1,40 +1,12 @@
-import Image from "next/image";
-import Link from "next/link";
+import { CmsImage as Image } from "@/components/cms-image";
 import type { SiteSettings } from "@/lib/site-settings";
 import type { VerifiedReview } from "@/lib/reviews";
 import { typographic } from "@/lib/typographic";
-import { navigation } from "@/lib/navigation";
 import { ReviewsSlider } from "@/components/reviews-slider";
 import { ServicesSection } from "@/components/services-section";
+import { AllProjectsButton, ProjectCard, ProjectRow } from "@/components/portfolio-project";
 import styles from "./home-page.module.css";
-
-function ArrowIcon({ light = false }: { light?: boolean }) {
-  return (
-    <span className={styles.arrowIcon} aria-hidden="true">
-      <Image src={light ? "/assets/figma/arrow1.svg" : "/assets/figma/arrow.svg"} alt="" fill sizes="20px" />
-    </span>
-  );
-}
-
-function ProjectPlatform({ platform }: { platform: string }) {
-  const normalized = platform.trim().toLowerCase();
-  if (!normalized) return <span className={styles.platformIcon} aria-hidden="true" />;
-
-  const isWordPress = normalized === "wordpress" || normalized === "word press" || normalized === "wp";
-  const isTilda = normalized === "tilda";
-  if (!isWordPress && !isTilda) return <span className={styles.platformIcon} aria-hidden="true" />;
-
-  return (
-    <span className={styles.platformIcon}>
-      <Image
-        src={isWordPress ? "/assets/figma/property1-wordpress.svg" : "/assets/figma/property1-tilda.svg"}
-        width={isWordPress ? 32 : 36}
-        height={isWordPress ? 32 : 36}
-        alt={`Логотип ${isWordPress ? "WordPress" : "Tilda"}`}
-      />
-    </span>
-  );
-}
+import { publicProject } from "@/lib/public-content";
 
 function SectionTitle({ eyebrow, children }: { eyebrow: string; children: React.ReactNode }) {
   return (
@@ -46,26 +18,13 @@ function SectionTitle({ eyebrow, children }: { eyebrow: string; children: React.
 }
 
 export function HomePage({ site, reviews }: { site: SiteSettings; reviews: VerifiedReview[] }) {
-  const portfolioProjects = site.portfolioProjects.filter((project) => project.published).sort((a, b) => a.order - b.order);
+  const portfolioProjects = site.portfolioProjects.filter((project) => project.published && project.homePlacement !== "hidden").map(publicProject).sort((a, b) => a.order - b.order);
   const featuredProjects = portfolioProjects.filter((project) => project.homePlacement === "featured").slice(0, 4);
   const listedProjects = portfolioProjects.filter((project) => project.homePlacement === "list");
-  const mobileFeaturedCopy = [
-    { label: "Центр творчества", tags: ["UX-исследование", "15 страниц"] },
-    { label: "Курсы ЕГЭ и ОГЭ", tags: ["UX-исследование", "15 страниц"] },
-    { label: "Студия разработки", tags: ["UX-исследование", "15 страниц"] },
-    { label: "Юридическая компания", tags: ["UX-исследование", "15 страниц"] },
-  ];
-  const mobileListedDescriptions = [
-    "Виниловый сайдинг для дома под ключ",
-    "Закупка строительных материалов",
-    "Управление посуточной и долгосрочной арендой",
-    "Управление посуточной и долгосрочной арендой",
-    "Управление посуточной и долгосрочной арендой",
-  ];
 
   return (
     <div className={styles.stage}>
-      <div className={`figma-home-page ${styles.page}`} id="top">
+      <div className={`figma-home-page site-mobile-layout ${styles.page}`} id="top">
       <section className={styles.hero} aria-labelledby="hero-title">
         <div className={styles.heroTop}>
           <h1 id="hero-title">— {typographic(site.heroTitle)}</h1>
@@ -98,7 +57,7 @@ export function HomePage({ site, reviews }: { site: SiteSettings; reviews: Verif
           {site.stats.map((item, statIndex) => (
             <article key={item.id}>
               <strong>
-                {statIndex === 1 ? <><span className={styles.desktopText}>{item.value}</span><span className={styles.mobileText}>30+</span></> : item.value}
+                {item.value}
               </strong>
               <span>{typographic(item.label)}</span>
               <i aria-hidden="true">
@@ -122,40 +81,12 @@ export function HomePage({ site, reviews }: { site: SiteSettings; reviews: Verif
         <div className={styles.portfolioInner}>
           <SectionTitle eyebrow="Лучшие проекты"><span id="portfolio-title">{typographic(site.portfolioTitle)}</span></SectionTitle>
           <div className={styles.portfolioGallery}>
-            {featuredProjects.map((project, index) => {
-              const label = project.title || "Проект";
-              const tags = project.tags.filter(Boolean);
-              const mobileCopy = mobileFeaturedCopy[index];
-
-              return (
-                <a href={project.url || "#"} key={project.id} target={project.url.startsWith("http") ? "_blank" : undefined} rel={project.url.startsWith("http") ? "noreferrer" : undefined}>
-                  <Image src={project.image} alt={`Превью проекта ${project.title}`} fill sizes="(max-width: 900px) 50vw, 540px" quality={90} />
-                  <span className={styles.featuredLabel}>
-                    <span className={styles.desktopText}>{typographic(label)}</span>
-                    <span className={styles.mobileText}>{typographic(mobileCopy?.label ?? label)}</span>
-                  </span>
-                  <span className={styles.featuredTags}>
-                    {tags.map((tag, i) => <small className={styles.desktopTag} key={`${tag}-${i}`}>{typographic(tag)}</small>)}
-                    {(mobileCopy?.tags ?? tags).map((tag, i) => <small className={styles.mobileTag} key={`mobile-${tag}-${i}`}>{typographic(tag)}</small>)}
-                  </span>
-                  <span className={styles.featuredArrow}><ArrowIcon /></span>
-                </a>
-              );
-            })}
+            {featuredProjects.map((project) => <ProjectCard key={project.id} project={project} sizes="(max-width: 960px) calc(100vw - 40px), 540px" />)}
           </div>
           <div className={styles.projectRows}>
-            {listedProjects.map((project, index) => (
-              <a href={project.url} key={project.id} target={project.url.startsWith("http") ? "_blank" : undefined} rel={project.url.startsWith("http") ? "noreferrer" : undefined}>
-                <strong>{typographic(project.title)}<ArrowIcon /></strong>
-                <span className={styles.projectDescription}>
-                  <span className={styles.desktopText}>{typographic(project.description)}</span>
-                  <span className={styles.mobileText}>{typographic(mobileListedDescriptions[index] ?? project.description)}</span>
-                </span>
-                <ProjectPlatform platform={project.platform} />
-              </a>
-            ))}
+            {listedProjects.map((project) => <ProjectRow key={project.id} project={project} />)}
           </div>
-          <Link className={styles.allProjects} href="/projects"><span>Все проекты</span><small><span className={styles.desktopText}>{`{${portfolioProjects.length}}`}</span><span className={styles.mobileText}>{`{26}`}</span></small></Link>
+          <AllProjectsButton className={styles.allProjects} href="/projects" count={site.portfolioProjects.filter((project) => project.published && project.portfolioPlacement !== "hidden").length} />
         </div>
       </section>
 

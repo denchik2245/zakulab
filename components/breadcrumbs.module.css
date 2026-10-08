@@ -40,3 +40,8 @@
   .breadcrumbs { gap: 6px; font-size: 12px; }
   .separator { width: 12px; font-size: 17px; }
 }
+
+@media (max-width: 960px) {
+  :global(body:has(.site-mobile-layout)) .breadcrumbs { gap: 8px; font-size: 14px; line-height: 1.4; }
+  :global(body:has(.site-mobile-layout)) .separator { width: 16px; font-size: 21px; line-height: 16px; }
+}

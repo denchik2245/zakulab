@@ -8,6 +8,7 @@ export type VerifiedReview = {
   order: number;
   text: string;
   image?: string;
+  consent?: { acceptedAt: string; version: "2026-10-08" };
   author: {
     name: string;
     initials: string;

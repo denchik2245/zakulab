@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PortfolioPage } from "@/components/portfolio-page";
 import { readContent } from "@/lib/content-store";
+import { publicPortfolio } from "@/lib/public-content";
 
 export const dynamic = "force-dynamic";
 
@@ -12,5 +13,5 @@ export const metadata: Metadata = {
 
 export default async function ProjectsPage() {
   const { site } = await readContent();
-  return <PortfolioPage site={site} />;
+  return <PortfolioPage site={publicPortfolio(site)} />;
 }
