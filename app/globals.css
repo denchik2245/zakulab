@@ -1139,13 +1139,17 @@ body:has(.admin-login) {
 .admin-case-toggle input { width: 25px; height: 25px; margin: 0; accent-color: #304e41; }
 .admin-case-toggle span { font-size: 16px; font-weight: 600; }
 .admin-placement-section {
-  height: 260px;
+  height: auto;
   padding: 32px;
   display: grid;
   align-content: start;
   gap: 28px;
   border-bottom: 1px solid #b8b8b8;
 }
+.admin-placement-section fieldset { min-width: 0; margin: 0; padding: 16px; display: flex; flex-wrap: wrap; gap: 14px 20px; border: 1px solid #b8b8b8; border-radius: 5px; }
+.admin-placement-section fieldset legend { padding-inline: 6px; font-size: 16px; }
+.admin-placement-section fieldset label { display: flex; align-items: center; gap: 10px; font-size: 16px; line-height: 1.4; cursor: pointer; }
+.admin-placement-section fieldset input[type="checkbox"] { width: 20px; height: 20px; margin: 0; flex: 0 0 20px; accent-color: #304e41; }
 .admin-placement-options { display: flex; flex-wrap: wrap; align-items: center; gap: 32px; }
 .admin-placement-options label { display: flex; align-items: center; gap: 12px; cursor: pointer; }
 .admin-placement-options input { width: 25px; height: 25px; margin: 0; accent-color: #304e41; }
