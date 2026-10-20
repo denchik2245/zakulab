@@ -130,25 +130,26 @@
   .dialog { width: min(720px, 100%); min-height: 0; }
 }
 
-@media (max-width: 768px) {
-  .overlay { padding: 12px; align-items: center; }
-  .dialog { width: 100%; max-height: calc(100svh - 24px); padding: 48px 24px 24px; overflow-y: auto; transform: none; }
-  .dialog > header h2, .success h2 { font-size: 38px; }
-  .dialog > header p, .success p { font-size: 17px; }
-  .form { margin-top: 36px; }
-  .row { grid-template-columns: 1fr; }
-  .success { min-height: 520px; }
+@media (width < 768px) {
+  .overlay { padding: 16px; }
+  .dialog { width: min(480px, 100%); min-height: 0; max-height: calc(100svh - 32px); padding: 56px 24px 24px; overflow-y: auto; overscroll-behavior: contain; transform: none; animation-name: tabletDialogReveal; }
+  .isClosing .dialog { animation-name: tabletDialogHide; }
+  .close { top: 8px; right: 8px; width: 44px; height: 44px; padding: 12px; }
+  .dialog > header h2, .success h2 { font-size: clamp(26px, 7.5vw, 32px); overflow-wrap: anywhere; }
+  .dialog > header p, .success p { margin-top: 16px; font-size: 16px; line-height: 1.5; }
+  .form { margin-top: 24px; gap: 20px; }
+  .row { grid-template-columns: 1fr; gap: 20px; }
+  .form label > span { font-size: 14px; line-height: 1.5; }
+  .form input, .form textarea { font-size: 16px; line-height: 1.4; }
+  .form textarea { height: 160px; }
+  .submit, .success > button { min-height: 52px; padding-inline: 20px; font-size: 16px; }
+  .success { min-height: 0; padding-block: 24px; }
+  .success p { margin: 0; }
 }
 
 @media (max-width: 360px) {
-  .overlay { padding: 8px; }
-  .dialog { max-height: calc(100svh - 16px); padding: 44px 16px 16px; }
-  .close { top: 16px; right: 16px; }
-  .dialog > header h2, .success h2 { font-size: 32px; }
-  .dialog > header p, .success p { margin-top: 16px; font-size: 15px; }
-  .form { margin-top: 28px; gap: 18px; }
-  .form textarea { height: 160px; }
-  .submit, .success > button { padding-inline: 20px; }
+  .dialog { padding-inline: 20px; padding-bottom: 20px; }
+  .dialog > header p, .success p { font-size: 15px; }
 }
 
 .form .consent { display: flex; align-items: flex-start; gap: 12px; font-size: 14px; line-height: 1.5; }
