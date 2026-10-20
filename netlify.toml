@@ -2,5 +2,17 @@
   command = "npm run build"
   publish = ".next"
 
+[[redirects]]
+  from = "https://zakulab.netlify.app/*"
+  to = "https://zakulab.ru/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://zakulab.netlify.app/*"
+  to = "https://zakulab.ru/:splat"
+  status = 301
+  force = true
+
 [[plugins]]
   package = "@netlify/plugin-nextjs"
