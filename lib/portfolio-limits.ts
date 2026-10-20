@@ -1,0 +1,1 @@
+export const MAX_HOME_ADDITIONAL_PROJECTS = 5;

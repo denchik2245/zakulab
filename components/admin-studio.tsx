@@ -8,6 +8,7 @@ import type { CaseBlock, CaseStudy } from "@/lib/cases";
 import type { VerifiedReview } from "@/lib/reviews";
 import type { PortfolioFilter, PortfolioProject, SiteSettings } from "@/lib/site-settings";
 import type { StyleReference } from "@/lib/style-references";
+import { MAX_HOME_ADDITIONAL_PROJECTS } from "@/lib/portfolio-limits";
 
 type Tab = "site" | "portfolio" | "reviews" | "styles" | "popups";
 
@@ -118,6 +119,7 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
   const pendingReviews = content?.reviews.filter((item) => item.status === "pending").length ?? 0;
   const activeReview = content?.reviews.find((item) => item.id === selectedReview) ?? content?.reviews[1] ?? content?.reviews[0] ?? null;
   const activePortfolio = content?.site.portfolioProjects.find((item) => item.id === selectedPortfolio) ?? content?.site.portfolioProjects[0] ?? null;
+  const homeAdditionalProjectCount = content?.site.portfolioProjects.filter((item) => item.homePlacement === "list").length ?? 0;
   const activeStyle = content?.site.styleChoice.styles.find((item) => item.id === selectedStyle) ?? content?.site.styleChoice.styles[0] ?? null;
   const popupItems = content ? [
     ...content.site.services.map((service) => ({
@@ -333,6 +335,10 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
 
   function patchPortfolio(id: string, patch: Partial<PortfolioProject>) {
     if (!content) return;
+    if (patch.homePlacement === "list" && content.site.portfolioProjects.filter((project) => project.id !== id && project.homePlacement === "list").length >= MAX_HOME_ADDITIONAL_PROJECTS) {
+      setNotice(`На главной уже ${MAX_HOME_ADDITIONAL_PROJECTS} дополнительных работ. Сначала уберите одну, чтобы добавить другую.`);
+      return;
+    }
     patchSite({ portfolioProjects: content.site.portfolioProjects.map((project) => project.id === id ? { ...project, ...patch } : project) });
   }
 
@@ -538,7 +544,8 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
                   <div className="admin-case-toggle"><h3>Страница кейса</h3><label><input type="checkbox" checked={Boolean(activePortfolio.caseStudy)} onChange={(event) => toggleCaseStudy(activePortfolio.id, event.target.checked)} /><span>{activePortfolio.caseStudy ? "Подключена" : "Не подключена"}</span></label></div>
                   <section className="admin-placement-section">
                     <h3>Размещение на главной</h3>
-                    <PortfolioRadioGroup name={`home-${activePortfolio.id}`} value={activePortfolio.homePlacement} onChange={(value) => patchPortfolio(activePortfolio.id, { homePlacement: value as PortfolioProject["homePlacement"] })} options={[["featured", "Избранное"], ["list", "Другие"], ["hidden", "Не показывать"]]} />
+                    <PortfolioRadioGroup name={`home-${activePortfolio.id}`} value={activePortfolio.homePlacement} onChange={(value) => patchPortfolio(activePortfolio.id, { homePlacement: value as PortfolioProject["homePlacement"] })} options={[["featured", "Избранное"], ["list", "Другие"], ["hidden", "Не показывать"]]} disabledValues={activePortfolio.homePlacement !== "list" && homeAdditionalProjectCount >= MAX_HOME_ADDITIONAL_PROJECTS ? ["list"] : []} hintId="home-additional-project-limit" />
+                    <p className="admin-placement-hint" id="home-additional-project-limit">Дополнительные работы: {homeAdditionalProjectCount} из {MAX_HOME_ADDITIONAL_PROJECTS}.{homeAdditionalProjectCount >= MAX_HOME_ADDITIONAL_PROJECTS && " Чтобы добавить другую работу, сначала уберите одну с главной."}</p>
                     <Field label="Порядок"><input type="number" value={activePortfolio.order} onChange={(event) => patchPortfolio(activePortfolio.id, { order: Number(event.target.value) })} /></Field>
                   </section>
                   <section className="admin-placement-section">
@@ -799,8 +806,8 @@ function CaseBuilder({
   );
 }
 
-function PortfolioRadioGroup({ name, value, options, onChange }: { name: string; value: string; options: [string, string][]; onChange: (value: string) => void }) {
-  return <div className="admin-placement-options">{options.map(([id, label]) => <label key={id}><input type="radio" name={name} value={id} checked={value === id} onChange={(event) => onChange(event.target.value)} /><span>{label}</span></label>)}</div>;
+function PortfolioRadioGroup({ name, value, options, onChange, disabledValues = [], hintId }: { name: string; value: string; options: [string, string][]; onChange: (value: string) => void; disabledValues?: string[]; hintId?: string }) {
+  return <div className="admin-placement-options">{options.map(([id, label]) => <label key={id}><input type="radio" name={name} value={id} checked={value === id} disabled={disabledValues.includes(id)} aria-describedby={hintId} onChange={(event) => onChange(event.target.value)} /><span>{label}</span></label>)}</div>;
 }
 
 function SiteCard({ title, className = "", children }: { title: string; className?: string; children: React.ReactNode }) {

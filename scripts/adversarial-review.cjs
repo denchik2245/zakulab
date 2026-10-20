@@ -138,6 +138,31 @@ async function main() {
     assert.equal((await admin.PUT(putRequest(legacy))).status, 200);
     assert.ok((await content.readContent()).site.portfolioProjects.find(p => p.id === project.id).caseStudy.blocks.length);
   });
+  await check('Home accepts five additional projects, rejects a sixth and allows replacing a slot', async () => {
+    const doc = await content.readContent(true);
+    doc.site.portfolioProjects.forEach((project, index) => { project.homePlacement = index < 5 ? 'list' : 'hidden'; });
+    assert.equal((await admin.PUT(putRequest(doc))).status, 200);
+    const saved = await content.readContent(true), overflow = structuredClone(saved);
+    overflow.site.portfolioProjects[5].homePlacement = 'list';
+    const rejected = await admin.PUT(putRequest(overflow));
+    assert.equal(rejected.status, 400);
+    assert.ok((await rejected.json()).details.some(message => message.includes('не более 5')));
+    assert.equal((await content.readContent(true)).revision, saved.revision);
+    overflow.site.portfolioProjects[0].homePlacement = 'hidden';
+    assert.equal((await admin.PUT(putRequest(overflow))).status, 200);
+    const after = await content.readContent(true);
+    assert.equal(after.site.portfolioProjects.filter(project => project.homePlacement === 'list').length, 5);
+    assert.equal(pub.publicPortfolio(after.site).portfolioProjects.length, pub.publicPortfolio(saved.site).portfolioProjects.length);
+  });
+  await check('Home renders only five additional projects from legacy overflow, in display order', () => {
+    const site = structuredClone(seed.site);
+    site.portfolioProjects.forEach((project, index) => { project.homePlacement = 'list'; project.published = true; project.order = -index; });
+    const page = load('components/home-page.tsx').HomePage({ site, reviews: [] });
+    const portfolio = page.props.children.props.children.find(element => element.props.id === 'portfolio');
+    const rows = portfolio.props.children[1].props.children[2].props.children;
+    assert.equal(rows.length, 5);
+    assert.deepEqual(rows.map(row => row.props.project.id), site.portfolioProjects.slice(-5).reverse().map(project => project.id));
+  });
   await check('Moderation publishes reviews; deletion does not resurrect queue entries', async () => {
     const doc = await content.readContent(true), review = doc.reviews.find(r => r.author.name === 'New while editing');
     review.status = 'published'; review.showOnHome = review.showOnReviewsPage = true;

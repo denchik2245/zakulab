@@ -1154,6 +1154,8 @@ body:has(.admin-login) {
 .admin-placement-options label { display: flex; align-items: center; gap: 12px; cursor: pointer; }
 .admin-placement-options input { width: 25px; height: 25px; margin: 0; accent-color: #304e41; }
 .admin-placement-options span { font-size: 16px; font-weight: 600; }
+.admin-placement-options label:has(input:disabled) { cursor: not-allowed; opacity: .45; }
+.admin-placement-hint { margin: 0; color: #727272; font-size: 14px; line-height: 1.5; }
 .admin-portfolio-editor label { display: grid; gap: 10px; }
 .admin-portfolio-editor label > span,
 .admin-portfolio-form label > span { color: #727272; font-size: 16px; font-weight: 600; }

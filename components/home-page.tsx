@@ -7,6 +7,7 @@ import { ServicesSection } from "@/components/services-section";
 import { AllProjectsButton, ProjectCard, ProjectRow } from "@/components/portfolio-project";
 import styles from "./home-page.module.css";
 import { publicProject } from "@/lib/public-content";
+import { MAX_HOME_ADDITIONAL_PROJECTS } from "@/lib/portfolio-limits";
 
 function SectionTitle({ eyebrow, children }: { eyebrow: string; children: React.ReactNode }) {
   return (
@@ -20,7 +21,7 @@ function SectionTitle({ eyebrow, children }: { eyebrow: string; children: React.
 export function HomePage({ site, reviews }: { site: SiteSettings; reviews: VerifiedReview[] }) {
   const portfolioProjects = site.portfolioProjects.filter((project) => project.published && project.homePlacement !== "hidden").map(publicProject).sort((a, b) => a.order - b.order);
   const featuredProjects = portfolioProjects.filter((project) => project.homePlacement === "featured").slice(0, 4);
-  const listedProjects = portfolioProjects.filter((project) => project.homePlacement === "list");
+  const listedProjects = portfolioProjects.filter((project) => project.homePlacement === "list").slice(0, MAX_HOME_ADDITIONAL_PROJECTS);
 
   return (
     <div className={styles.stage}>

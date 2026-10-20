@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { hasCasePlaceholders } from "@/lib/cases";
 import { normalizeContentUrl } from "@/lib/external-url";
+import { MAX_HOME_ADDITIONAL_PROJECTS } from "@/lib/portfolio-limits";
 
 const text = z.string().max(10000);
 const id = z.string().min(1).max(120);
@@ -50,7 +51,10 @@ const site = z.object({
   portfolioTitle: text, portfolioProjects: list(project).refine((items) => {
     const slugs = items.flatMap((item) => item.caseStudy ? [item.caseStudy.slug] : []);
     return new Set(slugs).size === slugs.length;
-  }, "Повторяющиеся slug кейсов"),
+  }, "Повторяющиеся slug кейсов").refine(
+    (items) => items.filter((item) => item.homePlacement === "list").length <= MAX_HOME_ADDITIONAL_PROJECTS,
+    `На главной можно разместить не более ${MAX_HOME_ADDITIONAL_PROJECTS} дополнительных работ. Уберите одну из главной, чтобы добавить другую.`,
+  ),
   processTitle: text, process: list(z.object({ id, title: text, text, image, secondaryTitle: text.optional(), secondaryText: text.optional(), secondaryImage: image.optional() })),
   reviewsTitle: text, reviewsText: text, reviewImage: image,
   servicesTitle: text, servicesText: text, services: list(z.object({ id, title: text, text, price: text, priceSecondary: text, time: text })),
