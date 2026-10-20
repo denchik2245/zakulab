@@ -22,11 +22,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 function CaseContentBlock({ block }: { block: CaseBlock }) {
   if (block.type === "image") {
-    if (!block.image) return null;
     return (
       <figure className={styles.block} data-spacing={block.spacing}>
         {block.caption && <figcaption>{block.caption}</figcaption>}
-        <img className={styles.image} src={block.image} alt={block.alt} />
+        {block.image ? <img className={styles.image} src={block.image} alt={block.alt} /> : (
+          <div className={styles.imagePlaceholder} role="img" aria-label={block.alt || "Место для изображения"}>
+            <span>Изображение будет добавлено</span>
+          </div>
+        )}
       </figure>
     );
   }

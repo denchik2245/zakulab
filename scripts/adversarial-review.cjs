@@ -214,6 +214,18 @@ async function main() {
     project.caseStudy.status = 'published'; assert.equal(pub.publicProject(project).url, `/cases/${project.caseStudy.slug}`);
     delete project.caseStudy; assert.equal(pub.publicProject(project).url, '');
   });
+  await check('Empty case image slots render an accessible placeholder with their caption', async () => {
+    const doc = await content.readContent(true), project = doc.site.portfolioProjects.find(p => p.caseStudy);
+    project.caseStudy.status = 'published';
+    project.caseStudy.blocks = [{ id: 'draft-placeholder', type: 'image', image: '', alt: 'Исходный набросок', caption: 'До редизайна', spacing: 'large' }];
+    assert.equal((await admin.PUT(putRequest(doc))).status, 200);
+    const page = await load('app/(main)/cases/[slug]/page.tsx').default({ params: Promise.resolve({ slug: project.caseStudy.slug }) });
+    const html = require('react-dom/server').renderToStaticMarkup(page);
+    assert.ok(html.includes('aria-label="Исходный набросок"'));
+    assert.ok(html.includes('До редизайна'));
+    assert.ok(html.includes('Изображение будет добавлено'));
+    assert.ok(!html.includes('<img'));
+  });
   await check('Unfinished case copy is kept in draft and cannot be published', () => {
     assert.ok(seed.site.portfolioProjects.filter(p => p.caseStudy).every(p => p.caseStudy.status === 'draft'));
     const doc = structuredClone(seed); doc.site.portfolioProjects.find(p => p.caseStudy).caseStudy.status = 'published';
