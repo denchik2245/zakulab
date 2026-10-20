@@ -2,7 +2,7 @@
 .burgerIcon i { display:block; width:20px; height:1px; background:currentColor; }
 .burgerIcon i:nth-child(2) { width:12px; }
 
-.drawer { position:fixed; inset:0; width:100%; max-width:none; height:100dvh; max-height:none; margin:0; padding:0; overflow:hidden; border:0; color:#fefefe; background:transparent; font-family:"Manrope Variable","Manrope",sans-serif; }
+.drawer { position:fixed; inset:0; width:100%; max-width:none; height:100dvh; max-height:none; margin:0; padding:0; overflow:clip; border:0; color:#fefefe; background:transparent; font-family:"Manrope Variable","Manrope",sans-serif; }
 .drawer::backdrop { background:rgb(5 5 5 / 48%); backdrop-filter:blur(4px); animation:fadeIn .3s ease both; }
 .panel { position:absolute; top:0; right:0; width:min(420px,calc(100% - 24px)); height:100%; padding:max(24px,env(safe-area-inset-top)) 28px max(28px,env(safe-area-inset-bottom)); display:flex; flex-direction:column; overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; scrollbar-color:#628073 transparent; background:#304e41; box-shadow:-16px 0 60px rgb(5 5 5 / 16%); animation:slideIn .36s cubic-bezier(.22,1,.36,1) both; }
 .top { position:sticky; top:0; z-index:3; display:flex; flex-shrink:0; align-items:center; gap:14px; background:#304e41; }

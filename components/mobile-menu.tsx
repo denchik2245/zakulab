@@ -60,6 +60,9 @@ export function MobileMenu({ className, telegramUrl, maxUrl, vkUrl }: MobileMenu
 
     document.body.style.overflow = "hidden";
     document.documentElement.style.overflow = "hidden";
+    // Keep showModal() from scrolling to a link inside the sliding panel on iOS.
+    // React does not set the autofocus attribute on client-mounted dialogs.
+    dialog?.setAttribute("autofocus", "");
     dialog?.showModal();
     closeRef.current?.focus({ preventScroll: true });
     desktop.addEventListener("change", onDesktop);
