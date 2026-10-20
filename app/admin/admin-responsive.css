@@ -1,0 +1,190 @@
+/* Compact admin layout. The original wide layout starts at 1920px. */
+@media (width < 1920px) {
+  .admin-login { min-height:100svh; padding:64px 40px; grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr); gap:64px; }
+  .admin-login form { min-width:0; max-width:640px; padding:40px; box-shadow:none; }
+  .admin-login h1 { margin-top:40px; font-size:64px; }
+  .admin-login label { margin-top:32px; }
+
+  .admin-studio { grid-template-columns:220px minmax(0,1fr); min-width:0; }
+  .admin-studio .admin-main { min-width:0; }
+  .admin-studio .admin-sidebar.admin-unified-sidebar { height:100svh; padding:20px 16px; gap:24px; overflow-y:auto; scrollbar-width:thin; }
+  .admin-studio .admin-unified-sidebar nav { flex-shrink:0; margin:0; gap:6px; }
+  .admin-studio .admin-unified-sidebar nav button { min-height:48px; padding:12px; line-height:1.4; }
+  .admin-studio .admin-unified-sidebar nav button span { display:block; }
+  .admin-studio .admin-unified-sidebar .admin-site-actions { display:grid; gap:12px; margin-top:auto; }
+  .admin-studio .admin-unified-sidebar .admin-sidebar-save { padding:14px 12px; color:#050505; line-height:1.4; }
+
+  .admin-studio .admin-view { width:100%; max-width:1520px; margin-inline:auto; padding:40px 32px 80px; }
+  .admin-studio .admin-view > h1,
+  .admin-studio .admin-portfolio-heading h1 { margin:0; font-size:40px; line-height:1.15; }
+  .admin-studio .admin-site-editor > h1 { margin-bottom:32px; }
+  .admin-studio .admin-portfolio-heading { min-height:0; margin-bottom:32px; gap:24px; flex-wrap:wrap; }
+  .admin-studio .admin-add-button { min-width:0; min-height:48px; padding:14px 24px; border:0; border-radius:5px; color:#fefefe; background:#304e41; font-size:16px; line-height:1.4; }
+  .admin-studio .admin-reviews-view > p { max-width:760px; margin:16px 0 24px; color:#727272; font-size:16px; line-height:1.5; }
+  .admin-studio .admin-reviews-view > .admin-add-button { margin-bottom:32px; }
+
+  .admin-studio :is(label,fieldset,input,textarea,select) { min-width:0; }
+  .admin-studio :is(h1,h2,h3,h4) { overflow-wrap:anywhere; }
+  .admin-studio :is(input[type="checkbox"],input[type="radio"]) { flex-shrink:0; }
+  .admin-studio label > span { line-height:1.4; }
+  .admin-studio :is(.admin-portfolio-layout,.admin-reviews-layout,.admin-style-layout,.admin-popup-layout) { margin-top:0; grid-template-columns:minmax(240px,.7fr) minmax(0,1.6fr); gap:20px; align-items:start; }
+  .admin-studio :is(.admin-portfolio-list,.admin-review-list,.admin-style-list,.admin-popup-list) { position:sticky; top:32px; height:calc(100svh - 160px); min-height:280px; max-height:800px; margin-bottom:0; overflow:auto; }
+  .admin-studio :is(.admin-portfolio-list,.admin-review-list,.admin-style-list,.admin-popup-list) > button { min-height:88px; padding:20px; gap:12px; }
+  .admin-studio :is(.admin-portfolio-list,.admin-review-list,.admin-style-list) strong { font-size:20px; line-height:1.3; white-space:normal; overflow-wrap:anywhere; }
+  .admin-studio .admin-popup-list > button { font-size:20px; line-height:1.3; overflow-wrap:anywhere; }
+  .admin-studio .admin-review-list small { flex-wrap:wrap; gap:6px; white-space:normal; }
+  .admin-studio :is(.admin-portfolio-editor,.admin-review-editor,.admin-style-editor,.admin-popup-editor) { min-height:0; }
+  .admin-studio :is(.admin-portfolio-editor-head,.admin-review-editor-head,.admin-popup-editor-head) { height:auto; min-height:80px; margin:0; padding:24px; gap:20px; align-items:center; }
+  .admin-studio :is(.admin-portfolio-editor-head,.admin-review-editor-head,.admin-popup-editor-head) h2 { min-width:0; font-size:24px; line-height:1.3; }
+  .admin-studio :is(.admin-portfolio-editor-head,.admin-review-editor-head) > button { flex:0 0 28px; }
+  .admin-studio :is(.admin-portfolio-form,.admin-review-form,.admin-popup-fields,.admin-style-fields) { height:auto; padding:24px; gap:24px; }
+  .admin-studio :is(.admin-style-order,.admin-style-visible,.admin-review-order) { height:auto; padding:24px; }
+  .admin-studio .admin-style-order { padding-top:0; }
+  .admin-studio .admin-review-order { padding-top:0; }
+  .admin-studio .admin-style-gallery-section { padding:24px; }
+  .admin-studio .admin-style-gallery { grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+
+  .admin-studio .admin-case-toggle { height:auto; min-height:96px; padding:24px; flex-wrap:wrap; gap:16px; }
+  .admin-studio .admin-case-toggle > label { padding:12px 16px; }
+  .admin-studio .admin-placement-section { height:auto; padding:24px; gap:24px; }
+  .admin-studio .admin-placement-section h3 { font-size:22px; }
+  .admin-studio .admin-placement-options { align-items:start; flex-direction:row; gap:16px 24px; }
+  .admin-studio .admin-placement-options label > span { line-height:1.4; }
+  .admin-studio .admin-placement-section fieldset { margin:0; padding:16px; display:flex; flex-wrap:wrap; gap:14px 20px; border:1px solid #b8b8b8; border-radius:5px; }
+  .admin-studio .admin-placement-section fieldset legend { padding-inline:6px; font-size:16px; }
+  .admin-studio .admin-placement-section fieldset label { display:flex; align-items:center; gap:10px; font-size:16px; line-height:1.4; }
+  .admin-studio .admin-portfolio-form { grid-template-columns:minmax(0,1fr) 160px; align-items:start; }
+  .admin-studio .admin-portfolio-main-fields { gap:24px; }
+  .admin-studio .admin-gallery-field.is-portfolio-preview > label { width:100%; height:174px; }
+  .admin-studio .admin-portfolio-form .admin-two-columns { gap:20px; }
+
+  .admin-studio .admin-review-moderation { padding:24px; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; align-items:end; border-bottom:1px solid #b8b8b8; }
+  .admin-studio .admin-review-moderation > button { min-height:50px; padding:12px 20px; border:0; border-radius:5px; color:#fefefe; background:#304e41; font-size:16px; font-weight:600; cursor:pointer; }
+  .admin-studio .admin-review-moderation > p { grid-column:1 / -1; margin:0; color:#727272; font-size:14px; line-height:1.5; }
+  .admin-studio .admin-review-editor .admin-publish-row { height:auto; padding:24px; flex-direction:row; flex-wrap:wrap; align-items:start; gap:16px 24px; }
+  .admin-studio .admin-review-editor .admin-publish-row span { white-space:normal; line-height:1.4; }
+  .admin-studio .admin-review-author-fields { grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; }
+  .admin-studio .admin-review-profile-fields { grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; }
+  .admin-studio .admin-review-profile-fields > label:last-child { grid-column:1 / -1; }
+  .admin-studio .admin-gallery-field.is-review-image > label { height:auto; aspect-ratio:1.6; }
+
+  .admin-studio .admin-site-card { margin-bottom:20px; padding:32px; }
+  .admin-studio .admin-site-card > h3,
+  .admin-studio .admin-site-card h4 { font-size:24px; }
+  .admin-studio .admin-site-card > div { margin-top:24px; gap:24px; }
+  .admin-studio .admin-hero-fields { grid-template-columns:minmax(0,1fr) 180px; gap:24px; }
+  .admin-studio .admin-hero-copy { gap:24px; }
+  .admin-studio .admin-gallery-field.is-portrait > label { width:100%; height:auto; aspect-ratio:1; }
+  .admin-studio .admin-gallery-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; }
+  .admin-studio .admin-gallery-add,
+  .admin-studio .admin-gallery-field.is-slider > label { width:100%; min-width:0; height:auto; min-height:130px; aspect-ratio:1.6; }
+  .admin-studio .admin-inline-fields,
+  .admin-studio .admin-two-columns { grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; }
+  .admin-studio .admin-four-columns { grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; }
+  .admin-studio .admin-stats-fields { grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; }
+  .admin-studio .admin-process-row { grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); gap:24px; }
+  .admin-studio .admin-gallery-field.is-process > label { width:100%; height:auto; min-height:210px; aspect-ratio:1.7; }
+  .admin-studio .admin-service-text { grid-template-columns:minmax(0,2fr) minmax(0,1fr); gap:20px; }
+
+  .admin-studio .admin-portfolio-editor .admin-case-settings { padding:24px; }
+  .admin-studio .admin-case-settings-head { flex-direction:column; gap:20px; }
+  .admin-studio .admin-case-builder-head { grid-template-columns:minmax(0,1fr); gap:24px; }
+  .admin-studio .admin-case-builder-head h3 { font-size:24px; }
+  .admin-studio .admin-case-image-fields { grid-template-columns:minmax(0,1fr); gap:20px; }
+  .admin-studio .admin-case-block > header { flex-wrap:wrap; gap:12px; }
+  .admin-studio .admin-case-block > header > div:first-child { min-width:0; flex:1 1 140px; }
+  .admin-studio .admin-case-gallery-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .admin-studio .admin-case-item { grid-template-columns:24px minmax(0,1fr) 36px; }
+}
+
+@media (width < 1280px) {
+  .admin-studio { grid-template-columns:200px minmax(0,1fr); }
+  .admin-studio .admin-view { padding-inline:24px; }
+  .admin-studio :is(.admin-portfolio-layout,.admin-reviews-layout,.admin-style-layout,.admin-popup-layout) { grid-template-columns:minmax(0,1fr); gap:24px; }
+  .admin-studio :is(.admin-portfolio-list,.admin-review-list,.admin-style-list,.admin-popup-list) { position:static; height:auto; min-height:0; max-height:280px; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); align-content:start; }
+  .admin-studio :is(.admin-portfolio-list,.admin-review-list,.admin-style-list,.admin-popup-list) > button { min-width:0; height:100%; }
+  .admin-studio .admin-portfolio-list > button:nth-child(odd),
+  .admin-studio .admin-review-list > button:nth-child(odd),
+  .admin-studio .admin-style-list > button:nth-child(odd),
+  .admin-studio .admin-popup-list > button:nth-child(odd) { border-right:1px solid #b8b8b8; }
+  .admin-studio .admin-gallery-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .admin-studio .admin-process-row { grid-template-columns:minmax(0,1fr); }
+  .admin-studio .admin-gallery-field.is-process > label { aspect-ratio:2; }
+}
+
+@media (width <= 1100px) {
+  .admin-login { grid-template-columns:minmax(0,1fr); gap:32px; padding:40px 32px; }
+  .admin-login::after { display:none; }
+  .admin-login-code { margin:0; }
+  .admin-login form { justify-self:center; }
+  .admin-studio { display:block; padding-bottom:0; }
+  .admin-studio .admin-sidebar.admin-unified-sidebar { position:sticky; z-index:30; top:0; right:auto; bottom:auto; left:auto; width:100%; height:auto; padding:12px 24px; gap:12px; display:grid; overflow:visible; border:0; border-bottom:1px solid #628073; }
+  .admin-studio .admin-unified-sidebar nav { width:100%; height:auto; display:flex; gap:6px; overflow-x:auto; scrollbar-width:thin; }
+  .admin-studio .admin-unified-sidebar nav button { flex:0 0 auto; min-height:44px; padding:10px 14px; font-size:14px; white-space:nowrap; }
+  .admin-studio .admin-unified-sidebar nav button span { font-size:inherit; }
+  .admin-studio .admin-unified-sidebar .admin-site-actions { margin:0; grid-template-columns:auto auto minmax(0,1fr); align-items:center; gap:12px; }
+  .admin-studio .admin-site-actions > button:first-child { grid-column:1; grid-row:1; }
+  .admin-studio .admin-site-actions > a { grid-column:2; grid-row:1; min-height:44px; }
+  .admin-studio .admin-site-actions > .admin-sidebar-save { grid-column:3; grid-row:1; justify-self:end; width:auto; min-height:44px; padding:12px 24px; }
+  .admin-studio .admin-site-actions > button:not(:first-child):not(.admin-sidebar-save),
+  .admin-studio .admin-site-actions > span { grid-column:1 / -1; }
+  .admin-studio .admin-view { max-width:960px; padding-top:32px; }
+}
+
+@media (width <= 768px) {
+  .admin-login { padding:28px 20px; }
+  .admin-login form { padding:28px 24px; }
+  .admin-login h1 { font-size:52px; }
+  .admin-login p { font-size:16px; }
+  .admin-login .button { width:100%; }
+  .admin-studio .admin-sidebar.admin-unified-sidebar { padding:10px 16px; gap:8px; }
+  .admin-studio .admin-unified-sidebar nav button { padding:10px 12px; font-size:13px; }
+  .admin-studio .admin-unified-sidebar .admin-site-actions { gap:8px; }
+  .admin-studio .admin-site-actions > button:first-child { padding:8px 0; font-size:12px; }
+  .admin-studio .admin-site-actions > a { padding:8px 0; font-size:12px; }
+  .admin-studio .admin-site-actions > .admin-sidebar-save { padding:10px 12px; font-size:12px; }
+  .admin-studio .admin-view { padding:28px 16px 48px; }
+  .admin-studio .admin-view > h1,
+  .admin-studio .admin-portfolio-heading h1 { font-size:32px; }
+  .admin-studio .admin-portfolio-heading { gap:16px; margin-bottom:24px; }
+  .admin-studio .admin-site-editor > h1 { margin-bottom:24px; }
+  .admin-studio .admin-portfolio-heading .admin-add-button { width:100%; }
+  .admin-studio :is(.admin-portfolio-list,.admin-review-list,.admin-style-list,.admin-popup-list) { grid-template-columns:minmax(0,1fr); max-height:264px; }
+  .admin-studio :is(.admin-portfolio-list,.admin-review-list,.admin-style-list,.admin-popup-list) > button { border-right:0; padding:16px; min-height:80px; }
+  .admin-studio .admin-portfolio-list > button:nth-child(odd),
+  .admin-studio .admin-review-list > button:nth-child(odd),
+  .admin-studio .admin-style-list > button:nth-child(odd),
+  .admin-studio .admin-popup-list > button:nth-child(odd) { border-right:0; }
+  .admin-studio :is(.admin-portfolio-editor-head,.admin-review-editor-head,.admin-popup-editor-head) { padding:20px; }
+  .admin-studio :is(.admin-portfolio-editor-head,.admin-review-editor-head,.admin-popup-editor-head) h2 { font-size:22px; }
+  .admin-studio :is(.admin-portfolio-form,.admin-review-form,.admin-popup-fields,.admin-style-fields,.admin-style-order,.admin-style-visible,.admin-review-order,.admin-style-gallery-section,.admin-case-toggle,.admin-placement-section) { padding:20px; }
+  .admin-studio .admin-site-card { padding:24px 20px; }
+  .admin-studio .admin-site-card > h3,
+  .admin-studio .admin-site-card h4 { font-size:22px; }
+  .admin-studio .admin-hero-fields,
+  .admin-studio .admin-inline-fields,
+  .admin-studio .admin-two-columns,
+  .admin-studio .admin-four-columns,
+  .admin-studio .admin-stats-fields,
+  .admin-studio .admin-service-text,
+  .admin-studio .admin-portfolio-form,
+  .admin-studio .admin-portfolio-form .admin-two-columns,
+  .admin-studio .admin-review-author-fields,
+  .admin-studio .admin-review-profile-fields,
+  .admin-studio .admin-review-moderation,
+  .admin-studio .admin-fields { grid-template-columns:minmax(0,1fr); }
+  .admin-studio .admin-gallery-field.is-portrait > label { width:180px; max-width:100%; }
+  .admin-studio .admin-gallery-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+  .admin-studio .admin-gallery-add,
+  .admin-studio .admin-gallery-field.is-slider > label { min-height:110px; }
+  .admin-studio .admin-slider-btn { left:6px; right:6px; bottom:6px; gap:4px; padding:8px; height:auto; min-height:36px; font-size:12px; }
+  .admin-studio .admin-gallery-field.is-portfolio-preview > label { height:auto; aspect-ratio:1.4; }
+  .admin-studio .admin-review-moderation { padding:20px; }
+  .admin-studio .admin-review-editor .admin-publish-row { padding:20px; gap:16px; }
+  .admin-studio .admin-review-editor .admin-publish-row label { align-items:flex-start; }
+  .admin-studio .admin-portfolio-editor .admin-case-settings { padding:20px; }
+  .admin-studio .admin-case-block { padding:16px; }
+  .admin-studio .admin-case-block > header { margin:-16px -16px 20px; padding:16px; }
+  .admin-studio .admin-case-add-buttons,
+  .admin-studio .admin-case-gallery-grid { grid-template-columns:minmax(0,1fr); }
+}

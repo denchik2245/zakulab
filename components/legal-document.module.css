@@ -144,3 +144,17 @@
   .section h2 { grid-template-columns: 32px 1fr; font-size: 22px; }
   .copy ul { padding-left: 0; }
 }
+
+@media (768px <= width <= 1024px) {
+  .page { padding:48px 0 88px; }
+  .layout { width:calc(100% - 64px); max-width:960px; margin-inline:auto; grid-template-columns:minmax(0,1fr); gap:40px; }
+  .intro { position:static; gap:24px; }
+  .intro h1 { margin:0; max-width:820px; font-size:40px; line-height:1.2; }
+  .intro > p { max-width:760px; margin:0; font-size:18px; }
+  .notice { margin:0 0 40px; font-size:16px; }
+  .section { padding:0 0 40px; }
+  .section + .section { padding-top:40px; }
+  .section h2 { margin-bottom:24px; grid-template-columns:32px minmax(0,1fr); gap:16px; font-size:26px; }
+  .copy { padding-left:48px; }
+  .copy p,.copy li { font-size:18px; line-height:1.6; overflow-wrap:anywhere; }
+}

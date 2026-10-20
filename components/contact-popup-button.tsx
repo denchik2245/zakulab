@@ -19,7 +19,7 @@ type ContactPopupButtonProps = {
 };
 
 function getPopupScale() {
-  return window.innerWidth >= 960 && window.innerWidth < 1920 ? window.innerWidth / 1920 : 1;
+  return window.innerWidth > 1024 && window.innerWidth < 1920 ? window.innerWidth / 1920 : 1;
 }
 
 export function ContactPopupButton({ children, title, description, telegramUrl, maxUrl, vkUrl, triggerClassName, onOpen, message }: ContactPopupButtonProps) {
@@ -97,7 +97,7 @@ export function ContactPopupButton({ children, title, description, telegramUrl, 
   }, [closePopup, isOpen]);
 
   const popup = isOpen ? (
-    <div className={`${styles.overlay} ${isClosing ? styles.isClosing : ""}`} data-smooth-scroll-prevent onMouseDown={(event) => { if (event.target === event.currentTarget) closePopup(); }}>
+    <div className={`${styles.overlay} ${isClosing ? styles.isClosing : ""}`} onMouseDown={(event) => { if (event.target === event.currentTarget) closePopup(); }}>
       <div ref={dialogRef} className={styles.dialog} style={{ "--popup-scale": popupScale } as CSSProperties} role="dialog" aria-modal="true" aria-labelledby={titleId} aria-describedby={descriptionId}>
         <button ref={closeButtonRef} className={styles.closeButton} type="button" onClick={closePopup} aria-label="Закрыть окно">
           <Image src="/assets/figma/cross-popup.svg" width={20} height={20} alt="" />

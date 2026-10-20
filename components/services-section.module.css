@@ -74,6 +74,33 @@
   .smallTasks article > p { width: auto; }
 }
 
+@media (960px < width < 1920px) {
+  :global(.site-mobile-layout) .section { padding-block: 104px; }
+  :global(.site-mobile-layout) .shell { width: min(1440px, calc(100% - 80px)); min-height: 0; }
+  :global(.site-mobile-layout) .heading { height: auto; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); align-items: end; gap: 64px; }
+  :global(.site-mobile-layout) .title h2 { font-size: 40px; }
+  :global(.site-mobile-layout) .heading p { margin: 0; font-size: 18px; }
+  :global(.site-mobile-layout) .services { height: auto; margin-top: 64px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  :global(.site-mobile-layout) .services article { min-width: 0; min-height: 320px; padding-right: 28px; }
+  :global(.site-mobile-layout) .services article + article { padding-left: 28px; }
+  :global(.site-mobile-layout) .services article:last-child { padding-right: 0; }
+  :global(.site-mobile-layout) .services h3,
+  :global(.site-mobile-layout) .smallTasks h3 { font-size: 24px; }
+  :global(.site-mobile-layout) .services article > p { margin-top: 20px; }
+  :global(.site-mobile-layout) .terms { padding-block: 32px; }
+  :global(.site-mobile-layout) .terms span,
+  :global(.site-mobile-layout) .taskTerms span { font-size: 18px; }
+  :global(.site-mobile-layout) .terms strong,
+  :global(.site-mobile-layout) .taskTerms strong { font-size: 22px; }
+  :global(.site-mobile-layout) .smallTasksTitle { margin-top: 80px; font-size: 40px; }
+  :global(.site-mobile-layout) .smallTasks { height: auto; margin-top: 40px; }
+  :global(.site-mobile-layout) .smallTasks article { padding: 28px; display: flex; flex-direction: column; }
+  :global(.site-mobile-layout) .smallTasks article > p { width: auto; min-height: 45px; margin: 20px 0 0; }
+  :global(.site-mobile-layout) .deliverable { position: static; flex: 1; margin: 24px -28px 0; padding: 24px 28px 0; }
+  :global(.site-mobile-layout) .deliverable h4 { margin-bottom: 12px; font-size: 22px; }
+  :global(.site-mobile-layout) .taskTerms { position: static; margin-top: 28px; gap: 12px; }
+}
+
 @media (max-width: 960px) {
   .section { padding-block: 104px; }
   .shell { width: calc(100% - 64px); }
@@ -140,4 +167,34 @@
   :global(body:has(.site-mobile-layout)) .taskTerms { position: static; margin-top: 20px; gap: 5px; }
   :global(body:has(.site-mobile-layout)) .taskTerms span { font-size: 16px; line-height: 1.4; }
   :global(body:has(.site-mobile-layout)) .taskTerms strong { font-size: 18px; line-height: 1.2; }
+}
+
+@media (768px <= width <= 1024px) {
+  :global(body:has(.site-mobile-layout)) .section { padding:88px 0; }
+  :global(body:has(.site-mobile-layout)) .shell { width:calc(100% - 64px); max-width:960px; min-height:0; }
+  :global(body:has(.site-mobile-layout)) .heading { height:auto; display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); align-items:end; gap:32px; }
+  :global(body:has(.site-mobile-layout)) .title > span { font-size:14px; color:#727272; }
+  :global(body:has(.site-mobile-layout)) .title h2 { margin:14px 0 0; font-size:34px; line-height:1.2; }
+  :global(body:has(.site-mobile-layout)) .heading p { margin:0; font-size:18px; line-height:1.5; }
+  :global(body:has(.site-mobile-layout)) .services { height:auto; margin:48px 0 0; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); border-top:0; border-bottom:1px solid var(--border); box-shadow:none; }
+  :global(body:has(.site-mobile-layout)) .services article,
+  :global(body:has(.site-mobile-layout)) .services article + article { min-width:0; min-height:0; height:auto; padding:0 20px 24px; border:0; border-left:1px solid var(--border); }
+  :global(body:has(.site-mobile-layout)) .services article:first-child { padding-left:0; border-left:0; }
+  :global(body:has(.site-mobile-layout)) .services article:last-child { padding-right:0; }
+  :global(body:has(.site-mobile-layout)) .services h3 { min-height:52px; font-size:clamp(18px,2.15vw,22px); line-height:1.2; }
+  :global(body:has(.site-mobile-layout)) .services article > p { margin-top:20px; font-size:16px; line-height:1.5; }
+  :global(body:has(.site-mobile-layout)) .terms { margin-top:auto; padding:28px 0 0; gap:4px; }
+  :global(body:has(.site-mobile-layout)) .terms span { margin-bottom:8px; font-size:16px; line-height:1.4; }
+  :global(body:has(.site-mobile-layout)) .terms strong { font-size:20px; line-height:1.3; }
+  :global(body:has(.site-mobile-layout)) .section .smallTasksTitle { margin-top:64px; font-size:34px; line-height:1.2; }
+  :global(body:has(.site-mobile-layout)) .smallTasks { height:auto; margin-top:32px; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 20px; }
+  :global(body:has(.site-mobile-layout)) .smallTasks article { min-height:0; padding:24px; display:grid; grid-template-rows:subgrid; grid-row:span 4; }
+  :global(body:has(.site-mobile-layout)) .smallTasks h3 { font-size:22px; }
+  :global(body:has(.site-mobile-layout)) .smallTasks article > p { min-height:0; margin-top:16px; font-size:16px; line-height:1.5; }
+  :global(body:has(.site-mobile-layout)) .deliverable { position:static; flex:1; margin:24px -24px 0; padding:24px 24px 0; border-top:1px solid var(--border-card); box-shadow:none; }
+  :global(body:has(.site-mobile-layout)) .deliverable h4 { margin-bottom:12px; font-size:20px; line-height:1.3; }
+  :global(body:has(.site-mobile-layout)) .deliverable p { font-size:16px; line-height:1.5; }
+  :global(body:has(.site-mobile-layout)) .taskTerms { position:static; margin-top:24px; gap:8px; }
+  :global(body:has(.site-mobile-layout)) .taskTerms span { font-size:16px; }
+  :global(body:has(.site-mobile-layout)) .taskTerms strong { font-size:20px; }
 }

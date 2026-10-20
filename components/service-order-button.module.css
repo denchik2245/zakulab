@@ -28,6 +28,11 @@
   transition: opacity .4s ease, transform .4s ease;
 }
 
+@media (960px < width < 1920px) {
+  :global(.site-mobile-layout) .trigger { max-width: 100%; }
+  :global(.site-mobile-layout) .trigger > span { min-width: 0; overflow-wrap: anywhere; }
+}
+
 @media (max-width: 960px) {
   :global(body:has(.site-mobile-layout)) .trigger { gap: 5px; }
   :global(body:has(.site-mobile-layout)) .triggerArrow { width: 16px; height: 16px; margin-top: 0; opacity: 1; transform: none; }
@@ -217,3 +222,31 @@
 .resultTransfer p { margin: 0; font-size: 14px; }
 .dialog:has(.resultTransfer) { height: auto; min-height: 522px; max-height: calc(100svh - 40px); overflow-y: auto; gap: 24px; }
 .dialog:has(.resultTransfer) .socials { flex: none; margin-top: 0; }
+
+@media (960px < width < 1920px) {
+  :global(body:has(.style-check-page)) .dialog:has(.resultTransfer) { --popup-scale:1 !important; width:min(820px,calc(100vw - 80px)); padding:40px; max-height:calc(100svh - 80px); }
+  :global(body:has(.style-check-page)) .dialog:has(.resultTransfer) .copy h2 { width:100%; font-size:40px; }
+  :global(body:has(.style-check-page)) .dialog:has(.resultTransfer) .copy p { width:100%; max-width:524px; font-size:18px; }
+}
+
+@media (768px <= width <= 1024px) {
+  :global(.site-mobile-layout) .trigger { max-width:100%; }
+  :global(.site-mobile-layout) .trigger > span { min-width:0; }
+  .overlay { padding:32px; }
+  .dialog,.dialog:has(.resultTransfer) { --popup-scale:1 !important; width:min(720px,100%); height:auto; min-height:0; max-height:calc(100svh - 64px); padding:48px 40px 40px; overflow-y:auto; transform:none; animation-name:tabletDialogReveal; }
+  .isClosing .dialog { animation-name:tabletDialogHide; }
+  .closeButton { top:12px; right:12px; width:44px; height:44px; padding:12px; }
+  .copy h2 { width:100%; font-size:36px; }
+  .copy p { width:100%; max-width:524px; margin-top:20px; font-size:18px; }
+  .socials { height:140px; flex-shrink:0; margin-top:32px; display:flex; }
+  .socials > div { display:block; }
+  .socials > a { min-width:0; min-height:0; padding:20px; grid-template-columns:minmax(0,1fr) 20px; grid-template-rows:1fr auto; }
+  .socials > a + a { border-top:0; }
+  .socials > a > svg { width:40px; height:40px; grid-column:1 / -1; grid-row:1; align-self:start; }
+  .socials > a::before { grid-column:1; grid-row:2; font-size:22px; }
+  .socials > a::after { grid-column:2; grid-row:2; }
+  :global(body:has(.style-check-page)) .dialog:has(.resultTransfer) { width:min(720px,calc(100vw - 64px)); padding:48px 40px 40px; max-height:calc(100svh - 64px); }
+  :global(body:has(.style-check-page)) .dialog:has(.resultTransfer) .copy h2 { font-size:36px; }
+}
+@keyframes tabletDialogReveal { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+@keyframes tabletDialogHide { from { opacity:1; transform:translateY(0); } to { opacity:0; transform:translateY(16px); } }

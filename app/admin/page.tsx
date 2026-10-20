@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { AdminStudio } from "@/components/admin-studio";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
 import { readContent } from "@/lib/content-store";
+import "./admin-responsive.css";
 
 export const dynamic = "force-dynamic";
 

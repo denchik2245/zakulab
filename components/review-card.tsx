@@ -26,7 +26,7 @@ export function ReviewCard({ review, variant = "catalog", fallbackImage = "/asse
   return (
     <article className={`${styles.card} ${styles[variant]}`}>
       <div className={styles.photo}>
-        <Image className={review.id === "figma-ivan" ? styles.trainImage : undefined} src={review.image || fallbackImage} alt="" fill sizes={isSlider ? "(max-width: 960px) calc(100vw - 40px), 960px" : "(max-width: 960px) calc(100vw - 40px), 50vw"} quality={90} priority={priority} />
+        <Image className={review.id === "figma-ivan" ? styles.trainImage : undefined} src={review.image || fallbackImage} alt="" fill sizes={isSlider ? "(max-width: 767px) calc(100vw - 40px), (max-width: 1024px) calc(100vw - 64px), 960px" : "(max-width: 767px) min(640px, calc(100vw - 40px)), (max-width: 1024px) calc((100vw - 84px) / 2), 50vw"} quality={90} priority={priority} />
       </div>
       {!isSlider && <span className={styles.category}>{review.project.name || review.author.company || "Совместный проект"}</span>}
       {review.status === "demo" && <small className={styles.demoBadge}>Демонстрационный отзыв</small>}

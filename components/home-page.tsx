@@ -37,12 +37,12 @@ export function HomePage({ site, reviews }: { site: SiteSettings; reviews: Verif
           <div className={styles.heroGallery} style={{ "--speed": `${site.heroGallerySpeed || 30}s` } as React.CSSProperties}>
             {site.heroGallery.map((src, index) => (
               <div className={styles.heroImage} key={`orig-${src}-${index}`}>
-                <Image src={src} alt="" fill sizes="420px" quality={90} priority={index < 2} />
+                <Image src={src} alt="" fill sizes="(max-width: 767px) 250px, (max-width: 1024px) 320px, (max-width: 1919px) 360px, 420px" quality={90} priority={index < 2} />
               </div>
             ))}
             {site.heroGallery.map((src, index) => (
               <div className={styles.heroImage} key={`dup-${src}-${index}`}>
-                <Image src={src} alt="" fill sizes="420px" quality={90} />
+                <Image src={src} alt="" fill sizes="(max-width: 767px) 250px, (max-width: 1024px) 320px, (max-width: 1919px) 360px, 420px" quality={90} />
               </div>
             ))}
           </div>
@@ -81,7 +81,7 @@ export function HomePage({ site, reviews }: { site: SiteSettings; reviews: Verif
         <div className={styles.portfolioInner}>
           <SectionTitle eyebrow="Лучшие проекты"><span id="portfolio-title">{typographic(site.portfolioTitle)}</span></SectionTitle>
           <div className={styles.portfolioGallery}>
-            {featuredProjects.map((project) => <ProjectCard key={project.id} project={project} sizes="(max-width: 960px) calc(100vw - 40px), 540px" />)}
+            {featuredProjects.map((project) => <ProjectCard key={project.id} project={project} sizes="(max-width: 767px) min(640px, calc(100vw - 40px)), (max-width: 1024px) calc((100vw - 80px) / 2), (max-width: 1919px) min(582px, calc((100vw - 356px) / 2)), 540px" />)}
           </div>
           <div className={styles.projectRows}>
             {listedProjects.map((project) => <ProjectRow key={project.id} project={project} />)}
@@ -120,7 +120,7 @@ export function HomePage({ site, reviews }: { site: SiteSettings; reviews: Verif
                   )}
                 </div>
                 <div className={styles.stepMedia}>
-                  <div><Image src={step.image} alt="" fill sizes="(max-width: 900px) 100vw, 770px" quality={90} /></div>
+                  <div><Image src={step.image} alt="" fill sizes="(max-width: 767px) min(600px, calc(100vw - 80px)), (max-width: 1024px) calc((100vw - 144px) / 2), 770px" quality={90} /></div>
                   {step.secondaryImage && <div><Image src={step.secondaryImage} alt="" fill sizes="380px" quality={90} /></div>}
                 </div>
               </article>

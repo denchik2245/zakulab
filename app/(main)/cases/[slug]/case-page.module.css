@@ -72,3 +72,21 @@ figure.block figcaption { margin-bottom: 20px; font-size: 20px; font-weight: 500
   .block { margin-bottom: 44px; }
   .callout { padding: 16px; align-items: flex-start; }
 }
+
+@media (768px <= width <= 1024px) {
+  .page { padding:48px 0 88px; }
+  .layout { width:calc(100% - 64px); max-width:960px; margin-inline:auto; grid-template-columns:minmax(0,1fr); gap:40px; }
+  .sidebar { position:static; }
+  .heading { gap:24px; }
+  .heading h1 { font-size:40px; }
+  .breadcrumbs { white-space:normal; flex-wrap:wrap; }
+  .whatDone { max-width:760px; margin-top:28px; font-size:18px; line-height:1.5; }
+  .content { width:100%; }
+  .block { margin-bottom:48px; }
+  .block[data-spacing="compact"] { margin-bottom:24px; }
+  .image { height:auto; aspect-ratio:820 / 469; }
+  .gallery { grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; }
+  .textBlock h2 { font-size:26px; }
+  .body,.list li { font-size:18px; line-height:1.5; }
+  .callout p { font-size:18px; }
+}

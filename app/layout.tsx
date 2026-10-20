@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Manrope, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
-import { SmoothScroll } from "@/components/smooth-scroll";
 
 const manrope = Manrope({
   subsets: ["cyrillic", "latin"],
@@ -48,7 +47,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="ru" data-scroll-behavior="smooth" className={`${manrope.variable} ${ibmPlexMono.variable}`}>
       <body>
-        <SmoothScroll />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
         {children}
       </body>

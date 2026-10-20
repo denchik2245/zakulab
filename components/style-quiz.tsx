@@ -40,6 +40,14 @@ function StyleGallery({ reference }: { reference: StyleReference }) {
   useEffect(() => {
     const viewport = viewportRef.current;
     if (!viewport) return;
+    const observer = new ResizeObserver(updateThumb);
+    observer.observe(viewport);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
     const keepWheelInsidePreview = (event: WheelEvent) => {
       event.preventDefault();
       event.stopPropagation();
@@ -94,9 +102,9 @@ function StyleGallery({ reference }: { reference: StyleReference }) {
 
       {images.length > 0 && (
         <div className={styles.pagination}>
-          <button type="button" onClick={() => changeImage(imageIndex - 1)} disabled={images.length < 2} aria-label="Предыдущий пример"><picture><source media="(max-width: 960px)" srcSet="/assets/figma/style-gallery-arrow.svg" /><Image src="/assets/figma/arrow.svg" width={20} height={20} alt="" /></picture></button>
+          <button type="button" onClick={() => changeImage(imageIndex - 1)} disabled={images.length < 2} aria-label="Предыдущий пример"><picture><source media="(max-width: 1024px)" srcSet="/assets/figma/style-gallery-arrow.svg" /><Image src="/assets/figma/arrow.svg" width={20} height={20} alt="" /></picture></button>
           <b>{imageIndex + 1} / {images.length}</b>
-          <button type="button" onClick={() => changeImage(imageIndex + 1)} disabled={images.length < 2} aria-label="Следующий пример"><picture><source media="(max-width: 960px)" srcSet="/assets/figma/style-gallery-arrow.svg" /><Image src="/assets/figma/arrow.svg" width={20} height={20} alt="" /></picture></button>
+          <button type="button" onClick={() => changeImage(imageIndex + 1)} disabled={images.length < 2} aria-label="Следующий пример"><picture><source media="(max-width: 1024px)" srcSet="/assets/figma/style-gallery-arrow.svg" /><Image src="/assets/figma/arrow.svg" width={20} height={20} alt="" /></picture></button>
         </div>
       )}
 
@@ -108,7 +116,6 @@ function StyleGallery({ reference }: { reference: StyleReference }) {
           aria-modal="true"
           aria-label={`Полноэкранный просмотр: ${reference.title}`}
           onCancel={(event) => { event.preventDefault(); setIsFullscreen(false); }}
-          data-smooth-scroll-prevent
           onWheel={(event) => {
             const scrollable = (event.target as HTMLElement)?.closest?.(`.${styles.fullscreenImage}`);
             if (!scrollable) {
@@ -118,7 +125,7 @@ function StyleGallery({ reference }: { reference: StyleReference }) {
           onMouseDown={(event) => { if (event.target === event.currentTarget) setIsFullscreen(false); }}
         >
           <button type="button" className={styles.fullscreenClose} onClick={() => setIsFullscreen(false)} aria-label="Закрыть полноэкранный просмотр"><Image src="/assets/figma/cross-popup.svg" width={20} height={20} alt="" /></button>
-          <div className={styles.fullscreenImage} data-smooth-scroll-prevent tabIndex={0}>{activeImage ? <img src={activeImage} alt={`Пример стиля «${reference.title}»`} /> : <StylePreview reference={reference} />}</div>
+          <div className={styles.fullscreenImage} tabIndex={0}>{activeImage ? <img src={activeImage} alt={`Пример стиля «${reference.title}»`} /> : <StylePreview reference={reference} />}</div>
         </dialog>, document.body
       )}
     </div>

@@ -94,7 +94,7 @@ export function ReviewForm({ title, description }: { title: string; description:
   }
 
   const popup = isOpen ? (
-    <div className={`${styles.overlay} ${isClosing ? styles.isClosing : ""}`} data-smooth-scroll-prevent onMouseDown={(event) => { if (event.target === event.currentTarget) close(); }}>
+    <div className={`${styles.overlay} ${isClosing ? styles.isClosing : ""}`} onMouseDown={(event) => { if (event.target === event.currentTarget) close(); }}>
       <div ref={dialogRef} className={styles.dialog} role="dialog" aria-modal="true" aria-labelledby={titleId} aria-describedby={descriptionId}>
         <button ref={closeRef} className={styles.close} type="button" onClick={close} aria-label="Закрыть окно">
           <Image src="/assets/figma/cross-popup.svg" width={20} height={20} alt="" />

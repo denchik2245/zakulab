@@ -16,14 +16,21 @@
 @media (hover:hover) and (pointer:fine) {
   .cta > button:hover { background:#446255; }
 }
-@media (max-width:1200px) {
-  .intro,.grid { width:calc(100% - 80px); }
-  .intro { height:400px; }
-  .heading h1 { font-size:52px; }
-  .cta { width:min(58vw,720px); gap:24px; }
+@media (960px < width < 1920px) {
+  .intro,.grid { width:min(1440px,calc(100% - 80px)); }
+  .intro { height:auto; padding:80px 0 104px; display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); align-items:end; gap:48px; }
+  .heading,.cta { position:static; min-width:0; }
+  .heading h1 { width:auto; margin-top:24px; font-size:clamp(36px,3.45vw,52px); }
+  .desktopBreak { display:none; }
+  .cta { width:auto; height:auto; min-height:112px; padding:24px; gap:24px; }
   .cta strong { font-size:20px; white-space:normal; }
-  .cta > button { padding-inline:30px; }
-  .grid { padding-bottom:120px; }
+  .cta > button { flex-shrink:0; padding-inline:24px; }
+  .grid { padding-bottom:104px; align-items:stretch; }
+}
+@media (960px < width < 1200px) {
+  .intro { grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:32px; }
+  .cta { flex-direction:column; align-items:stretch; gap:20px; }
+  .cta > button { margin-left:0; min-height:50px; }
 }
 
 @media (max-width:960px) {
@@ -37,4 +44,17 @@
   .cta strong { font-size:18px; line-height:22px; white-space:normal; }
   .cta > button { width:100%; height:54px; margin:0; padding:16px 20px; font-size:16px; }
   .grid { padding-bottom:80px; grid-template-columns:1fr; gap:20px; }
+}
+
+@media (768px <= width <= 1024px) {
+  .intro,.grid { width:calc(100% - 64px); max-width:960px; }
+  .intro { height:auto; padding:48px 0 64px; display:block; }
+  .heading,.cta { position:static; }
+  .heading h1 { width:100%; max-width:760px; margin-top:24px; font-size:40px; line-height:1.12; }
+  .desktopBreak { display:none; }
+  .cta { width:100%; height:auto; min-height:112px; margin-top:28px; padding:24px; flex-direction:row; align-items:center; gap:24px; }
+  .cta small { font-size:16px; }
+  .cta strong { font-size:20px; line-height:1.3; white-space:normal; }
+  .cta > button { width:auto; height:54px; min-width:180px; margin-left:auto; padding:16px 24px; font-size:16px; }
+  .grid { padding-bottom:88px; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; align-items:start; }
 }

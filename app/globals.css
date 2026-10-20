@@ -1820,3 +1820,9 @@ body:has(.admin-login) {
   .admin-case-item { grid-template-columns: 24px minmax(0, 1fr) 34px; }
   .admin-style-gallery { grid-template-columns: 1fr; }
 }
+
+@media (768px <= width <= 1024px) {
+  .success-page.shell { width:calc(100% - 64px); max-width:960px; padding-block:72px 88px; }
+  .success-page h1 { max-width:820px; font-size:64px; line-height:1.1; }
+  .success-page p { max-width:720px; font-size:20px; line-height:1.5; }
+}

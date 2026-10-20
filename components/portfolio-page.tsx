@@ -32,7 +32,7 @@ export function PortfolioPage({ site }: { site: PortfolioContent }) {
       <div className={styles.workTextureTop} aria-hidden="true" /><div className={styles.workTextureBottom} aria-hidden="true" />
       <div className={styles.workInner}>
         <div className={styles.sectionTitle}><span>{`{Лучшее}`}</span><h2 id="featured-title">Избранные проекты</h2></div>
-        <div className={styles.featuredGrid} id="featured-projects">{featuredProjects.map((project, index) => <ProjectCard className={`${styles.featuredCard} ${mobileFeaturedIds.has(project.id) ? "" : styles.extraCard}`} project={project} priority={index < 3} key={project.id} />)}</div>
+        <div className={styles.featuredGrid} id="featured-projects">{featuredProjects.map((project, index) => <ProjectCard className={`${styles.featuredCard} ${mobileFeaturedIds.has(project.id) ? "" : styles.extraCard}`} project={project} priority={index < 3} sizes="(max-width: 767px) min(640px, calc(100vw - 40px)), (max-width: 1024px) calc((100vw - 80px) / 2), (max-width: 1199px) calc((100vw - 96px) / 2), (max-width: 1919px) min(470px, calc((100vw - 112px) / 3)), 540px" key={project.id} />)}</div>
 
         <h2 className={styles.otherTitle} id="other">Другие проекты</h2>
         <div className={styles.filters} role="group" aria-label="Фильтр проектов">{filters.map((filter) => <button type="button" key={filter.id} className={activeFilter === filter.id ? styles.activeFilter : ""} aria-pressed={activeFilter === filter.id} onClick={() => { setActiveFilter(filter.id); setShowAll(false); }}>{filter.id === "tilda" && <Image src="/assets/figma/property1-tilda.svg" width={28} height={28} alt="" />}{filter.label}</button>)}</div>

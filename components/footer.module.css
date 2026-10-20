@@ -36,6 +36,18 @@
   .legal { left: 40px; }
 }
 
+@media (960px < width < 1920px) {
+  :global(body:has(.site-mobile-layout)) .footer { height: auto; padding: 80px max(40px, calc((100% - 1440px) / 2)) 32px; }
+  :global(body:has(.site-mobile-layout)) .top h2 { max-width: 50%; font-size: 40px; }
+  :global(body:has(.site-mobile-layout)) .discuss { flex-shrink: 0; padding-inline: 32px; }
+  :global(body:has(.site-mobile-layout)) .toTop { flex-shrink: 0; }
+  :global(body:has(.site-mobile-layout)) .columns { position: relative; inset: auto; margin-top: 64px; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; }
+  :global(body:has(.site-mobile-layout)) .columns > div { min-width: 0; font-size: 20px; line-height: 1.3; }
+  :global(body:has(.site-mobile-layout)) .columns a { overflow-wrap: anywhere; }
+  :global(body:has(.site-mobile-layout)) .legal { position: relative; inset: auto; width: auto; margin-top: 80px; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; font-size: 16px; line-height: 1.4; }
+  :global(body:has(.site-mobile-layout)) .mark { width: 380px; height: 380px; right: -40px; bottom: -60px; }
+}
+
 @media (max-width: 960px) {
   .footer { height: auto; min-height: 650px; }
   .columns { position: relative; top: auto; left: auto; right: auto; margin-top: 64px; grid-template-columns: repeat(3, 1fr); }
@@ -85,4 +97,20 @@
   :global(body:has(.site-mobile-layout)) .legal { position: relative; top: auto; bottom: auto; left: auto; width: auto; margin-top: 36px; display: grid; grid-template-columns: 1fr; gap: 10px; font-size: 16px; line-height: 22px; }
   :global(body:has(.site-mobile-layout)) .mark { display: none; }
   :global(body:has(.site-mobile-layout)) .texture { height: 250px; background-size: 360px 360px; }
+}
+
+@media (768px <= width <= 1024px) {
+  .footer,:global(body:has(.site-mobile-layout)) .footer { height:auto; min-height:0; padding:72px 32px 28px; }
+  .top,:global(body:has(.site-mobile-layout)) .top { display:grid; grid-template-columns:minmax(0,1fr) 64px; gap:24px 16px; }
+  .top h2,:global(body:has(.site-mobile-layout)) .top h2 { grid-column:1 / -1; width:auto; max-width:720px; font-size:34px; line-height:1.2; }
+  .discuss,:global(body:has(.site-mobile-layout)) .discuss { grid-column:1; width:fit-content; height:56px; margin:0; padding:16px 28px; justify-content:center; font-size:16px; }
+  .toTop,:global(body:has(.site-mobile-layout)) .toTop { grid-column:2; width:64px; height:56px; margin:0; }
+  .columns,:global(body:has(.site-mobile-layout)) .columns { position:relative; inset:auto; margin-top:48px; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:24px; }
+  .columns > div,:global(body:has(.site-mobile-layout)) .columns > div { min-width:0; gap:10px; font-size:18px; line-height:1.4; }
+  .columns > div > span,:global(body:has(.site-mobile-layout)) .columns > div > span { margin-bottom:10px; font-size:16px; line-height:1.4; }
+  .columns a { overflow-wrap:anywhere; }
+  .columns a[href^="mailto:"] { font-size:16px; }
+  .legal,:global(body:has(.site-mobile-layout)) .legal { position:relative; inset:auto; width:auto; margin-top:48px; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; font-size:14px; line-height:1.5; }
+  .mark,:global(body:has(.site-mobile-layout)) .mark { display:block; width:280px; height:280px; right:-60px; bottom:-60px; opacity:.3; }
+  .texture,:global(body:has(.site-mobile-layout)) .texture { height:300px; background-size:567px 567px; }
 }

@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { navigation } from "@/lib/navigation";
 import styles from "./site-header.module.css";
 import { SocialLinks } from "./social-links";
+import { MobileMenu } from "./mobile-menu";
 
 export function Header(links: { telegramUrl: string; maxUrl: string; vkUrl: string }) {
   const [isHidden, setIsHidden] = useState(false);
@@ -48,13 +49,7 @@ export function Header(links: { telegramUrl: string; maxUrl: string; vkUrl: stri
 
         <SocialLinks className={styles.socials} {...links} />
 
-        <details className={styles.mobileMenu}>
-          <summary>Меню</summary>
-          <nav aria-label="Мобильное меню">
-            {navigation.map(([label, href]) => <Link href={href} key={href}>{label}</Link>)}
-            <Link href="/style-check">Выбор стиля</Link>
-          </nav>
-        </details>
+        <MobileMenu className={styles.mobileMenu} {...links} />
       </div>
     </header>
   );
