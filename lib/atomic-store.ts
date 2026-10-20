@@ -7,7 +7,8 @@ import { getStore } from "@netlify/blobs";
 
 export type Stored<T> = { data: T; etag: string };
 export function isNetlifyRuntime() {
-  return process.env.NETLIFY === "true" || process.env.NETLIFY_LOCAL === "true";
+  // SITE_ID is available to deployed Functions; NETLIFY is build-time only.
+  return Boolean(process.env.SITE_ID) || process.env.NETLIFY === "true" || process.env.NETLIFY_LOCAL === "true";
 }
 
 function filename(key: string) {

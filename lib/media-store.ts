@@ -5,6 +5,7 @@ import path from "node:path";
 import { randomUUID } from "node:crypto";
 import { getStore } from "@netlify/blobs";
 import sharp from "sharp";
+import { isNetlifyRuntime } from "@/lib/atomic-store";
 
 const localMediaDirectory = path.join(process.cwd(), ".data", "media");
 const allowedTypes = new Map([
@@ -15,10 +16,6 @@ const allowedTypes = new Map([
 ]);
 
 export const maxMediaSize = 8 * 1024 * 1024;
-
-function isNetlifyRuntime() {
-  return process.env.NETLIFY === "true" || process.env.NETLIFY_LOCAL === "true";
-}
 
 function isSafeKey(key: string) {
   return /^[a-f0-9-]+\.(png|jpg|webp|gif)$/.test(key);

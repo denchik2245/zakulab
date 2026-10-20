@@ -54,6 +54,35 @@ async function main() {
   const schema = load('lib/content-schema.ts'), pub = load('lib/public-content.ts'), queue = load('lib/review-queue.ts'), limits = load('lib/request-limits.ts'), media = load('lib/media-store.ts');
   const seed = await content.readContent(true);
   cookieToken = auth.createAdminSession();
+  await check('Netlify Functions use imported CMS, login limiter and media with runtime SITE_ID only', async () => {
+    const envKeys = ['NETLIFY', 'NETLIFY_LOCAL', 'SITE_ID'];
+    const previous = Object.fromEntries(envKeys.map(key => [key, process.env[key]]));
+    try {
+      delete process.env.NETLIFY;
+      delete process.env.NETLIFY_LOCAL;
+      process.env.SITE_ID = 'isolated-netlify-site';
+      const imported = structuredClone(seed);
+      imported.site.heroName = 'Imported runtime content';
+      blobs.set('content-v1', { data: imported, etag: String(++serial), metadata: {} });
+      assert.equal((await content.readContent()).site.heroName, imported.site.heroName);
+      const response = await login.POST(new Request('http://localhost/api/admin/login', {
+        method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ password: 'test-password' }),
+      }));
+      assert.equal(response.status, 200);
+      assert.ok([...blobs.keys()].some(key => key.startsWith('limits/login/')));
+      const png = await require('sharp')({ create: { width: 1, height: 1, channels: 4, background: '#ffffff' } }).png().toBuffer();
+      const saved = await media.saveMedia(new File([png], 'runtime.png', { type: 'image/png' }));
+      const retrieved = await media.readMedia(saved.key);
+      assert.equal(retrieved.contentType, 'image/png');
+      assert.deepEqual(Buffer.from(retrieved.data), png);
+    } finally {
+      blobs.clear();
+      for (const key of envKeys) {
+        if (previous[key] === undefined) delete process.env[key];
+        else process.env[key] = previous[key];
+      }
+    }
+  });
   await check('Seed satisfies the full schema', () => {
     const result = schema.contentSchema.safeParse(seed); assert.ok(result.success, JSON.stringify(result.error?.issues));
   });
