@@ -307,6 +307,7 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
 
   function patchReview(id: string, patch: Partial<VerifiedReview>) {
     if (!content) return;
+    if (patch.order !== undefined) setSelectedReview(id);
     const reviews = content.reviews.map((item) => item.id === id ? { ...item, ...patch } : item);
     setContent({ ...content, reviews: patch.order === undefined ? reviews : moveItemToPosition(reviews, id, patch.order) });
   }
@@ -337,6 +338,7 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
 
   function patchPortfolio(id: string, patch: Partial<PortfolioProject>) {
     if (!content) return;
+    if (patch.order !== undefined) setSelectedPortfolio(id);
     if (patch.homePlacement === "list" && content.site.portfolioProjects.filter((project) => project.id !== id && project.homePlacement === "list").length >= MAX_HOME_ADDITIONAL_PROJECTS) {
       setNotice(`На главной уже ${MAX_HOME_ADDITIONAL_PROJECTS} дополнительных работ. Сначала уберите одну, чтобы добавить другую.`);
       return;
@@ -374,6 +376,7 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
 
   function patchStyle(id: string, patch: Partial<StyleReference>) {
     if (!content) return;
+    if (patch.order !== undefined) setSelectedStyle(id);
     const styles = content.site.styleChoice.styles.map((item) => item.id === id ? { ...item, ...patch } : item);
     patchSite({ styleChoice: { ...content.site.styleChoice, styles: patch.order === undefined ? styles : moveItemToPosition(styles, id, patch.order) } });
   }
