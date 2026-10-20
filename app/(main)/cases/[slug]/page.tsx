@@ -77,7 +77,7 @@ export default async function CasePage({ params }: { params: Promise<{ slug: str
   const blocks = item.blocks ?? createLegacyCaseBlocks(item);
 
   return (
-    <article className={styles.page}>
+    <article className={`site-mobile-layout ${styles.page}`} id="top">
       <div className={styles.layout}>
         <aside className={styles.sidebar}>
           <div className={styles.heading}>
