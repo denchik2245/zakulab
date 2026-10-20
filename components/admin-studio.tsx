@@ -592,7 +592,10 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
 
         {tab === "reviews" && (
           <div className="admin-view admin-reviews-view">
-            <h1>Отзывы</h1><p>Новые отзывы поступают на проверку. Очередь ограничена 100 отзывами; необработанные отзывы хранятся 90 дней.</p><button type="button" className="admin-add-button" onClick={createReview}>Новый отзыв</button>
+            <div className="admin-portfolio-heading admin-reviews-heading">
+              <div><h1>Отзывы</h1><p>Новые отзывы поступают на проверку. Очередь ограничена 100 отзывами; необработанные отзывы хранятся 90 дней.</p></div>
+              <button type="button" className="admin-add-button" onClick={createReview}>Новый отзыв</button>
+            </div>
             <div className="admin-reviews-layout">
               <div className="admin-review-list">
                 {[...content.reviews].sort((a, b) => a.order - b.order).map((item) => (
@@ -606,8 +609,8 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
                 <div className="admin-review-editor">
                   <div className="admin-review-editor-head"><h2>{activeReview.author.name}</h2><button type="button" aria-label="Удалить отзыв" onClick={() => deleteReview(activeReview.id)}><Image src="/assets/figma/reviews-admin-trash.svg" width={28} height={28} alt="" /></button></div>
                   <div className="admin-review-moderation">
-                    <button type="button" disabled={saving} onClick={saveReview}>Сохранить отзыв</button>
                     <Field label="Статус модерации"><select value={activeReview.status} disabled={saving} onChange={(event) => setReviewStatus(activeReview.id, event.target.value as VerifiedReview["status"])}><option value="pending">На проверке</option><option value="published">Опубликован</option><option value="rejected">Отклонён</option><option value="demo">Демонстрационный</option></select></Field>
+                    <button type="button" disabled={saving} onClick={saveReview}>Сохранить отзыв</button>
                     <p>{activeReview.consent ? `Согласие получено ${formatReviewDate(activeReview.consent.acceptedAt)}` : "Перед публикацией получите согласие автора."}</p>
                   </div>
                   <div className="admin-publish-row"><label><input type="checkbox" checked={activeReview.showOnHome} onChange={(event) => patchReview(activeReview.id, { showOnHome: event.target.checked })} /><span>Показывать на главной</span></label><label><input type="checkbox" checked={activeReview.showOnReviewsPage} onChange={(event) => patchReview(activeReview.id, { showOnReviewsPage: event.target.checked })} /><span>Показывать на странице отзывов</span></label></div>
