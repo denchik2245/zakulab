@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { navigation } from "@/lib/navigation";
+import { SocialLinks } from "./social-links";
 import styles from "./mobile-menu.module.css";
 
 type MobileMenuProps = {
@@ -22,6 +23,7 @@ function MenuArrow() {
 export function MobileMenu({ className, telegramUrl, maxUrl, vkUrl }: MobileMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+  const [isKeyboardNavigation, setIsKeyboardNavigation] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const closingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -84,7 +86,10 @@ export function MobileMenu({ className, telegramUrl, maxUrl, vkUrl }: MobileMenu
       aria-haspopup="dialog"
       aria-expanded={isOpen}
       aria-controls={isOpen ? dialogId : undefined}
-      onClick={() => setIsOpen(true)}
+      onClick={(event) => {
+        setIsKeyboardNavigation(event.detail === 0);
+        setIsOpen(true);
+      }}
     ><span className={styles.burgerIcon} aria-hidden="true"><i /><i /><i /></span></button>
 
     {isOpen && createPortal(
@@ -95,9 +100,11 @@ export function MobileMenu({ className, telegramUrl, maxUrl, vkUrl }: MobileMenu
         aria-label="Меню сайта"
         aria-modal="true"
         data-closing={isClosing}
+        data-keyboard-navigation={isKeyboardNavigation}
         onCancel={(event) => { event.preventDefault(); closeMenu(); }}
         onKeyDown={(event) => {
           if (event.key !== "Tab") return;
+          setIsKeyboardNavigation(true);
           const focusable = Array.from(event.currentTarget.querySelectorAll<HTMLElement>("a[href], button:not([disabled])"));
           const first = focusable[0];
           const last = focusable.at(-1);
@@ -109,7 +116,10 @@ export function MobileMenu({ className, telegramUrl, maxUrl, vkUrl }: MobileMenu
             first?.focus();
           }
         }}
-        onPointerDown={(event) => { if (event.target === event.currentTarget) closeMenu(); }}
+        onPointerDown={(event) => {
+          setIsKeyboardNavigation(false);
+          if (event.target === event.currentTarget) closeMenu();
+        }}
       >
         <div className={styles.panel}>
           <div className={styles.top}>
@@ -124,10 +134,10 @@ export function MobileMenu({ className, telegramUrl, maxUrl, vkUrl }: MobileMenu
           </nav>
 
           <div className={styles.bottom}>
-            <Link className={styles.discuss} href="/#contact" onClick={finishClose}><span>Обсудить проект</span><MenuArrow /></Link>
             <div className={styles.contacts}>
-              <span>Написать мне</span>
-              <div>{[["Telegram", telegramUrl], ["MAX", maxUrl], ["VK", vkUrl]].map(([label, href]) => <a href={href} key={label} target="_blank" rel="noreferrer">{label}<MenuArrow /></a>)}</div>
+              <span>Обсудим ваш проект</span>
+              <p>Выберите, где удобнее написать</p>
+              <SocialLinks className={styles.contactLinks} telegramUrl={telegramUrl} maxUrl={maxUrl} vkUrl={vkUrl} />
             </div>
           </div>
         </div>

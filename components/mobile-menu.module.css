@@ -11,23 +11,22 @@
 .top > span { color:#a9beb5; font-size:14px; line-height:1.4; }
 .closeButton { width:44px; height:44px; margin-left:auto; padding:10px; display:grid; flex:0 0 44px; place-items:center; border:1px solid #628073; border-radius:5px; color:#fefefe; background:transparent; cursor:pointer; transition:background-color .25s ease; }
 .closeButton svg { width:24px; height:24px; }
-.nav { margin:36px 0 40px; border-top:1px solid #628073; }
+.nav { margin:36px 0 24px; border-top:1px solid #628073; }
 .menuLink { position:relative; min-height:70px; padding:18px 0; display:flex; justify-content:space-between; align-items:center; gap:16px; border-bottom:1px solid #628073; color:#fefefe; font-size:clamp(24px,6.6vw,30px); font-weight:500; line-height:1.2; letter-spacing:-.03em; transition:color .25s ease; }
 .menuLink > span { min-width:0; }
 .menuLink svg { width:20px; height:20px; flex:0 0 20px; color:#a9beb5; transition:transform .25s ease,color .25s ease; }
-.menuLink[aria-current="page"]::before { content:""; position:absolute; inset:6px -12px; z-index:0; border-radius:5px; background:#446255; }
-.menuLink > * { position:relative; z-index:1; }
 .menuLink[aria-current="page"] svg { color:#fefefe; }
 .bottom { margin-top:auto; display:grid; gap:28px; }
-.discuss { min-height:56px; padding:16px 20px; display:flex; align-items:center; justify-content:space-between; gap:16px; border-radius:5px; color:#050505; background:#fefefe; font-size:16px; font-weight:700; line-height:1.4; transition:background-color .25s ease; }
-.discuss svg { width:20px; height:20px; flex:0 0 20px; }
-.contacts { display:grid; gap:14px; }
-.contacts > span { color:#a9beb5; font-size:14px; line-height:1.4; }
-.contacts > div { display:flex; justify-content:space-between; gap:20px; }
-.contacts a { min-height:32px; display:inline-flex; align-items:center; gap:6px; color:#fefefe; font-size:16px; line-height:1.4; }
-.contacts a svg { width:14px; height:14px; color:#a9beb5; }
-.drawer :is(a,button):focus-visible { outline:2px solid #fefefe; outline-offset:5px; }
-.discuss:focus-visible { outline-offset:5px; }
+.contacts { display:grid; gap:12px; }
+.contacts > span { color:#fefefe; font-size:20px; font-weight:500; line-height:1.3; letter-spacing:-.02em; }
+.contacts > p { margin:0; color:#a9beb5; font-size:14px; line-height:1.4; }
+.contacts .contactLinks { --social-icon-base-opacity:0; --social-icon-color-opacity:1; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); align-items:stretch; gap:8px; width:100%; height:auto; margin-top:4px; border:0; border-radius:0; overflow:visible; }
+.contactLinks > div { display:none; }
+.contacts .contactLinks > a { min-height:84px; padding:12px 4px; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:6px; border-radius:5px; color:#304e41; background:#fefefe; }
+.contactLinks > a::after { content:attr(aria-label); font-size:14px; font-weight:600; line-height:1.2; }
+.contacts .contactLinks svg { width:32px; height:32px; flex-shrink:0; }
+.drawer :is(a,button) { outline:none; -webkit-tap-highlight-color:transparent; }
+.drawer[data-keyboard-navigation="true"] :is(a,button):focus-visible { outline:2px solid #fefefe; outline-offset:5px; }
 .drawer[data-closing="true"] .panel { animation:slideOut .24s cubic-bezier(.4,0,1,1) both; }
 .drawer[data-closing="true"]::backdrop { animation:fadeOut .24s ease both; }
 
@@ -40,8 +39,7 @@
   .closeButton:hover { background:#446255; }
   .menuLink:hover { color:#d6e4dd; }
   .menuLink:hover svg { color:#fefefe; transform:translate(2px,-2px); }
-  .discuss:hover { background:#e8efeb; }
-  .contacts a:hover { text-decoration:underline; text-underline-offset:4px; }
+  .contacts .contactLinks > a:hover { opacity:.9; }
 }
 @media (max-width:360px), (max-height:640px) {
   .panel { padding:max(20px,env(safe-area-inset-top)) 24px max(20px,env(safe-area-inset-bottom)); }
