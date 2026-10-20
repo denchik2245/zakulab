@@ -6,6 +6,7 @@ import { cases as seedCases, createLegacyCaseBlocks, hasCasePlaceholders, type C
 import { verifiedReviews as seedReviews, type VerifiedReview } from "@/lib/reviews";
 import { defaultSiteSettings, type SiteSettings } from "@/lib/site-settings";
 import { normalizeContentUrl } from "@/lib/external-url";
+import { normalizeContentOrder } from "@/lib/content-order";
 
 export type AdminContent = {
   version: 1;
@@ -110,7 +111,7 @@ function mergeWithDefaults(value: Partial<AdminContent>): AdminContent {
       homePlacement: "hidden",
       portfolioPlacement: "archive",
       published: caseStudy.status === "published",
-      order: (portfolioProjects.length + 1) * 10,
+      order: portfolioProjects.length + 1,
       caseStudy,
     });
   });
@@ -146,7 +147,7 @@ function mergeWithDefaults(value: Partial<AdminContent>): AdminContent {
                 ...style,
                 images: Array.isArray(style.images) ? style.images : [],
                 active: style.active ?? true,
-                order: Number.isFinite(style.order) ? style.order : (index + 1) * 10,
+                order: Number.isFinite(style.order) ? style.order : index + 1,
               }))
             : seed.site.styleChoice.styles,
         },
@@ -168,7 +169,7 @@ function mergeWithDefaults(value: Partial<AdminContent>): AdminContent {
         profile: { ...review.profile, url: normalizeContentUrl(review.profile.url) },
         showOnHome: review.showOnHome ?? true,
         showOnReviewsPage: review.showOnReviewsPage ?? true,
-        order: Number.isFinite(review.order) ? review.order : (index + 1) * 10,
+        order: Number.isFinite(review.order) ? review.order : index + 1,
       }))
     : seed.reviews;
   if (hasLegacyReviewPlacements) {
@@ -197,7 +198,7 @@ export async function readContent(includeSubmissions = false): Promise<AdminCont
     const known = new Set(content.reviews.map((review) => review.id));
     content.reviews.unshift(...submissions.map((entry) => entry!.data).filter((review) => !known.has(review.id)));
   }
-  return content;
+  return normalizeContentOrder(content);
 }
 
 export class ContentConflictError extends Error {}
@@ -205,7 +206,7 @@ export class ContentConflictError extends Error {}
 export async function writeContent(value: AdminContent): Promise<AdminContent> {
   const stored = await readJSON<Partial<AdminContent>>(blobKey);
   if (value.revision !== (stored?.etag ?? "initial")) throw new ContentConflictError("Документ уже изменён. Обновите данные и повторите правки.");
-  const content = mergeWithDefaults({ ...value, updatedAt: new Date().toISOString() });
+  const content = normalizeContentOrder(mergeWithDefaults({ ...value, updatedAt: new Date().toISOString() }));
   const queue = await readReviewQueue();
   const queuedIds = new Set(queue.flatMap((entry) => entry ? [entry.data.id] : []));
   const retainedIds = new Set(content.reviews.map((review) => review.id));

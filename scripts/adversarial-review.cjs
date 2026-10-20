@@ -98,6 +98,34 @@ async function main() {
     const serialized = JSON.stringify(pub.publicPortfolio(site));
     for (const forbidden of ['PRIVATE-', 'caseStudy', 'styleChoice']) assert.ok(!serialized.includes(forbidden));
   });
+  await check('Legacy order values become consecutive positions without changing display order or content', async () => {
+    const legacy = structuredClone(seed);
+    legacy.site.portfolioProjects.forEach((item, index) => { item.order = (index + 1) * 10; });
+    legacy.reviews.forEach((item, index) => { item.order = 1700000000000 + index; });
+    legacy.site.styleChoice.styles.forEach((item, index) => { item.order = (index + 1) * 20; });
+    const source = structuredClone(legacy);
+    blobs.set('content-v1', { data: legacy, etag: String(++serial), metadata: {} });
+    const migrated = await content.readContent(true);
+    for (const [before, after] of [[source.site.portfolioProjects, migrated.site.portfolioProjects], [source.reviews, migrated.reviews], [source.site.styleChoice.styles, migrated.site.styleChoice.styles]]) {
+      assert.deepEqual(after.map(item => item.order), after.map((_, index) => index + 1));
+      assert.deepEqual(after.map(({ order, ...item }) => item), before.map(({ order, ...item }) => item));
+    }
+    assert.equal((await admin.PUT(putRequest(migrated))).status, 200);
+    const stored = blobs.get('content-v1').data;
+    assert.deepEqual(stored.site.portfolioProjects.map(item => item.order), stored.site.portfolioProjects.map((_, index) => index + 1));
+    blobs.clear();
+  });
+  await check('Moving an item shifts other positions and keeps deletion and insertion gap-free', () => {
+    const { moveItemToPosition, normalizeItemOrder } = load('lib/content-order.ts');
+    const items = [{ id: 'a', order: 10 }, { id: 'b', order: 70 }, { id: 'c', order: 160 }];
+    const moved = moveItemToPosition(items, 'c', 1);
+    assert.deepEqual(moved, [{ id: 'c', order: 1 }, { id: 'a', order: 2 }, { id: 'b', order: 3 }]);
+    const deleted = normalizeItemOrder(moved.filter(item => item.id !== 'a'));
+    const inserted = normalizeItemOrder([...deleted, { id: 'd', order: deleted.length + 1 }]);
+    assert.deepEqual(inserted, [{ id: 'c', order: 1 }, { id: 'b', order: 2 }, { id: 'd', order: 3 }]);
+    assert.deepEqual(moveItemToPosition(inserted, 'c', 160).map(item => item.id), ['b', 'd', 'c']);
+    assert.deepEqual(items.map(item => item.order), [10, 70, 160]);
+  });
   await check('Concurrent reviews survive without rewriting CMS', async () => {
     blobs.clear();
     const responses = await Promise.all([reviews.POST(requestReview('Concurrent A')), reviews.POST(requestReview('Concurrent B'))]);

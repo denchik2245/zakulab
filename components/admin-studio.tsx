@@ -9,6 +9,7 @@ import type { VerifiedReview } from "@/lib/reviews";
 import type { PortfolioFilter, PortfolioProject, SiteSettings } from "@/lib/site-settings";
 import type { StyleReference } from "@/lib/style-references";
 import { MAX_HOME_ADDITIONAL_PROJECTS } from "@/lib/portfolio-limits";
+import { moveItemToPosition, normalizeContentOrder } from "@/lib/content-order";
 
 type Tab = "site" | "portfolio" | "reviews" | "styles" | "popups";
 
@@ -20,7 +21,7 @@ const portfolioFilterOptions: { id: PortfolioFilter; label: string }[] = [
 ];
 
 function blankPortfolioProject(count: number): PortfolioProject {
-  return { id: `portfolio-${Date.now()}`, title: "Новая работа", description: "Короткое описание проекта", image: "", url: "", platform: "", tags: ["", ""], filters: [], homePlacement: "hidden", portfolioPlacement: "archive", published: false, order: (count + 1) * 10 };
+  return { id: `portfolio-${Date.now()}`, title: "Новая работа", description: "Короткое описание проекта", image: "", url: "", platform: "", tags: ["", ""], filters: [], homePlacement: "hidden", portfolioPlacement: "archive", published: false, order: count + 1 };
 }
 
 function blankCaseBlock(type: CaseBlock["type"]): CaseBlock {
@@ -65,7 +66,7 @@ function blankCase(count: number, title = "Новый проект"): CaseStudy 
   };
 }
 
-function blankReview(): VerifiedReview {
+function blankReview(count: number): VerifiedReview {
   const now = new Date().toISOString();
   return {
     id: `review-${Date.now()}`,
@@ -74,7 +75,7 @@ function blankReview(): VerifiedReview {
     publishedAt: "",
     showOnHome: false,
     showOnReviewsPage: false,
-    order: Date.now(),
+    order: count + 1,
     text: "",
     image: "",
     author: { name: "Новый отзыв", initials: "", role: "", company: "" },
@@ -95,7 +96,7 @@ function blankStyle(count: number): StyleReference {
     axes: { space: 0, energy: 0, expression: 0, emotion: 0 },
     images: [],
     active: true,
-    order: (count + 1) * 10,
+    order: count + 1,
   };
 }
 
@@ -105,7 +106,7 @@ function formatReviewDate(value: string) {
 
 export function AdminStudio({ authenticated, initialContent }: { authenticated: boolean; initialContent: AdminContent | null }) {
   const [isAuthenticated, setIsAuthenticated] = useState(authenticated);
-  const [content, setContent] = useState(initialContent);
+  const [content, setContent] = useState(initialContent ? normalizeContentOrder(initialContent) : null);
   const [tab, setTab] = useState<Tab>("site");
   const [selectedReview, setSelectedReview] = useState<string | null>(null);
   const [selectedPortfolio, setSelectedPortfolio] = useState<string | null>(null);
@@ -185,7 +186,7 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
       const response = await fetch("/api/admin/content", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(next),
+        body: JSON.stringify(normalizeContentOrder(next)),
       });
       const result = await response.json();
       if (response.status === 409) setHasConflict(true);
@@ -306,12 +307,13 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
 
   function patchReview(id: string, patch: Partial<VerifiedReview>) {
     if (!content) return;
-    setContent({ ...content, reviews: content.reviews.map((item) => item.id === id ? { ...item, ...patch } : item) });
+    const reviews = content.reviews.map((item) => item.id === id ? { ...item, ...patch } : item);
+    setContent({ ...content, reviews: patch.order === undefined ? reviews : moveItemToPosition(reviews, id, patch.order) });
   }
 
   function createReview() {
     if (!content) return;
-    const item = blankReview();
+    const item = blankReview(content.reviews.length);
     setContent({ ...content, reviews: [item, ...content.reviews] });
     setSelectedReview(item.id);
     setTab("reviews");
@@ -330,7 +332,7 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
 
   function patchSite(patch: Partial<SiteSettings>) {
     if (!content) return;
-    setContent({ ...content, site: { ...content.site, ...patch } });
+    setContent(normalizeContentOrder({ ...content, site: { ...content.site, ...patch } }));
   }
 
   function patchPortfolio(id: string, patch: Partial<PortfolioProject>) {
@@ -339,7 +341,8 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
       setNotice(`На главной уже ${MAX_HOME_ADDITIONAL_PROJECTS} дополнительных работ. Сначала уберите одну, чтобы добавить другую.`);
       return;
     }
-    patchSite({ portfolioProjects: content.site.portfolioProjects.map((project) => project.id === id ? { ...project, ...patch } : project) });
+    const projects = content.site.portfolioProjects.map((project) => project.id === id ? { ...project, ...patch } : project);
+    patchSite({ portfolioProjects: patch.order === undefined ? projects : moveItemToPosition(projects, id, patch.order) });
   }
 
   function createPortfolioProject() {
@@ -371,7 +374,8 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
 
   function patchStyle(id: string, patch: Partial<StyleReference>) {
     if (!content) return;
-    patchSite({ styleChoice: { ...content.site.styleChoice, styles: content.site.styleChoice.styles.map((item) => item.id === id ? { ...item, ...patch } : item) } });
+    const styles = content.site.styleChoice.styles.map((item) => item.id === id ? { ...item, ...patch } : item);
+    patchSite({ styleChoice: { ...content.site.styleChoice, styles: patch.order === undefined ? styles : moveItemToPosition(styles, id, patch.order) } });
   }
 
   function createStyle() {
@@ -486,7 +490,7 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
                 <div className="admin-style-editor">
                   <div className="admin-portfolio-editor-head"><h2>{activeStyle.title}</h2><button type="button" aria-label="Удалить стиль" onClick={() => deleteStyle(activeStyle.id)}><Image src="/assets/figma/portfolio-admin-7.svg" width={28} height={28} alt="" /></button></div>
                   <div className="admin-style-visible"><label><input type="checkbox" checked={activeStyle.active} onChange={(event) => patchStyle(activeStyle.id, { active: event.target.checked })} /><span>Показывать в тесте</span></label></div>
-                  <div className="admin-style-order"><Field label="Порядок"><input type="number" value={activeStyle.order} onChange={(event) => patchStyle(activeStyle.id, { order: Number(event.target.value) })} /></Field></div>
+                  <div className="admin-style-order"><OrderField value={activeStyle.order} max={content.site.styleChoice.styles.length} onChange={(order) => patchStyle(activeStyle.id, { order })} /></div>
                   <div className="admin-style-fields">
                     <Field label="Название стиля"><input value={activeStyle.title} onChange={(event) => patchStyle(activeStyle.id, { title: event.target.value })} /></Field>
                     <Field label="Описание стиля"><textarea rows={4} value={activeStyle.description} onChange={(event) => patchStyle(activeStyle.id, { description: event.target.value })} /></Field>
@@ -546,13 +550,13 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
                     <h3>Размещение на главной</h3>
                     <PortfolioRadioGroup name={`home-${activePortfolio.id}`} value={activePortfolio.homePlacement} onChange={(value) => patchPortfolio(activePortfolio.id, { homePlacement: value as PortfolioProject["homePlacement"] })} options={[["featured", "Избранное"], ["list", "Другие"], ["hidden", "Не показывать"]]} disabledValues={activePortfolio.homePlacement !== "list" && homeAdditionalProjectCount >= MAX_HOME_ADDITIONAL_PROJECTS ? ["list"] : []} hintId="home-additional-project-limit" />
                     <p className="admin-placement-hint" id="home-additional-project-limit">Дополнительные работы: {homeAdditionalProjectCount} из {MAX_HOME_ADDITIONAL_PROJECTS}.{homeAdditionalProjectCount >= MAX_HOME_ADDITIONAL_PROJECTS && " Чтобы добавить другую работу, сначала уберите одну с главной."}</p>
-                    <Field label="Порядок"><input type="number" value={activePortfolio.order} onChange={(event) => patchPortfolio(activePortfolio.id, { order: Number(event.target.value) })} /></Field>
+                    <OrderField value={activePortfolio.order} max={content.site.portfolioProjects.length} onChange={(order) => patchPortfolio(activePortfolio.id, { order })} />
                   </section>
                   <section className="admin-placement-section">
                     <h3>Размещение в портфолио</h3>
                     <fieldset><legend>Фильтры проектов</legend>{portfolioFilterOptions.map((filter) => <label key={filter.id}><input type="checkbox" checked={activePortfolio.filters.includes(filter.id)} onChange={(event) => togglePortfolioFilter(activePortfolio.id, filter.id, event.target.checked)} />{filter.label}</label>)}</fieldset>
                     <PortfolioRadioGroup name={`portfolio-${activePortfolio.id}`} value={activePortfolio.portfolioPlacement} onChange={(value) => patchPortfolio(activePortfolio.id, { portfolioPlacement: value as PortfolioProject["portfolioPlacement"] })} options={[["featured", "Избранное"], ["archive", "Другие"], ["hidden", "Не показывать"]]} />
-                    <Field label="Порядок"><input type="number" value={activePortfolio.order} onChange={(event) => patchPortfolio(activePortfolio.id, { order: Number(event.target.value) })} /></Field>
+                    <OrderField value={activePortfolio.order} max={content.site.portfolioProjects.length} onChange={(order) => patchPortfolio(activePortfolio.id, { order })} />
                   </section>
                   <div className="admin-portfolio-form">
                     <div className="admin-portfolio-main-fields"><Field label="Название"><input value={activePortfolio.title} onChange={(event) => patchPortfolio(activePortfolio.id, { title: event.target.value })} /></Field><Field label="Ссылка"><input value={activePortfolio.url} onChange={(event) => patchPortfolio(activePortfolio.id, { url: event.target.value })} /></Field></div>
@@ -621,7 +625,7 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
                     <p>{activeReview.consent ? `Согласие получено ${formatReviewDate(activeReview.consent.acceptedAt)}` : "Перед публикацией получите согласие автора."}</p>
                   </div>
                   <div className="admin-publish-row"><label><input type="checkbox" checked={activeReview.showOnHome} onChange={(event) => patchReview(activeReview.id, { showOnHome: event.target.checked })} /><span>Показывать на главной</span></label><label><input type="checkbox" checked={activeReview.showOnReviewsPage} onChange={(event) => patchReview(activeReview.id, { showOnReviewsPage: event.target.checked })} /><span>Показывать на странице отзывов</span></label></div>
-                  <section className="admin-review-order"><Field label="Порядок"><input type="number" value={activeReview.order} onChange={(event) => patchReview(activeReview.id, { order: Number(event.target.value) })} /></Field></section>
+                  <section className="admin-review-order"><OrderField value={activeReview.order} max={content.reviews.length} onChange={(order) => patchReview(activeReview.id, { order })} /></section>
                   <div className="admin-review-form">
                     <Field label="Название проекта"><input value={activeReview.project.name} onChange={(e) => patchReview(activeReview.id, { project: { ...activeReview.project, name: e.target.value } })} /></Field>
                     <div className="admin-review-author-fields"><Field label="Имя"><input value={activeReview.author.name} onChange={(e) => patchReview(activeReview.id, { author: { ...activeReview.author, name: e.target.value } })} /></Field><Field label="Должность"><input value={activeReview.author.role} onChange={(e) => patchReview(activeReview.id, { author: { ...activeReview.author, role: e.target.value } })} /></Field></div>
@@ -804,6 +808,16 @@ function CaseBuilder({
       </div>
     </section>
   );
+}
+
+function OrderField({ value, max, onChange }: { value: number; max: number; onChange: (position: number) => void }) {
+  return <Field label="Порядок"><input key={value} type="number" min={1} max={max} step={1} defaultValue={value} onBlur={(event) => {
+    const input = event.currentTarget;
+    const entered = input.value.trim() ? Number(input.value) : value;
+    const position = Number.isFinite(entered) ? Math.max(1, Math.min(max, Math.trunc(entered))) : value;
+    input.value = String(position);
+    if (position !== value) onChange(position);
+  }} onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); event.currentTarget.blur(); } }} /></Field>;
 }
 
 function PortfolioRadioGroup({ name, value, options, onChange, disabledValues = [], hintId }: { name: string; value: string; options: [string, string][]; onChange: (value: string) => void; disabledValues?: string[]; hintId?: string }) {
