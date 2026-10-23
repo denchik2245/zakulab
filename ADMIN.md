@@ -2,6 +2,8 @@
 
 Панель управления доступна по адресу `/admin`.
 
+Основная сборка теперь работает на PHP, действующий сайт размещён на HostiMan: [состояние размещения](HOSTIMAN-DEPLOYMENT.md). Настройка хостинга, пароля и резервных копий описана в [PHP-HOSTING.md](PHP-HOSTING.md). Разделы о Netlify и локальной Next.js-версии ниже относятся к сохранённой старой реализации; для неё используйте `npm run legacy:dev`.
+
 ## Настройка на Netlify
 
 Добавьте в **Project configuration → Environment variables**:

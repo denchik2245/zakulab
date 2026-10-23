@@ -12,7 +12,7 @@ import styles from "./portfolio-page.module.css";
 const filters = [{ id: "all", label: "Все" }, { id: "tilda", label: "Tilda" }, { id: "landing", label: "Одностраничные" }, { id: "multipage", label: "Многостраничные" }, { id: "commerce", label: "Интернет-магазины" }, { id: "interface", label: "Интерфейсы" }] as const;
 type Filter = (typeof filters)[number]["id"];
 
-export function PortfolioPage({ site }: { site: PortfolioContent }) {
+export function PortfolioPage({ site, updatedAt }: { site: PortfolioContent; updatedAt?: string }) {
   const [activeFilter, setActiveFilter] = useState<Filter>("all");
   const [showAll, setShowAll] = useState(false);
   const projects = useMemo(() => site.portfolioProjects.filter((project) => project.published).sort((a, b) => a.order - b.order), [site.portfolioProjects]);
@@ -25,7 +25,7 @@ export function PortfolioPage({ site }: { site: PortfolioContent }) {
   return <div className={`figma-portfolio-page site-mobile-layout ${styles.page} ${showAll ? styles.expanded : ""}`} id="top">
     <section className={styles.intro}>
       <div className={styles.heading}><Breadcrumbs current="Портфолио" /><h1>Сайты и интерфейсы,<br className={styles.desktopBreak} /> которые я спроектировал</h1></div>
-      <div className={styles.updated}><span><small>Последнее обновление</small><strong>28 августа 2026</strong></span><Image className={styles.desktopUpdateIcon} src="/assets/figma/portfolio-update.svg" width={28} height={28} alt="" /><Image className={styles.mobileUpdateIcon} src="/assets/figma/portfolio-update-mobile.svg" width={24} height={24} alt="" /></div>
+      <div className={styles.updated}><span><small>Последнее обновление</small><strong>{updatedAt ? new Intl.DateTimeFormat("ru-RU", { day: "2-digit", month: "2-digit", year: "numeric", timeZone: "UTC" }).format(new Date(updatedAt)) : "28 августа 2026"}</strong></span><Image className={styles.desktopUpdateIcon} src="/assets/figma/portfolio-update.svg" width={28} height={28} alt="" /><Image className={styles.mobileUpdateIcon} src="/assets/figma/portfolio-update-mobile.svg" width={24} height={24} alt="" /></div>
     </section>
 
     <section className={styles.work} aria-labelledby="featured-title">

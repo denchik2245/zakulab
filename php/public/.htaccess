@@ -1,0 +1,38 @@
+Options -Indexes -MultiViews
+DirectoryIndex index.php
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "DENY"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  <FilesMatch "\.(?:js|css|woff2|webp|png|jpg|jpeg|gif|svg|ico)$">
+    Header set Cache-Control "public, max-age=604800"
+  </FilesMatch>
+  <FilesMatch "\.html$">
+    Header set Cache-Control "public, max-age=0, must-revalidate"
+  </FilesMatch>
+</IfModule>
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  # Internal cached pages contain public HTML only. Private data is outside public_html.
+  RewriteCond %{THE_REQUEST} "\s/+page-cache(?:/|[?\s])" [NC]
+  RewriteRule ^ - [R=404,L]
+  # The hosting provider needs these public tokens to renew HTTPS certificates.
+  RewriteRule ^\.well-known/acme-challenge/[A-Za-z0-9_-]+$ - [L]
+  RewriteRule (^|/)\. - [R=404,L]
+  RewriteRule ^(?:app|storage|config|console\.php|router\.php)(?:/|$) - [R=404,L]
+  RewriteCond %{REQUEST_METHOD} ^(?:GET|HEAD)$
+  RewriteCond %{DOCUMENT_ROOT}/page-cache/home.html -f
+  RewriteRule ^$ page-cache/home.html [L]
+  RewriteCond %{REQUEST_METHOD} ^(?:GET|HEAD)$
+  RewriteCond %{DOCUMENT_ROOT}/page-cache/$1.html -f
+  RewriteRule ^(projects|reviews|style-check|privacy|consent)$ page-cache/$1.html [L]
+  RewriteCond %{REQUEST_METHOD} ^(?:GET|HEAD)$
+  RewriteCond %{DOCUMENT_ROOT}/page-cache/case-$1.html -f
+  RewriteRule ^cases/([a-z0-9]+(?:-[a-z0-9]+)*)$ page-cache/case-$1.html [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^ index.php [L,QSA]
+</IfModule>
+<FilesMatch "^(?:router|console|config(?:\.local|\.example)?)\.php$">
+  Require all denied
+</FilesMatch>

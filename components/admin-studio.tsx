@@ -10,6 +10,8 @@ import type { PortfolioFilter, PortfolioProject, SiteSettings } from "@/lib/site
 import type { StyleReference } from "@/lib/style-references";
 import { MAX_HOME_ADDITIONAL_PROJECTS } from "@/lib/portfolio-limits";
 import { moveItemToPosition, normalizeContentOrder } from "@/lib/content-order";
+import { apiFetch } from "@/php/frontend/api";
+import { prepareImage } from "@/php/frontend/prepare-image";
 
 type Tab = "site" | "portfolio" | "reviews" | "styles" | "popups";
 
@@ -162,28 +164,32 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
     event.preventDefault();
     setLoginError("");
     const password = String(new FormData(event.currentTarget).get("password") ?? "");
-    const response = await fetch("/api/admin/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password }) });
+    const response = await apiFetch("/api/admin/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password }) });
     if (!response.ok) {
       const result = await response.json().catch(() => ({ error: "Не удалось войти" })) as { error?: string };
       setLoginError(result.error ?? "Не удалось войти");
       return;
     }
-    const contentResponse = await fetch("/api/admin/content");
+    const contentResponse = await apiFetch("/api/admin/content");
+    if (!contentResponse.ok) { setLoginError("Вход выполнен, но данные не загрузились. Обновите страницу."); return; }
     setContent(await contentResponse.json());
     setIsAuthenticated(true);
+    window.dispatchEvent(new Event("zakulab-auth"));
   }
 
   async function logout() {
-    await fetch("/api/admin/logout", { method: "POST" });
+    const response = await apiFetch("/api/admin/logout", { method: "POST" });
+    if (!response.ok) { setNotice("Не удалось выйти. Проверьте соединение."); return; }
     setIsAuthenticated(false);
     setContent(null);
+    window.dispatchEvent(new Event("zakulab-auth"));
   }
 
   async function persist(next: AdminContent, message: string) {
     setSaving(true);
     setNotice("");
     try {
-      const response = await fetch("/api/admin/content", {
+      const response = await apiFetch("/api/admin/content", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(normalizeContentOrder(next)),
@@ -468,7 +474,7 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
           <button type="button" onClick={logout}>Выйти</button>
           {hasConflict && <button type="button" onClick={async () => {
             if (!window.confirm("Загрузить актуальную версию? Несохранённые правки будут сброшены.")) return;
-            const response = await fetch("/api/admin/content", { cache: "no-store" });
+            const response = await apiFetch("/api/admin/content", { cache: "no-store" });
             if (response.ok) { setContent(await response.json()); setHasConflict(false); setNotice("Загружена актуальная версия"); }
           }}>Загрузить актуальную версию</button>}
           <Link href="/" target="_blank">Открыть сайт <Image src="/assets/figma/admin-asset-3.svg" width={14} height={14} alt="" /></Link>
@@ -860,8 +866,8 @@ function GalleryMediaField({
     setError("");
     try {
       const body = new FormData();
-      body.set("file", file);
-      const response = await fetch("/api/admin/media", { method: "POST", body });
+      body.set("file", await prepareImage(file));
+      const response = await apiFetch("/api/admin/media", { method: "POST", body });
       const result = await response.json() as { url?: string; error?: string };
       if (!response.ok || !result.url) throw new Error(result.error || "Не удалось загрузить изображение");
       onChange(result.url);

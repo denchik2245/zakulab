@@ -96,16 +96,18 @@
 .copy { text-align: center; }
 .copy h2 {
   margin: 0;
-  width: 720px;
+  width: min(720px, 100%);
   font-size: 48px;
   font-weight: 500;
   line-height: 1.2;
   letter-spacing: -.03em;
 }
 .copy h2 span { display: block; }
-.copy p { width: 524px; margin: 21px auto 0; font-size: 20px; line-height: 1.4; }
+.copy p { width: min(524px, 100%); margin: 21px auto 0; font-size: 20px; line-height: 1.4; }
 
-.socials {
+/* Keep popup dimensions independent of the shared header social-link styles. */
+.dialog .socials {
+  flex-shrink: 0;
   width: 100%;
   height: 180px;
   margin-top: auto;
@@ -114,7 +116,7 @@
   border-radius: 0;
 }
 
-.socials > a {
+.dialog .socials > a {
   padding: 24px;
   display: grid;
   grid-template-columns: 1fr 20px;
@@ -125,7 +127,7 @@
   transition: background-color .4s ease;
 }
 
-.socials > a > svg {
+.dialog .socials > a > svg {
   width: 48px;
   height: 48px;
   grid-column: 1 / -1;
@@ -133,10 +135,10 @@
   align-self: start;
 }
 
-.socials > a > svg > path:first-child { opacity: 0; }
-.socials > a > svg > path:nth-child(2) { opacity: 1; }
+.dialog .socials > a > svg > path:first-child { opacity: 0; }
+.dialog .socials > a > svg > path:nth-child(2) { opacity: 1; }
 
-.socials > a::before {
+.dialog .socials > a::before {
   grid-column: 1;
   grid-row: 2;
   content: attr(aria-label);
@@ -145,7 +147,7 @@
   line-height: 1.2;
 }
 
-.socials > a::after {
+.dialog .socials > a::after {
   grid-column: 2;
   grid-row: 2;
   width: 20px;
@@ -157,8 +159,8 @@
   transition: background-color .4s ease;
 }
 
-.socials > a:focus-visible { outline: 2px solid #304e41; outline-offset: -2px; background: #eaeaea; }
-.socials > a:focus-visible::after { background-color: #050505; }
+.dialog .socials > a:focus-visible { outline: 2px solid #304e41; outline-offset: -2px; background: #eaeaea; }
+.dialog .socials > a:focus-visible::after { background-color: #050505; }
 
 .isClosing { pointer-events: none; animation: overlayHide .3s cubic-bezier(.4, 0, .8, .2) both; }
 .isClosing .dialog { animation: dialogHide .4s cubic-bezier(.4, 0, .8, .2) both; }
@@ -178,8 +180,8 @@
   .trigger:hover { color: #304e41; }
   .trigger:hover .triggerArrow { opacity: 1; transform: translate(0, 0); }
   .closeButton:hover { opacity: .55; }
-  .socials > a:hover { background: #eaeaea; }
-  .socials > a:hover::after { background-color: #050505; }
+  .dialog .socials > a:hover { background: #eaeaea; }
+  .dialog .socials > a:hover::after { background-color: #050505; }
 }
 
 @media (max-width: 1200px) {
@@ -199,20 +201,20 @@
   .copy h2, .copy p { width: 100%; }
   .copy p { margin-top: 16px; font-size: 16px; line-height: 1.5; }
   .desktopBreak { display: none; }
-  .socials { height: auto; flex: none; margin-top: 24px; display: grid; grid-template-columns: minmax(0, 1fr); }
-  .socials > div { display: none; }
-  .socials > a { height: auto; min-width: 0; min-height: 76px; padding: 18px 16px; grid-template-columns: 36px minmax(0, 1fr) 20px; grid-template-rows: auto; column-gap: 12px; align-items: center; }
-  .socials > a > svg { width: 36px; height: 36px; grid-column: 1; grid-row: 1; align-self: center; }
-  .socials > a::before { grid-column: 2; grid-row: 1; font-size: 22px; }
-  .socials > a::after { grid-column: 3; grid-row: 1; align-self: center; }
-  .socials > a ~ a { border-top: 1px solid #babcaf; }
+  .dialog .socials { height: auto; flex: none; margin-top: 24px; display: grid; grid-template-columns: minmax(0, 1fr); }
+  .dialog .socials > div { display: none; }
+  .dialog .socials > a { height: auto; min-width: 0; min-height: 76px; padding: 18px 16px; grid-template-columns: 36px minmax(0, 1fr) 20px; grid-template-rows: auto; column-gap: 12px; align-items: center; }
+  .dialog .socials > a > svg { width: 36px; height: 36px; grid-column: 1; grid-row: 1; align-self: center; }
+  .dialog .socials > a::before { grid-column: 2; grid-row: 1; font-size: 22px; }
+  .dialog .socials > a::after { grid-column: 3; grid-row: 1; align-self: center; }
+  .dialog .socials > a ~ a { border-top: 1px solid #babcaf; }
 }
 
 @media (max-width: 360px) {
   .dialog { padding-inline: 20px; padding-bottom: 20px; }
   .copy p { font-size: 15px; }
-  .socials > a { min-height: 68px; padding: 14px 12px; column-gap: 10px; }
-  .socials > a::before { font-size: 20px; }
+  .dialog .socials > a { min-height: 68px; padding: 14px 12px; column-gap: 10px; }
+  .dialog .socials > a::before { font-size: 20px; }
 }
 .resultTransfer { display: grid; gap: 12px; width: 100%; }
 .resultTransfer textarea { width: 100%; min-height: 140px; padding: 12px; border: 1px solid #babcaf; border-radius: 5px; color: #050505; background: #fff; resize: vertical; font-size: 16px; }
@@ -241,13 +243,13 @@
   .closeButton { top:12px; right:12px; width:44px; height:44px; padding:12px; }
   .copy h2 { width:100%; font-size:36px; }
   .copy p { width:100%; max-width:524px; margin-top:20px; font-size:18px; }
-  .socials { height:140px; flex-shrink:0; margin-top:32px; display:flex; }
-  .socials > div { display:block; }
-  .socials > a { min-width:0; min-height:0; padding:20px; grid-template-columns:minmax(0,1fr) 20px; grid-template-rows:1fr auto; }
-  .socials > a + a { border-top:0; }
-  .socials > a > svg { width:40px; height:40px; grid-column:1 / -1; grid-row:1; align-self:start; }
-  .socials > a::before { grid-column:1; grid-row:2; font-size:22px; }
-  .socials > a::after { grid-column:2; grid-row:2; }
+  .dialog .socials { height:140px; flex-shrink:0; margin-top:32px; display:flex; }
+  .dialog .socials > div { display:block; }
+  .dialog .socials > a { min-width:0; min-height:0; padding:20px; grid-template-columns:minmax(0,1fr) 20px; grid-template-rows:1fr auto; }
+  .dialog .socials > a + a { border-top:0; }
+  .dialog .socials > a > svg { width:40px; height:40px; grid-column:1 / -1; grid-row:1; align-self:start; }
+  .dialog .socials > a::before { grid-column:1; grid-row:2; font-size:22px; }
+  .dialog .socials > a::after { grid-column:2; grid-row:2; }
   :global(body:has(.style-check-page)) .dialog:has(.resultTransfer) { width:min(720px,calc(100vw - 64px)); padding:48px 40px 40px; max-height:calc(100svh - 64px); }
   :global(body:has(.style-check-page)) .dialog:has(.resultTransfer) .copy h2 { font-size:36px; }
 }

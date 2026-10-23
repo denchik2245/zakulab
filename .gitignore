@@ -6,3 +6,7 @@ node_modules
 *.log
 .env*
 !.env.example
+/build/
+/php/generated/
+/php/config.local.php
+/php/storage/
