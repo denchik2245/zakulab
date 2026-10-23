@@ -1,0 +1,172 @@
+{
+  "casePlaceholders": [
+    {
+      "label": "Первый экран лендинга Belstudy",
+      "text": "Изображение будет добавлено"
+    },
+    {
+      "label": "Прототип лендинга",
+      "text": "Изображение будет добавлено"
+    },
+    {
+      "label": "Дизайн главной страницы",
+      "text": "Изображение будет добавлено"
+    },
+    {
+      "label": "Мобильная версия лендинга",
+      "text": "Изображение будет добавлено"
+    },
+    {
+      "label": "Планшетная версия лендинга",
+      "text": "Изображение будет добавлено"
+    },
+    {
+      "label": "Буклеты для сервиса поступления в Беларусь",
+      "text": "Изображение будет добавлено"
+    }
+  ],
+  "projectsBefore": [
+    "/cases/normdev",
+    "/cases/vladkovsky",
+    "/cases/kuzin-partners",
+    "/cases/talantum",
+    "/cases/traktor-event",
+    "/cases/domstroy44",
+    "/cases/liniya-prava",
+    "/cases/flabellum",
+    "/cases/redcross",
+    "/cases/dunaeff-store",
+    "/cases/anodfero",
+    "/cases/vn-metallgrupp"
+  ],
+  "projectsAfter": [
+    "/cases/normdev",
+    "/cases/vladkovsky",
+    "/cases/kuzin-partners",
+    "/cases/talantum",
+    "/cases/traktor-event",
+    "/cases/domstroy44",
+    "/cases/liniya-prava",
+    "/cases/flabellum",
+    "/cases/redcross",
+    "/cases/dunaeff-store",
+    "/cases/anodfero",
+    "/cases/vn-metallgrupp"
+  ],
+  "legalOverflow": {
+    "viewport": 1440,
+    "document": 1510
+  },
+  "externalPlaceholders": [
+    {
+      "url": "https://example.com/demo-profile-1",
+      "status": 404,
+      "final": "https://example.com/demo-profile-1"
+    },
+    {
+      "url": "https://example.com/demo-project-4",
+      "status": 404,
+      "final": "https://example.com/demo-project-4"
+    }
+  ],
+  "googlebot": [
+    {
+      "route": "/",
+      "status": 200,
+      "canonicalTags": [],
+      "robotsTags": [
+        "<meta name=\"robots\" content=\"index, follow\"/>"
+      ],
+      "headers": {
+        "age": "0",
+        "cache-control": "private,no-cache,no-store,max-age=0,must-revalidate",
+        "cache-status": "\"Netlify Durable\"; fwd=bypass, \"Netlify Edge\"; fwd=miss; fwd-status=200",
+        "content-encoding": "br",
+        "content-type": "text/html; charset=utf-8",
+        "date": "Wed, 21 Oct 2026 07:27:44 GMT",
+        "link": "</_next/static/media/59b15b4bcd7b1eb5-s.p.2vemzm0itqzfy.woff2>; rel=preload; as=\"font\"; crossorigin=\"\"; type=\"font/woff2\", </_next/static/media/99e609270109b47d-s.p.40sczeszzbjw1.woff2>; rel=preload; as=\"font\"; crossorigin=\"\"; type=\"font/woff2\", </_next/static/media/a343f882a40d2cc9-s.p.1sj6eobyi31rd.woff2>; rel=preload; as=\"font\"; crossorigin=\"\"; type=\"font/woff2\", </_next/static/media/d3fe2f289711ac3f-s.p.1l2zhvq5eocqf.woff2>; rel=preload; as=\"font\"; crossorigin=\"\"; type=\"font/woff2\", </_next/static/chunks/0mirzn9xwhbr3.css>; rel=preload; as=\"style\", </_next/static/chunks/0llie0v1l6foc.css>; rel=preload; as=\"style\", </_next/static/chunks/3-aqg66gtdv81.css>; rel=preload; as=\"style\"",
+        "netlify-vary": "query=__nextDataReq|_rsc, header=x-nextjs-data|x-next-debug-logging|next-router-prefetch|next-router-segment-prefetch|next-router-state-tree|next-url|rsc|accept-encoding, cookie=__prerender_bypass|__next_preview_data",
+        "server": "Netlify",
+        "strict-transport-security": "max-age=31536000",
+        "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding",
+        "x-content-type-options": "nosniff",
+        "x-nf-request-id": "01M5ENQQHW3PCMABV5AWQRWJRZ",
+        "transfer-encoding": "chunked"
+      }
+    },
+    {
+      "route": "/reviews",
+      "status": 200,
+      "canonicalTags": [],
+      "robotsTags": [
+        "<meta name=\"robots\" content=\"index, follow\"/>"
+      ],
+      "headers": {
+        "age": "0",
+        "cache-control": "private,no-cache,no-store,max-age=0,must-revalidate",
+        "cache-status": "\"Netlify Durable\"; fwd=bypass, \"Netlify Edge\"; fwd=miss; fwd-status=200",
+        "content-encoding": "br",
+        "content-type": "text/html; charset=utf-8",
+        "date": "Wed, 21 Oct 2026 07:27:44 GMT",
+        "link": "</_next/static/media/59b15b4bcd7b1eb5-s.p.2vemzm0itqzfy.woff2>; rel=preload; as=\"font\"; crossorigin=\"\"; type=\"font/woff2\", </_next/static/media/99e609270109b47d-s.p.40sczeszzbjw1.woff2>; rel=preload; as=\"font\"; crossorigin=\"\"; type=\"font/woff2\", </_next/static/media/a343f882a40d2cc9-s.p.1sj6eobyi31rd.woff2>; rel=preload; as=\"font\"; crossorigin=\"\"; type=\"font/woff2\", </_next/static/media/d3fe2f289711ac3f-s.p.1l2zhvq5eocqf.woff2>; rel=preload; as=\"font\"; crossorigin=\"\"; type=\"font/woff2\", </_next/static/chunks/0mirzn9xwhbr3.css>; rel=preload; as=\"style\", </_next/static/chunks/0llie0v1l6foc.css>; rel=preload; as=\"style\", </_next/static/chunks/3-aqg66gtdv81.css>; rel=preload; as=\"style\"",
+        "netlify-vary": "query=__nextDataReq|_rsc, header=x-nextjs-data|x-next-debug-logging|next-router-prefetch|next-router-segment-prefetch|next-router-state-tree|next-url|rsc|accept-encoding, cookie=__prerender_bypass|__next_preview_data",
+        "server": "Netlify",
+        "strict-transport-security": "max-age=31536000",
+        "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding",
+        "x-content-type-options": "nosniff",
+        "x-nf-request-id": "01M5ENQR2ZVC39NZT29F84ZN08",
+        "transfer-encoding": "chunked"
+      }
+    },
+    {
+      "route": "/cases/belstudy",
+      "status": 200,
+      "canonicalTags": [
+        "<link rel=\"canonical\" href=\"https://zakulab.ru/cases/belstudy\"/>"
+      ],
+      "robotsTags": [
+        "<meta name=\"robots\" content=\"index, follow\"/>"
+      ],
+      "headers": {
+        "age": "0",
+        "cache-control": "private,no-cache,no-store,max-age=0,must-revalidate",
+        "cache-status": "\"Netlify Durable\"; fwd=bypass, \"Netlify Edge\"; fwd=miss; fwd-status=200",
+        "content-encoding": "br",
+        "content-type": "text/html; charset=utf-8",
+        "date": "Wed, 21 Oct 2026 07:27:45 GMT",
+        "link": "</_next/static/media/59b15b4bcd7b1eb5-s.p.2vemzm0itqzfy.woff2>; rel=preload; as=\"font\"; crossorigin=\"\"; type=\"font/woff2\", </_next/static/media/99e609270109b47d-s.p.40sczeszzbjw1.woff2>; rel=preload; as=\"font\"; crossorigin=\"\"; type=\"font/woff2\", </_next/static/media/a343f882a40d2cc9-s.p.1sj6eobyi31rd.woff2>; rel=preload; as=\"font\"; crossorigin=\"\"; type=\"font/woff2\", </_next/static/media/d3fe2f289711ac3f-s.p.1l2zhvq5eocqf.woff2>; rel=preload; as=\"font\"; crossorigin=\"\"; type=\"font/woff2\", </_next/static/chunks/0mirzn9xwhbr3.css>; rel=preload; as=\"style\", </_next/static/chunks/0llie0v1l6foc.css>; rel=preload; as=\"style\", </_next/static/chunks/3-aqg66gtdv81.css>; rel=preload; as=\"style\"",
+        "netlify-vary": "query=__nextDataReq|_rsc, header=x-nextjs-data|x-next-debug-logging|next-router-prefetch|next-router-segment-prefetch|next-router-state-tree|next-url|rsc|accept-encoding, cookie=__prerender_bypass|__next_preview_data",
+        "server": "Netlify",
+        "strict-transport-security": "max-age=31536000",
+        "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding",
+        "x-content-type-options": "nosniff",
+        "x-nf-request-id": "01M5ENQRFAK9WHZ43YZQ45FJXS",
+        "transfer-encoding": "chunked"
+      }
+    },
+    {
+      "route": "/success",
+      "status": 200,
+      "canonicalTags": [],
+      "robotsTags": [
+        "<meta name=\"robots\" content=\"index, follow\"/>"
+      ],
+      "headers": {
+        "age": "0",
+        "cache-control": "private,no-cache,no-store,max-age=0,must-revalidate",
+        "cache-status": "\"Netlify Durable\"; fwd=bypass, \"Netlify Edge\"; fwd=miss; fwd-status=200",
+        "content-encoding": "br",
+        "content-type": "text/html; charset=utf-8",
+        "date": "Wed, 21 Oct 2026 07:27:45 GMT",
+        "link": "</_next/static/media/59b15b4bcd7b1eb5-s.p.2vemzm0itqzfy.woff2>; rel=preload; as=\"font\"; crossorigin=\"\"; type=\"font/woff2\", </_next/static/media/99e609270109b47d-s.p.40sczeszzbjw1.woff2>; rel=preload; as=\"font\"; crossorigin=\"\"; type=\"font/woff2\", </_next/static/media/a343f882a40d2cc9-s.p.1sj6eobyi31rd.woff2>; rel=preload; as=\"font\"; crossorigin=\"\"; type=\"font/woff2\", </_next/static/media/d3fe2f289711ac3f-s.p.1l2zhvq5eocqf.woff2>; rel=preload; as=\"font\"; crossorigin=\"\"; type=\"font/woff2\", </_next/static/chunks/0mirzn9xwhbr3.css>; rel=preload; as=\"style\", </_next/static/chunks/0llie0v1l6foc.css>; rel=preload; as=\"style\", </_next/static/chunks/3-aqg66gtdv81.css>; rel=preload; as=\"style\"",
+        "netlify-vary": "query=__nextDataReq|_rsc, header=x-nextjs-data|x-next-debug-logging|next-router-prefetch|next-router-segment-prefetch|next-router-state-tree|next-url|rsc|accept-encoding, cookie=__prerender_bypass|__next_preview_data",
+        "server": "Netlify",
+        "strict-transport-security": "max-age=31536000",
+        "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding",
+        "x-content-type-options": "nosniff",
+        "x-nf-request-id": "01M5ENQRTNSDMGZFQJ2E6QW41E",
+        "transfer-encoding": "chunked"
+      }
+    }
+  ]
+}

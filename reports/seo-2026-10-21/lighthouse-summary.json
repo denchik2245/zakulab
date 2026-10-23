@@ -1,0 +1,112 @@
+[
+  {
+    "file": "lighthouse-case-belstudy-mobile.report.json",
+    "url": "https://zakulab.ru/cases/belstudy",
+    "fetchTime": "2026-10-21T07:25:00.073Z",
+    "version": "13.5.0",
+    "scores": {
+      "performance": 98,
+      "seo": 100,
+      "agentic-browsing": 100
+    },
+    "lcp_ms": 2325.022,
+    "cls": 0,
+    "tbt_ms": 19.5,
+    "transfer_bytes": 1876609,
+    "warnings": []
+  },
+  {
+    "file": "lighthouse-home-mobile.report.json",
+    "url": "https://zakulab.ru/",
+    "fetchTime": "2026-10-21T07:22:25.248Z",
+    "version": "13.5.0",
+    "scores": {
+      "performance": 95,
+      "seo": 100,
+      "agentic-browsing": 100
+    },
+    "lcp_ms": 2577.9745000000003,
+    "cls": 0,
+    "tbt_ms": 24,
+    "transfer_bytes": 2185532,
+    "warnings": []
+  },
+  {
+    "file": "lighthouse-projects-mobile-repeat.json",
+    "url": "https://zakulab.ru/projects",
+    "fetchTime": "2026-10-21T07:26:43.570Z",
+    "version": "13.5.0",
+    "scores": {
+      "performance": 75,
+      "seo": 100
+    },
+    "lcp_ms": 10823.353,
+    "cls": 0,
+    "tbt_ms": 17.5,
+    "transfer_bytes": 2065790,
+    "warnings": []
+  },
+  {
+    "file": "lighthouse-projects-mobile.report.json",
+    "url": "https://zakulab.ru/projects",
+    "fetchTime": "2026-10-21T07:24:08.827Z",
+    "version": "13.5.0",
+    "scores": {
+      "performance": 75,
+      "seo": 100,
+      "agentic-browsing": 100
+    },
+    "lcp_ms": 10956.243,
+    "cls": 0,
+    "tbt_ms": 22.5,
+    "transfer_bytes": 2065648,
+    "warnings": []
+  },
+  {
+    "file": "lighthouse-reviews-mobile.report.json",
+    "url": "https://zakulab.ru/reviews",
+    "fetchTime": "2026-10-21T07:24:26.197Z",
+    "version": "13.5.0",
+    "scores": {
+      "performance": 96,
+      "seo": 100,
+      "agentic-browsing": 100
+    },
+    "lcp_ms": 2604.937,
+    "cls": 0,
+    "tbt_ms": 27.5,
+    "transfer_bytes": 2151413,
+    "warnings": []
+  },
+  {
+    "file": "lighthouse-style-check-mobile-repeat.json",
+    "url": "https://zakulab.ru/style-check",
+    "fetchTime": "2026-10-21T07:26:59.232Z",
+    "version": "13.5.0",
+    "scores": {
+      "performance": 98,
+      "seo": 100
+    },
+    "lcp_ms": 2269.9700000000003,
+    "cls": 0,
+    "tbt_ms": 28,
+    "transfer_bytes": 4666757,
+    "warnings": []
+  },
+  {
+    "file": "lighthouse-style-check-mobile.report.json",
+    "url": "https://zakulab.ru/style-check",
+    "fetchTime": "2026-10-21T07:24:43.055Z",
+    "version": "13.5.0",
+    "scores": {
+      "performance": 75,
+      "seo": 100,
+      "agentic-browsing": 100
+    },
+    "lcp_ms": 9124.708,
+    "cls": 0,
+    "tbt_ms": 19,
+    "transfer_bytes": 4666861,
+    "warnings": []
+  }
+]
