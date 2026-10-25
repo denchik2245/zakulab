@@ -1,7 +1,5 @@
-"use client";
 
-import Image from "next/image";
-import Link from "next/link";
+import Image from "@/components/image";
 import { useState, useEffect, useRef } from "react";
 import { navigation } from "@/lib/navigation";
 import styles from "./site-header.module.css";
@@ -45,16 +43,16 @@ export function Header(links: { telegramUrl: string; maxUrl: string; vkUrl: stri
   return (
     <header ref={headerRef} className={`site-header ${styles.siteHeader} ${isHidden ? styles.hidden : ""}`}>
       <div className={styles.headerInner}>
-        <Link href="/" className={styles.logo} aria-label="Zakulab">
+        <a href="/" className={styles.logo} aria-label="Zakulab">
           <Image src="/assets/figma/logo.svg" width={48} height={48} alt="" priority />
-        </Link>
+        </a>
 
         <nav className={styles.primaryNav} aria-label="Основное меню">
-          {navigation.map(([label, href]) => <Link href={href} key={href}>{label}</Link>)}
+          {navigation.map(([label, href]) => <a href={href} key={href}>{label}</a>)}
         </nav>
 
         <nav className={styles.secondaryNav} aria-label="Дополнительное">
-          <Link href="/style-check">Выбор стиля</Link>
+          <a href="/style-check">Выбор стиля</a>
         </nav>
 
         <SocialLinks className={styles.socials} {...links} />

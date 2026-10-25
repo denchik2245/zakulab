@@ -1,13 +1,7 @@
-"use client";
 
 import { ChangeEvent, FormEvent, useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import type { AdminContent } from "@/lib/content-store";
-import type { CaseBlock, CaseStudy } from "@/lib/cases";
-import type { VerifiedReview } from "@/lib/reviews";
-import type { PortfolioFilter, PortfolioProject, SiteSettings } from "@/lib/site-settings";
-import type { StyleReference } from "@/lib/style-references";
+import Image from "@/components/image";
+import type { AdminContent, CaseBlock, CaseStudy, PortfolioFilter, PortfolioProject, SiteSettings, StyleReference, VerifiedReview } from "@/lib/content-schema";
 import { MAX_HOME_ADDITIONAL_PROJECTS } from "@/lib/portfolio-limits";
 import { moveItemToPosition, normalizeContentOrder } from "@/lib/content-order";
 import { apiFetch } from "@/php/frontend/api";
@@ -475,7 +469,7 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
             const response = await apiFetch("/api/admin/content", { cache: "no-store" });
             if (response.ok) { setContent(await response.json()); setHasConflict(false); setNotice("Загружена актуальная версия"); }
           }}>Загрузить актуальную версию</button>}
-          <Link href="/" target="_blank">Открыть сайт <Image src="/assets/figma/admin-asset-3.svg" width={14} height={14} alt="" /></Link>
+          <a href="/" target="_blank">Открыть сайт <Image src="/assets/figma/admin-asset-3.svg" width={14} height={14} alt="" /></a>
           <button className="admin-sidebar-save" disabled={saving} onClick={() => persist(content, "Изменения сохранены")}>{saving ? "Сохраняю…" : "Сохранить изменения"}</button>
           {notice && <span role="status">{notice}</span>}
         </div>

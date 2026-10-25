@@ -1,8 +1,5 @@
-"use client";
 
-import Image from "next/image";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import Image from "@/components/image";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { navigation } from "@/lib/navigation";
@@ -28,7 +25,7 @@ export function MobileMenu({ className, telegramUrl, maxUrl, vkUrl }: MobileMenu
   const closeRef = useRef<HTMLButtonElement>(null);
   const closingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const dialogId = useId();
-  const pathname = usePathname();
+  const pathname = window.location.pathname;
 
   const finishClose = useCallback(() => {
     if (closingTimer.current) clearTimeout(closingTimer.current);
@@ -123,13 +120,13 @@ export function MobileMenu({ className, telegramUrl, maxUrl, vkUrl }: MobileMenu
       >
         <div className={styles.panel}>
           <div className={styles.top}>
-            <Link href="/" className={styles.homeLink} aria-label="На главную" onClick={finishClose}><Image src="/assets/figma/logo.svg" width={40} height={40} alt="" /></Link>
+            <a href="/" className={styles.homeLink} aria-label="На главную" onClick={finishClose}><Image src="/assets/figma/logo.svg" width={40} height={40} alt="" /></a>
             <button ref={closeRef} className={styles.closeButton} type="button" aria-label="Закрыть меню" onClick={closeMenu}><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg></button>
           </div>
 
           <nav className={styles.nav} aria-label="Мобильное меню">
             {[...navigation, ["Выбор стиля", "/style-check"]].map(([label, href]) => (
-              <Link className={styles.menuLink} href={href} key={href} aria-current={pathname === href ? "page" : undefined} onClick={finishClose}><span>{label}</span><MenuArrow /></Link>
+              <a className={styles.menuLink} href={href} key={href} aria-current={pathname === href ? "page" : undefined} onClick={finishClose}><span>{label}</span><MenuArrow /></a>
             ))}
           </nav>
 

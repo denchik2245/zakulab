@@ -25,30 +25,26 @@ async function walk(directory) {
     else if (name.endsWith(".module.css")) files.push(name);
   }
 }
-await walk("components"); await walk("app");
+await walk("components"); await walk("php/styles");
 const classMaps = {};
-const globalCss = await fs.readFile("app/globals.css", "utf8");
+const globalCss = await fs.readFile("styles/globals.css", "utf8");
 const fontCss = await fs.readFile("public/fonts/fonts.css", "utf8");
 const moduleCss = new Map();
-for (const file of files.sort()) {
+// Module order is part of the cascade: elements can carry classes from two modules.
+// Keep the order the site was designed with (case page first, then by file name).
+const cascadeKey = file => (path.basename(file) === "case-page.module.css" ? "0" : "1") + path.basename(file);
+files.sort((a, b) => cascadeKey(a).localeCompare(cascadeKey(b)));
+for (const file of files) {
   let mapping;
   const result = await postcss([modules({ generateScopedName: name => `z_${hash(file)}_${name}`, getJSON: (_file, json) => { mapping = json; } })]).process(await fs.readFile(file, "utf8"), { from: path.resolve(file) });
   moduleCss.set(file, result.css);
   classMaps[path.resolve(file)] = mapping;
 }
-const aliases = {
-  "next/image": path.join(root, "php/frontend/next-image.tsx"),
-  "next/link": path.join(root, "php/frontend/next-link.tsx"),
-  "next/navigation": path.join(root, "php/frontend/next-navigation.ts"),
-};
 const plugin = { name: "php-browser", setup(builder) {
-  builder.onResolve({ filter: /^next\/(image|link|navigation)$/ }, args => ({ path: aliases[args.path] }));
-  builder.onResolve({ filter: /^server-only$/ }, () => ({ path: "empty", namespace: "empty" }));
-  builder.onLoad({ filter: /.*/, namespace: "empty" }, () => ({ contents: "export {}" }));
   builder.onLoad({ filter: /\.module\.css$/ }, args => ({ contents: `export default ${JSON.stringify(classMaps[args.path])}`, loader: "js" }));
 } };
 const common = { bundle: true, plugins: [plugin], tsconfig: "tsconfig.json", jsx: "automatic", logLevel: "warning" };
-// Export schemas and normalized data using the existing migration logic; no server is required.
+// Export the JSON Schema used by PHP validation and check the frozen seed against it.
 const temporary = await fs.mkdtemp(path.join(os.tmpdir(), "zakulab-php-build-"));
 await build({ ...common, entryPoints: ["php/frontend/export.ts"], outfile: path.join(temporary, "export.cjs"), platform: "node", format: "cjs", packages: "external" });
 // External packages resolve from this project's node_modules, even when the temporary file is elsewhere.
@@ -58,13 +54,8 @@ const exported = new Module(path.join(root, ".php-export.cjs"));
 exported.filename = path.join(root, ".php-export.cjs");
 exported.paths = Module._nodeModulePaths(root);
 exported._compile(await fs.readFile(path.join(temporary, "export.cjs"), "utf8"), exported.filename);
-const netlifyEnv = Object.fromEntries(["NETLIFY", "NETLIFY_LOCAL", "SITE_ID"].map(key => [key, process.env[key]]));
-for (const key of Object.keys(netlifyEnv)) delete process.env[key];
-process.chdir(temporary);
-const seed = await exported.exports.readContent(false);
-process.chdir(root);
-const local = await exported.exports.readContent(true);
-for (const [key, value] of Object.entries(netlifyEnv)) if (value !== undefined) process.env[key] = value;
+const seed = JSON.parse(await fs.readFile("php/seed.json", "utf8"));
+exported.exports.checkSeed(seed);
 await fs.writeFile("php/generated/seed.json", JSON.stringify(seed));
 await fs.writeFile("php/generated/schema.json", JSON.stringify(exported.exports.schema));
 const styleBundle = await build({ ...common, entryPoints: ["php/frontend/styles.ts"], platform: "node", format: "cjs", write: false, metafile: true });
@@ -127,10 +118,8 @@ await fs.writeFile(path.join(output, "app/generated/images.json"), JSON.stringif
 // Browser image components read this immutable mapping; uploaded images use their PHP media route.
 const imagesName = `images-${hash(JSON.stringify(imageMap))}.js`;
 await fs.writeFile(path.join(output, "public_html/bundles", imagesName), 'window.zakulabImages=' + JSON.stringify(imageMap) + ';');
-// This import is private and is only used to seed a new installation. Never publish storage/ as a document root.
-await fs.writeFile(path.join(output, "storage/initial-content.json"), JSON.stringify(local));
-try { await fs.cp(".data/media", path.join(output, "storage/media"), { recursive: true }); } catch (error) { if (error.code !== "ENOENT") throw error; }
-// Prefer saved PHP development data when present. Configuration, rate limits and backups stay local.
+// Saved PHP development data seeds the package when present; never publish storage/ as a document root.
+// Configuration, rate limits and backups stay local. Without it PHP falls back to php/seed.json.
 for (const name of ["initial-content.json", "db/content.json", "db/queue.json", "db/requests.json", "media"]) {
   try {
     await fs.mkdir(path.dirname(path.join(output, "storage", name)), { recursive: true });
@@ -151,8 +140,8 @@ function requiredModules(metafile, entry) {
 }
 const publicModules = new Set([...requiredModules(browser.metafile, 'php/frontend/public.tsx'), ...requiredModules(styleBundle.metafile, 'php/frontend/styles.ts')]);
 const adminModules = requiredModules(browser.metafile, 'php/frontend/admin.tsx');
-// Global styles are a source shared with Next. Strip admin-only selectors from
-// the public artifact without modifying that source or changing admin cascade order.
+// Global styles are shared by the site and the admin panel. Strip admin-only selectors
+// from the public artifact without modifying that source or changing admin cascade order.
 const publicGlobals = postcss.parse(globalCss);
 publicGlobals.walkRules(rule => {
   const selectors = rule.selectors.filter(selector => !/[.#]admin[\w-]*/.test(selector));
@@ -171,7 +160,7 @@ async function writeStyles(name, sources) {
   return assetUrl('bundles', file);
 }
 const publicCss = await writeStyles('site', [publicGlobals.toString(), fontCss, ...[...moduleCss].filter(([file]) => publicModules.has(file)).map(([, source]) => source), extras]);
-const adminCss = await writeStyles('admin', [globalCss, fontCss, ...[...moduleCss].filter(([file]) => adminModules.has(file)).map(([, source]) => source), await fs.readFile('app/admin/admin-responsive.css', 'utf8'), extras]);
+const adminCss = await writeStyles('admin', [globalCss, fontCss, ...[...moduleCss].filter(([file]) => adminModules.has(file)).map(([, source]) => source), await fs.readFile('styles/admin-responsive.css', 'utf8'), extras]);
 const manifest = { css: publicCss, adminCss, images: assetUrl('bundles', imagesName), texture: assetUrl('optimized', textureName) };
 for (const [file, meta] of Object.entries(browser.metafile.outputs)) if (meta.entryPoint) manifest[meta.entryPoint.includes("admin.tsx") ? "admin" : "site"] = assetUrl('bundles', path.basename(file));
 await fs.writeFile(path.join(output, "app/generated/assets.json"), JSON.stringify(manifest));

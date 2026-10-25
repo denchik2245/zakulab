@@ -1,4 +1,4 @@
-import type { AdminContent } from "@/lib/content-store";
+import type { AdminContent } from "@/lib/content-schema";
 
 type OrderedItem = { id: string; order: number };
 

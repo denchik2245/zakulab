@@ -1,4 +1,6 @@
-import type { PublicProject } from "@/lib/public-content";
+import type { PortfolioProject } from "@/lib/content-schema";
+
+type PublicProject = Omit<PortfolioProject, "caseStudy">;
 
 // Keep the server-rendered introduction, texture and project images in place.
 // Filtering only needs to move existing rows; replacing the whole page made

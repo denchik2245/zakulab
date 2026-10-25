@@ -1,13 +1,13 @@
-"use client";
 
-import Image from "next/image";
+import Image from "@/components/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { ContactPopupButton } from "@/components/contact-popup-button";
 import { StylePreview } from "@/components/style-preview";
-import { styleReasons, type StyleChoiceSettings, type StyleReference } from "@/lib/style-references";
-import type { PopupSettings } from "@/lib/site-settings";
+import type { PopupSettings, StyleChoiceSettings, StyleReference } from "@/lib/content-schema";
 import styles from "@/components/style-check.module.css";
+
+const styleReasons = ["Цвет", "Шрифты", "Композиция", "Фото / графика", "Плотность", "Эффекты / анимация"] as const;
 
 type Vote = "like" | "dislike" | "skip";
 type Response = { vote: Vote; reasons: string[] };

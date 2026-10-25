@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { hasCasePlaceholders } from "@/lib/cases";
 import { normalizeContentUrl } from "@/lib/external-url";
 import { MAX_HOME_ADDITIONAL_PROJECTS } from "@/lib/portfolio-limits";
 
@@ -21,14 +20,20 @@ const block = z.discriminatedUnion("type", [
   z.object({ id, type: z.literal("text"), title: text, body: text, listStyle: z.enum(["none", "bullet", "numbered", "labeled"]), items: list(z.object({ id, label: text, text }), 100), spacing }),
   z.object({ id, type: z.literal("callout"), text, spacing }),
 ]);
-const caseStudy = z.object({
+const caseStudyFields = z.object({
   slug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).max(120), index: text, title: text, eyebrow: text,
   summary: text, role: text, year: text, url: link, accent: z.enum(["green", "orange", "coral"]),
   category: z.enum(["corporate", "commerce"]), catalogTask: text, status: z.enum(["published", "draft"]),
   featured: z.boolean(), createdAt: z.iso.datetime(), updatedAt: z.iso.datetime(), whatDone: text.optional(),
   blocks: list(block, 100).optional(), verified: z.array(text).max(100),
   draft: z.object({ challenge: text, approach: text, decisions: z.array(z.object({ title: text, text })).max(100), result: text }),
-}).refine((item) => item.status !== "published" || !hasCasePlaceholders(item), "Перед публикацией замените все [УТОЧНИТЬ]");
+});
+// Unfinished source copy is marked with [УТОЧНИТЬ] and must not become a public case page.
+export function hasCasePlaceholders(item: z.output<typeof caseStudyFields>) {
+  return JSON.stringify([item.title, item.eyebrow, item.summary, item.whatDone, item.role, item.catalogTask,
+    item.verified, item.blocks ?? item.draft]).includes("[УТОЧНИТЬ]");
+}
+const caseStudy = caseStudyFields.refine((item) => item.status !== "published" || !hasCasePlaceholders(item), "Перед публикацией замените все [УТОЧНИТЬ]");
 export const reviewSchema = z.object({
   id, status: z.enum(["published", "pending", "rejected", "demo"]), submittedAt: z.iso.datetime(),
   publishedAt: z.string().refine((value) => value === "" || !Number.isNaN(Date.parse(value))),
@@ -68,3 +73,14 @@ const site = z.object({
 });
 export const contentSchema = z.object({ version: z.literal(1), updatedAt: z.iso.datetime(), revision: z.string().min(1),
   reviewSnapshotIds: z.array(id).max(100), dismissedSubmissions: z.array(id).max(100).optional(), reviews: list(reviewSchema, 500), site });
+
+export type AdminContent = z.output<typeof contentSchema>;
+export type SiteSettings = AdminContent["site"];
+export type PortfolioProject = SiteSettings["portfolioProjects"][number];
+export type PortfolioFilter = PortfolioProject["filters"][number];
+export type CaseStudy = z.output<typeof caseStudy>;
+export type CaseBlock = z.output<typeof block>;
+export type VerifiedReview = z.output<typeof reviewSchema>;
+export type StyleChoiceSettings = SiteSettings["styleChoice"];
+export type StyleReference = StyleChoiceSettings["styles"][number];
+export type PopupSettings = SiteSettings["popups"];

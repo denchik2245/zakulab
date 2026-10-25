@@ -1,6 +1,5 @@
-"use client";
 
-import Image from "next/image";
+import Image from "@/components/image";
 import { FormEvent, useCallback, useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import styles from "./review-form.module.css";

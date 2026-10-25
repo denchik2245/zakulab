@@ -1,4 +1,4 @@
-import type { StyleReference } from "@/lib/style-references";
+import type { StyleReference } from "@/lib/content-schema";
 
 export function StylePreview({ reference }: { reference: StyleReference }) {
   return (

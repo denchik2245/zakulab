@@ -186,10 +186,27 @@ with tempfile.TemporaryDirectory(prefix='zakulab-php-test-') as temporary:
         invalid = copy.deepcopy(original)
         invalid['site']['portfolioProjects'][1]['id'] = invalid['site']['portfolioProjects'][0]['id']
         check(request('/api/admin/content', 'PUT', invalid, csrf)[0] == 400, 'Duplicate IDs rejected server-side')
+        invalid = copy.deepcopy(original)
+        for project in invalid['site']['portfolioProjects'][:6]:
+            project['homePlacement'] = 'list'
+        check(request('/api/admin/content', 'PUT', invalid, csrf)[0] == 400, 'Home rejects a sixth additional project')
+        invalid = copy.deepcopy(original)
+        with_case = next(item for item in invalid['site']['portfolioProjects'] if item.get('caseStudy'))
+        invalid['site']['portfolioProjects'].append(dict(copy.deepcopy(with_case), id='php-duplicate-slug'))
+        check(request('/api/admin/content', 'PUT', invalid, csrf)[0] == 400, 'Duplicate case slugs rejected server-side')
+        invalid = copy.deepcopy(original)
+        with_case = next(item for item in invalid['site']['portfolioProjects'] if item.get('caseStudy'))
+        with_case['caseStudy'].update(status='published', summary='[УТОЧНИТЬ] Черновик')
+        check(request('/api/admin/content', 'PUT', invalid, csrf)[0] == 400, 'Unfinished case copy cannot be published')
         check(submit_review('PRIVATE_PENDING_SENTINEL Отзыв для проверки модерации.')[0] == 201, 'Public review accepted into private moderation queue')
         original['site']['heroTitle'] = 'PHP MIGRATION PUBLIC CHECK'
+        display_order = [item['id'] for item in sorted(original['site']['portfolioProjects'], key=lambda item: item['order'])]
+        for index, item in enumerate(sorted(original['site']['portfolioProjects'], key=lambda item: item['order'])):
+            item['order'] = (index + 1) * 10
         status, saved, headers, raw = request('/api/admin/content', 'PUT', original, csrf)
         check(status == 200, 'Content save passes PHP schema validation: ' + str(saved if status != 200 else 'OK'))
+        projects = saved['site']['portfolioProjects']
+        check([item['id'] for item in projects] == display_order and [item['order'] for item in projects] == list(range(1, len(projects) + 1)), 'Sparse order values become consecutive positions without changing display order')
         check(any('PRIVATE_PENDING_SENTINEL' in item['text'] for item in saved['reviews']), 'Review arriving during editing survives content save')
         check(request('/api/admin/content', 'PUT', original, csrf)[0] == 409, 'Stale CMS revision returns conflict')
         status, home, _, _ = request('/', authenticated=False)
@@ -207,6 +224,15 @@ with tempfile.TemporaryDirectory(prefix='zakulab-php-test-') as temporary:
             data = request(path, authenticated=False)[1]
             check('PRIVATE_DRAFT_SENTINEL' not in data, f'{path}: draft absent from HTML and boot data')
         check('PRIVATE_PENDING_SENTINEL' in request('/reviews', authenticated=False)[1], 'Approved review appears in public HTML')
+        check(submit_review('DISMISSED_REVIEW_SENTINEL Отзыв, который модератор удалит.')[0] == 201, 'Second review accepted into moderation queue')
+        current = request('/api/admin/content')[1]
+        current['reviews'] = [item for item in current['reviews'] if 'DISMISSED_REVIEW_SENTINEL' not in item['text']]
+        check(request('/api/admin/content', 'PUT', current, csrf)[0] == 200, 'Moderator deletes a pending review')
+        check(not any('DISMISSED_REVIEW_SENTINEL' in item['text'] for item in request('/api/admin/content')[1]['reviews']), 'Deleted review does not return from the queue')
+        fields = {'name': 'Проверка PHP', 'role': 'Заказчик', 'public-profile': 'https://example.com/profile', 'review': 'Отзыв без согласия на публикацию.', 'response': 'json'}
+        check(request('/api/reviews', 'POST', urllib.parse.urlencode(fields).encode(), {'Content-Type': 'application/x-www-form-urlencoded'}, False)[0] == 400, 'Review without consent is rejected')
+        status, _, headers, _ = submit_review('Четвёртый отзыв за час должен упереться в лимит.')
+        check(status == 429 and headers.get('Retry-After') == '3600', 'Review form allows three submissions per hour')
         current = request('/api/admin/content')[1]
         case = copy.deepcopy(next(item['caseStudy'] for item in current['site']['portfolioProjects'] if item.get('caseStudy')))
         case = json.loads(re.sub(r'\[УТОЧНИТЬ[^\]]*\]', 'Проверенные сведения', json.dumps(case, ensure_ascii=False)))
@@ -321,6 +347,8 @@ with tempfile.TemporaryDirectory(prefix='zakulab-php-test-') as temporary:
         check(sorted(statuses) == [200, 409], 'Concurrent saves commit once and report the competing revision')
         check(request('/api/admin/logout', 'POST', headers=csrf)[0] == 200, 'Logout succeeds')
         check(request('/api/admin/content')[0] == 401, 'Logout removes access to CMS')
+        attempts = [request('/api/admin/login', 'POST', {'password': 'wrong'})[0] for _ in range(10)]
+        check(attempts[-1] == 429 and set(attempts) <= {401, 429}, 'Repeated wrong passwords are rate limited')
         if apache:
             expected = request('/', authenticated=False)[1]
             os.killpg(cgi.pid, signal.SIGTERM)

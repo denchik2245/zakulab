@@ -1,7 +1,6 @@
 let token = "";
 
 export async function apiFetch(url: string, init: RequestInit = {}) {
-  if (!(window as Window & { zakulabPhp?: boolean }).zakulabPhp) return fetch(url, init);
   if (init.method && init.method !== "GET" && url !== "/api/admin/login" && !token) {
     const response = await fetch("/api/admin/session", { cache: "no-store" });
     const session = await response.json();

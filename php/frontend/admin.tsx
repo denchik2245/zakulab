@@ -1,9 +1,7 @@
 import { createRoot } from "react-dom/client";
 import { AdminStudio } from "@/components/admin-studio";
-import type { AdminContent } from "@/lib/content-store";
+import type { AdminContent } from "@/lib/content-schema";
 import { apiFetch } from "./api";
-
-(window as Window & { zakulabPhp?: boolean }).zakulabPhp = true;
 
 async function start() {
   const response = await apiFetch("/api/admin/content");

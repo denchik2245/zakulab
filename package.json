@@ -7,14 +7,11 @@
     "build": "node scripts/build-php.mjs",
     "package:php": "npm run build && python3 scripts/package-php.py",
     "start": "node scripts/serve-php.mjs",
-    "lint": "eslint app components lib php/frontend next.config.ts --max-warnings=0",
-    "test": "npm run test:legacy && npm run test:php",
+    "lint": "eslint components lib php/frontend --max-warnings=0",
+    "test": "npm run lint && npm run typecheck && npm run test:php",
     "test:php": "python3 scripts/test-php.py",
     "test:apache": "python3 scripts/test-php.py --apache",
-    "test:legacy": "node scripts/adversarial-review.cjs",
-    "legacy:dev": "next dev",
-    "legacy:build": "next build",
-    "legacy:start": "next start"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "react": "latest",
@@ -24,13 +21,11 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@netlify/blobs": "^11.1.6",
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
     "esbuild": "^0.28.2",
     "eslint": "^10.12.0",
-    "next": "^16.4.2",
     "postcss": "^8.5.23",
     "postcss-modules": "^9.0.1",
     "typescript": "latest",

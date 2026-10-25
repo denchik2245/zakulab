@@ -1,6 +1,5 @@
 /** Decode on the editor's device, keeping oversized pixel buffers off the shared server. */
 export async function prepareImage(file: File): Promise<File> {
-  if (!(window as Window & { zakulabPhp?: boolean }).zakulabPhp) return file;
   if (!/^image\/(png|jpeg|webp|gif)$/.test(file.type)) throw new Error("Выберите PNG, JPEG, WebP или GIF.");
   if (file.size > 32 * 1024 * 1024) throw new Error("Исходный файл должен быть не больше 32 МБ.");
   if (file.type === "image/gif") {

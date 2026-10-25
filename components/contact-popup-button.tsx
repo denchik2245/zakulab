@@ -1,6 +1,5 @@
-"use client";
 
-import Image from "next/image";
+import Image from "@/components/image";
 import { useCallback, useEffect, useId, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { SocialLinks } from "./social-links";

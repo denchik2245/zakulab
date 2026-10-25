@@ -1,9 +1,7 @@
-"use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import { typographic } from "@/lib/typographic";
-import type { VerifiedReview } from "@/lib/reviews";
+import type { VerifiedReview } from "@/lib/content-schema";
 import styles from "./home-page.module.css";
 
 import { ReviewCard } from "./review-card";
@@ -55,7 +53,7 @@ export function ReviewsSlider({ reviews, title, text, fallbackImage }: ReviewsSl
             </button>
           </span>
         </div>
-        <Link className={styles.reviewButton} href="/reviews"><span>Все отзывы</span><small>{`{${total}}`}</small></Link>
+        <a className={styles.reviewButton} href="/reviews"><span>Все отзывы</span><small>{`{${total}}`}</small></a>
       </div>
 
       <div className={styles.reviewCard} aria-live="polite">

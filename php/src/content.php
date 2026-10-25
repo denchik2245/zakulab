@@ -4,7 +4,7 @@ declare(strict_types=1);
 function content_source(): array {
     $value = store()->get('content');
     if ($value === null) $value = read_json_file(storage_path('initial-content.json'), generated('seed'));
-    // Build exports already pass through the legacy migration and normalization code.
+    // Documents saved before case blocks existed still get blocks from their draft copy.
     unset($value['revision'], $value['reviewSnapshotIds']);
     $value['dismissedSubmissions'] ??= [];
     foreach ($value['site']['portfolioProjects'] as &$project) {

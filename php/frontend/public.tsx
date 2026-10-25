@@ -5,8 +5,7 @@ import { ReviewsSlider } from "@/components/reviews-slider";
 import { ReviewForm } from "@/components/review-form";
 import { ServiceOrderButton } from "@/components/service-order-button";
 import { StyleQuiz } from "@/components/style-quiz";
-import type { SiteSettings } from "@/lib/site-settings";
-import type { VerifiedReview } from "@/lib/reviews";
+import type { SiteSettings, VerifiedReview } from "@/lib/content-schema";
 
 const boot = JSON.parse(document.getElementById("site-data")?.textContent || "{}");
 const browserWindow = window as Window & { zakulabImages?: Record<string, { src: string; srcset: string }> };

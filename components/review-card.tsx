@@ -1,5 +1,5 @@
-import { CmsImage as Image } from "@/components/cms-image";
-import type { VerifiedReview } from "@/lib/reviews";
+import Image from "@/components/image";
+import type { VerifiedReview } from "@/lib/content-schema";
 import { externalUrl } from "@/lib/external-url";
 import { typographic } from "@/lib/typographic";
 import { TgIcon, WebIcon, ArrowIcon } from "@/components/review-icons";
