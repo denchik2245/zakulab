@@ -15,8 +15,12 @@
   --hover-speed: .4s;
   --hover-easing: cubic-bezier(.22, .72, .24, 1);
   width: min(820px, 100%);
-  min-height: 813px;
+  /* 82px = overlay padding on both sides plus the 21px downward offset, so the dialog never leaves the viewport */
+  max-height: calc(100svh - 82px);
+  min-height: min(813px, calc(100svh - 82px));
   padding: 50px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   position: relative;
   color: #050505;
   background: #fefefe;
@@ -95,7 +99,7 @@
 }
 .submit:disabled { cursor: wait; opacity: .65; }
 .error { margin: -8px 0 -6px; color: #9a493e; font-size: 14px; line-height: 1.4; }
-.success { min-height: 713px; display: grid; place-items: center; align-content: center; gap: 24px; text-align: center; }
+.success { min-height: min(713px, calc(100svh - 182px)); display: grid; place-items: center; align-content: center; gap: 24px; text-align: center; }
 .success > span { width: 64px; height: 64px; display: grid; place-items: center; color: #fefefe; background: #304e41; border-radius: 50%; font-size: 28px; }
 .success h2 { margin: 0; font-size: 48px; font-weight: 500; line-height: 1.2; letter-spacing: -.03em; }
 .success p { max-width: 524px; margin: 0; font-size: 20px; line-height: 1.4; }
