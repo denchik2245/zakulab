@@ -9,12 +9,13 @@
   width: min(1380px, calc(100% - 260px));
   margin-left: max(130px, calc((100vw - 1660px) / 2));
   display: grid;
-  grid-template-columns: 460px 820px;
-  gap: 100px;
+  grid-template-columns: minmax(0, 460fr) minmax(0, 820fr);
+  gap: clamp(40px, 5.2vw, 100px);
   align-items: start;
 }
 
 .intro {
+  min-width: 0;
   position: sticky;
   top: 112px;
   display: grid;
@@ -36,7 +37,7 @@
   line-height: 1.55;
 }
 
-.document { min-width: 0; }
+.document { min-width: 0; overflow-wrap: anywhere; }
 
 .notice {
   margin: 0 0 56px;

@@ -83,12 +83,15 @@ function StyleGallery({ reference }: { reference: StyleReference }) {
   }
 
   const activeImage = images[imageIndex];
+  // The scrollable preview needs its natural height. Use prepared PHP variants
+  // here instead of loading the full original before the visitor opens it.
+  const preview = typeof window !== "undefined" ? (window as Window & { zakulabImages?: Record<string, { src?: string; srcset?: string; width?: number; height?: number }> }).zakulabImages?.[activeImage] : undefined;
 
   return (
     <div className={styles.galleryShell}>
       <div ref={viewportRef} className={styles.previewFrame} onScroll={updateThumb}>
         {activeImage ? (
-          <img className={styles.referenceImage} src={activeImage} alt={`Пример стиля «${reference.title}», ${imageIndex + 1} из ${images.length}`} onLoad={updateThumb} />
+          <img className={styles.referenceImage} src={preview?.src || activeImage} srcSet={preview?.srcset} sizes="(max-width: 767px) calc(100vw - 40px), (max-width: 1024px) calc(100vw - 64px), (max-width: 1919px) calc(47.5vw - 61px), 760px" width={preview?.width} height={preview?.height} loading="lazy" decoding="async" alt={`Пример стиля «${reference.title}», ${imageIndex + 1} из ${images.length}`} onLoad={updateThumb} />
         ) : (
           <div className={styles.syntheticPreview}><StylePreview reference={reference} /></div>
         )}

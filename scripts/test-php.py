@@ -3,8 +3,10 @@
 import base64
 import concurrent.futures
 import copy
+import gzip
 import hashlib
 import http.cookiejar
+from html.parser import HTMLParser
 import json
 import os
 from pathlib import Path
@@ -29,6 +31,18 @@ if not (DEPLOY / 'app/generated/assets.json').exists():
     raise SystemExit('Run npm run build first.')
 PHP = os.environ.get('PHP_BINARY', 'php')
 checks = []
+
+class Markup(HTMLParser):
+    def __init__(self, html):
+        super().__init__()
+        self.tags = []
+        self.feed(html)
+
+    def handle_starttag(self, tag, attrs):
+        self.tags.append((tag, dict(attrs)))
+
+    def elements(self, tag):
+        return [attrs for name, attrs in self.tags if name == tag]
 
 def check(condition, message):
     if not condition:
@@ -120,7 +134,13 @@ with tempfile.TemporaryDirectory(prefix='zakulab-php-test-') as temporary:
         for path in ['/app/generated/seed.json', '/storage/initial-content.json', '/config.local.php', '/page-cache/home.html', '/router.php', '/.env']:
             check(request(path, authenticated=False)[0] in [403, 404], f'{path}: private path blocked')
         assets = json.loads((directory / 'app/generated/assets.json').read_text())
-        for kind in ['css', 'images', 'site', 'admin']:
+        project_preloads = [link for link in Markup(request('/projects', authenticated=False)[1]).elements('link') if link.get('rel') == 'preload' and link.get('as') == 'image']
+        check(any(link.get('href') == assets['texture'] and link.get('fetchpriority') == 'high' for link in project_preloads), 'Portfolio discovers its measured LCP texture in initial HTML')
+        check(not any(link.get('href') == assets['texture'] and link.get('rel') == 'preload' for link in Markup(request('/', authenticated=False)[1]).elements('link')), 'Other pages do not preload the below-fold portfolio texture')
+        portfolio_html = request('/projects', authenticated=False)[1]
+        row_ids = [link['data-project-id'] for link in Markup(portfolio_html).elements('a') if 'data-project-id' in link]
+        check(bool(row_ids) and len(row_ids) == len(set(row_ids)) and 'data-expanded-class=' in portfolio_html, 'Server portfolio provides unique row identities and expansion styling for progressive filtering')
+        for kind in ['css', 'adminCss', 'images', 'site', 'admin']:
             status, _, headers, raw = request(assets[kind], authenticated=False)
             check(status == 200 and len(raw) > 100 and 'text/html' not in headers.get('Content-Type', ''), f'{kind}: browser asset is available')
         font = next((directory / 'public_html/fonts').glob('*.woff2'))
@@ -129,6 +149,26 @@ with tempfile.TemporaryDirectory(prefix='zakulab-php-test-') as temporary:
         check(request('/api/admin/content', authenticated=False)[0] == 401, 'Anonymous users cannot read CMS')
         check(request('/api/admin/backup', authenticated=False)[0] == 401, 'Anonymous users cannot export private data')
         check(request('/missing-page', authenticated=False)[0] == 404, 'Unknown pages return HTTP 404')
+        public_css = request(assets['css'], authenticated=False)[1]
+        check('.admin-' not in public_css and '/assets/figma/image44.png' not in public_css, 'Public CSS excludes admin rules and the original heavy texture')
+        check(assets['adminCss'] != assets['css'] and '.admin-' in request(assets['adminCss'], authenticated=False)[1], 'Admin CSS is separate and retains editor styles')
+        _, _, css_headers, css_bytes = request(assets['css'], authenticated=False)
+        check('immutable' in css_headers.get('Cache-Control', '') and 'Accept-Encoding' in css_headers.get('Vary', ''), 'Versioned resources have explicit immutable caching and encoding variation')
+        status, _, zipped_headers, zipped = request(assets['css'], headers={'Accept-Encoding': 'gzip'}, authenticated=False)
+        check(status == 200 and zipped_headers.get('Content-Encoding') == 'gzip' and gzip.decompress(zipped) == css_bytes, 'Asset route serves the matching precompressed representation')
+        check(zipped_headers['ETag'] != css_headers['ETag'], 'Compressed and identity asset representations have distinct validators')
+        check(request(assets['css'], headers={'If-None-Match': css_headers['ETag']}, authenticated=False)[0] == 304, 'Asset revalidation returns 304')
+        status, _, head_headers, head_body = request(assets['css'], method='HEAD', authenticated=False)
+        check(status == 200 and not head_body and head_headers['ETag'] == css_headers['ETag'] and head_headers.get('Content-Length') in [None, str(len(css_bytes))], 'Asset HEAD preserves its validator without a body or conflicting length')
+        check(request(assets['css'], headers={'Accept-Encoding': 'gzip;q=0, br;q=0'}, authenticated=False)[2].get('Content-Encoding') is None, 'Explicitly rejected compression falls back to identity')
+        check(request(assets['css'], headers={'Accept-Encoding': 'identity;q=0, gzip;q=0, br;q=0'}, authenticated=False)[0] == 406, 'Asset route rejects requests that accept no available representation')
+        for path in ['/api/assets/bundles/config.local.php', '/api/assets/fonts/../../config.local.php', '/api/assets/storage/content.json', '/api/assets/bundles/site-not-found.js']:
+            check(request(path, authenticated=False)[0] == 404, f'{path}: static fallback cannot expose private or absent files')
+        for path in ['/request', '/success', '/success?form=review']:
+            _, html, headers, _ = request(path, authenticated=False)
+            robots = next(meta.get('content', '') for meta in Markup(html).elements('meta') if meta.get('name') == 'robots')
+            check('noindex' in robots and 'noindex' in headers.get('X-Robots-Tag', ''), f'{path}: noindex in HTML and HTTP')
+        check('<lastmod>' not in request('/sitemap.xml', authenticated=False)[1], 'Sitemap does not claim a global save date for every page')
         check(request('/api/admin/login', 'POST', {'password': 'wrong'})[0] == 401, 'Incorrect password rejected')
         check(request('/api/admin/login', 'POST', {'password': password}, {'Origin': 'https://attacker.invalid'})[0] == 403, 'Cross-origin login rejected')
         status, data, headers, raw = request('/api/admin/login', 'POST', {'password': password})
@@ -210,12 +250,47 @@ with tempfile.TemporaryDirectory(prefix='zakulab-php-test-') as temporary:
         check(status == 201, 'Valid 5-megapixel image and previews fit the 96M limit')
         status, _, headers, raw = request(large['url'] + '?w=1280', authenticated=False)
         check(status == 200 and headers.get('Content-Type') == 'image/webp' and raw[8:12] == b'WEBP', 'Uploaded image serves a prepared WebP preview')
+        full_status, _, full_headers, full_raw = request(large['url'] + '?w=full', authenticated=False)
+        check(full_status == 200 and full_headers.get('Content-Type') == 'image/webp' and full_raw[8:12] == b'WEBP', 'Full-resolution WebP prevents high-DPR screens from downloading the PNG')
+        check(request(large['url'], authenticated=False)[3][:8] == b'\x89PNG\r\n\x1a\n', 'Original uploaded PNG remains available without conversion')
         check(request(large['url'] + '?w=1280', headers={'If-None-Match': headers['ETag']}, authenticated=False)[0] == 304, 'Media cache revalidation returns 304')
         current = request('/api/admin/content')[1]
         current['site']['heroPortrait'] = large['url']
         check(request('/api/admin/content', 'PUT', current, csrf)[0] == 200, 'Uploaded image can become the public portrait')
         preview_html = request('/', authenticated=False)[1]
         check(large['url'] + '?w=320' in preview_html and 'srcset=' in preview_html, 'Public HTML and browser islands receive prepared media variants')
+        check(large['url'] + '?w=full 2500w' in preview_html, 'Responsive image set terminates with full-resolution WebP instead of the PNG original')
+        preview_image = next(image for image in Markup(preview_html).elements('img') if image.get('alt') == current['site']['heroName'])
+        check(preview_image.get('width') == '2500' and preview_image.get('height') == '2000', 'Uploaded image dimensions reserve its intrinsic aspect ratio')
+        seo_content = request('/api/admin/content')[1]
+        case_project = seo_content['site']['portfolioProjects'][0]
+        case_project['caseStudy']['status'] = 'published'
+        case_project['portfolioPlacement'] = 'archive'
+        case_project['caseStudy']['blocks'] = [
+            {'id': 'seo-cover', 'type': 'image', 'image': large['url'], 'alt': 'SEO cover', 'caption': '', 'spacing': 'large'},
+            {'id': 'seo-gallery', 'type': 'gallery', 'images': [{'id': 'seo-detail', 'image': large['url'], 'alt': 'SEO detail'}], 'spacing': 'large'},
+        ]
+        for slug, placement in [('seo-related-visible', 'archive'), ('seo-related-hidden', 'hidden')]:
+            other = copy.deepcopy(case_project)
+            other.update(id=slug, title=slug, homePlacement='hidden', portfolioPlacement=placement, order=len(seo_content['site']['portfolioProjects']) + 1)
+            other['caseStudy'].update(slug=slug, title=slug)
+            seo_content['site']['portfolioProjects'].append(other)
+        check(request('/api/admin/content', 'PUT', seo_content, csrf)[0] == 200, 'Image-dimension fixture saves through the real CMS API')
+        path = '/cases/' + case_project['caseStudy']['slug']
+        _, case_html, _, _ = request(path, authenticated=False)
+        case_images = [image for image in Markup(case_html).elements('img') if image.get('alt') in ['SEO cover', 'SEO detail']]
+        check(len(case_images) == 2 and all(image.get('width') == '2500' and image.get('height') == '2000' for image in case_images), 'Cover and gallery both expose intrinsic dimensions')
+        check(case_images[0].get('loading') == 'eager' and case_images[0].get('fetchpriority') == 'high' and case_images[1].get('loading') == 'lazy', 'Only case cover receives eager/high image loading')
+        graph = json.loads(re.search(r'<script type="application/ld\+json">(.*?)</script>', case_html, re.S).group(1))['@graph']
+        person = next(item for item in graph if item['@type'] == 'Person')
+        work = next(item for item in graph if item['@type'] == 'CreativeWork')
+        crumbs = next(item for item in graph if item['@type'] == 'BreadcrumbList')['itemListElement']
+        check(work['author']['@id'] == person['@id'] and work['url'] == origin + path and len(crumbs) == 3, 'Case schema links author, work and its three visible breadcrumb levels')
+        related = re.search(r'<nav[^>]+aria-labelledby="related-cases-title".*?</nav>', case_html, re.S)
+        check(related is not None, 'Case includes contextual links in the server-rendered article')
+        related_links = [link['href'] for link in Markup(related.group(0)).elements('a')]
+        hidden_paths = {'/cases/' + project['caseStudy']['slug'] for project in seo_content['site']['portfolioProjects'] if project.get('caseStudy') and (not project['published'] or project['portfolioPlacement'] == 'hidden' or project['caseStudy']['status'] != 'published')}
+        check('/cases/seo-related-visible' in related_links and path not in related_links and not hidden_paths.intersection(related_links), 'Related-case links include relevant visible work and exclude current, hidden and unpublished projects')
         fields = {'name': 'Заявка PHP', 'company': 'Проверка', 'task': 'PRIVATE_REQUEST_SENTINEL', 'budget': 'Пока не определён', 'messenger': 'Telegram', 'contact': '@test', 'consent': 'yes', 'response': 'json', 'visual-profile': 'Профиль визуальных предпочтений'}
         check(request('/api/requests', 'POST', urllib.parse.urlencode(fields).encode(), {'Content-Type': 'application/x-www-form-urlencoded'}, False)[0] == 201, 'Project form persists a private request')
         inbox = request('/api/admin/requests')[1]['requests']

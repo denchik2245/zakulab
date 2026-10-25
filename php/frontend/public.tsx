@@ -1,6 +1,6 @@
 import { createRoot } from "react-dom/client";
 import { Header } from "@/components/header";
-import { PortfolioPage } from "@/components/portfolio-page";
+import { enhancePortfolio } from "./portfolio";
 import { ReviewsSlider } from "@/components/reviews-slider";
 import { ReviewForm } from "@/components/review-form";
 import { ServiceOrderButton } from "@/components/service-order-button";
@@ -20,7 +20,7 @@ if (site) {
   const links = { telegramUrl: site.telegramUrl, maxUrl: site.maxUrl, vkUrl: site.vkUrl };
   mount("site-header", <Header {...links} />);
   // PHP already resolves published case URLs and removes editor data. Keep these destinations intact.
-  if (boot.page === "projects") mount("portfolio-view", <PortfolioPage site={{ ...site, portfolioProjects: site.portfolioProjects.filter(project => project.portfolioPlacement !== "hidden") }} updatedAt={boot.updatedAt} />);
+  if (boot.page === "projects") enhancePortfolio(site.portfolioProjects.filter(project => project.portfolioPlacement !== "hidden"));
   if (boot.page === "home") mount("reviews-slider", <ReviewsSlider reviews={boot.reviews as VerifiedReview[]} title={site.reviewsTitle} text={site.reviewsText} fallbackImage={site.reviewImage} />);
   if (boot.page === "reviews") mount("review-form", <ReviewForm title={site.popups.reviewFormTitle} description={site.popups.reviewFormDescription} />);
   if (boot.page === "style-check") mount("style-quiz", <StyleQuiz settings={site.styleChoice} popups={site.popups} socialLinks={links} />);

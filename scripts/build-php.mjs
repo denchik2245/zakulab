@@ -7,11 +7,15 @@ import path from "node:path";
 import os from "node:os";
 import { createRequire } from "node:module";
 import { execFileSync } from "node:child_process";
+import { gzipSync, brotliCompressSync, constants as zlibConstants } from "node:zlib";
 import sharp from "sharp";
 
 const root = process.cwd();
 const output = path.join(root, "build/beget");
 const hash = text => createHash("sha256").update(text).digest("hex").slice(0, 10);
+// Serve generated resources through PHP where the hosting proxy strips static
+// cache headers. Physical paths remain available for deployments and rollbacks.
+const assetUrl = (directory, name) => `/api/assets/${directory}/${name}`;
 await fs.mkdir("php/generated", { recursive: true });
 const files = [];
 async function walk(directory) {
@@ -23,11 +27,13 @@ async function walk(directory) {
 }
 await walk("components"); await walk("app");
 const classMaps = {};
-const css = [await fs.readFile("app/globals.css", "utf8"), await fs.readFile("public/fonts/fonts.css", "utf8")];
+const globalCss = await fs.readFile("app/globals.css", "utf8");
+const fontCss = await fs.readFile("public/fonts/fonts.css", "utf8");
+const moduleCss = new Map();
 for (const file of files.sort()) {
   let mapping;
   const result = await postcss([modules({ generateScopedName: name => `z_${hash(file)}_${name}`, getJSON: (_file, json) => { mapping = json; } })]).process(await fs.readFile(file, "utf8"), { from: path.resolve(file) });
-  css.push(result.css);
+  moduleCss.set(file, result.css);
   classMaps[path.resolve(file)] = mapping;
 }
 const aliases = {
@@ -61,7 +67,7 @@ const local = await exported.exports.readContent(true);
 for (const [key, value] of Object.entries(netlifyEnv)) if (value !== undefined) process.env[key] = value;
 await fs.writeFile("php/generated/seed.json", JSON.stringify(seed));
 await fs.writeFile("php/generated/schema.json", JSON.stringify(exported.exports.schema));
-const styleBundle = await build({ ...common, entryPoints: ["php/frontend/styles.ts"], platform: "node", format: "cjs", write: false });
+const styleBundle = await build({ ...common, entryPoints: ["php/frontend/styles.ts"], platform: "node", format: "cjs", write: false, metafile: true });
 const styleModule = new Module(path.join(root, ".php-styles.cjs"));
 styleModule.filename = path.join(root, ".php-styles.cjs");
 styleModule._compile(styleBundle.outputFiles[0].text, styleModule.filename);
@@ -87,21 +93,36 @@ async function optimizeDirectory(directory) {
   for (const item of await fs.readdir(directory, { withFileTypes: true })) {
     const file = path.join(directory, item.name);
     if (item.isDirectory()) await optimizeDirectory(file);
-    else if (/\.(?:png|jpe?g|webp)$/i.test(item.name)) {
+    else if (/\.(?:png|jpe?g|webp|gif|svg)$/i.test(item.name)) {
       const metadata = await sharp(file).metadata();
-      if (!metadata.width || !metadata.height || (metadata.pages || 1) > 1) continue;
-      const widths = [...new Set([320, 640, 960, 1600, 2400].map(width => Math.min(metadata.width, width)))];
+      if (!metadata.width || !metadata.height) continue;
+      // rotate() below applies EXIF orientation, including orientations that swap axes.
+      const swapsAxes = [5, 6, 7, 8].includes(metadata.orientation);
+      const width = swapsAxes ? metadata.height : metadata.width;
+      const height = swapsAxes ? metadata.width : metadata.height;
+      const sourcePath = '/' + file.replace(/^public\//, '');
+      if (/\.(?:svg|gif)$/i.test(item.name) || (metadata.pages || 1) > 1) {
+        imageMap[sourcePath] = { width, height };
+        continue;
+      }
+      const widths = [...new Set([320, 640, 960, 1600, 2400].map(size => Math.min(width, size)))];
+      const digest = hash(await fs.readFile(file));
       const variants = [];
       for (const width of widths) {
-        const name = `${hash(await fs.readFile(file))}-${width}.webp`;
+        const name = `${digest}-${width}.webp`;
         await sharp(file).rotate().resize({ width, withoutEnlargement: true }).webp({ quality: 88 }).toFile(path.join(output, "public_html/optimized", name));
-        variants.push(`/optimized/${name} ${width}w`);
+        variants.push(`${assetUrl('optimized', name)} ${width}w`);
       }
-      imageMap['/' + file.replace(/^public\//, '')] = { src: variants.at(-1).split(' ')[0], srcset: variants.join(', ') };
+      const fallbackIndex = widths.findIndex(size => size >= Math.min(width, 960));
+      imageMap[sourcePath] = { src: variants[fallbackIndex].split(' ')[0], srcset: variants.join(', '), width, height };
     }
   }
 }
 await optimizeDirectory('public/assets');
+// The repeating texture is drawn at 567 CSS pixels; a full PNG is unnecessary.
+const textureSource = 'public/assets/figma/image44.png';
+const textureName = `${hash(await fs.readFile(textureSource))}-texture-567.webp`;
+await sharp(textureSource).rotate().resize({ width: 567, withoutEnlargement: true }).webp({ quality: 85 }).toFile(path.join(output, 'public_html/optimized', textureName));
 await fs.writeFile(path.join(output, "app/generated/images.json"), JSON.stringify(imageMap));
 // Browser image components read this immutable mapping; uploaded images use their PHP media route.
 const imagesName = `images-${hash(JSON.stringify(imageMap))}.js`;
@@ -117,14 +138,60 @@ for (const name of ["initial-content.json", "db/content.json", "db/queue.json", 
   } catch (error) { if (error.code !== "ENOENT") throw error; }
 }
 const browser = await build({ ...common, entryPoints: { site: "php/frontend/public.tsx", admin: "php/frontend/admin.tsx" }, outdir: path.join(output, "public_html/bundles"), entryNames: "[name]-[hash]", chunkNames: "chunk-[hash]", platform: "browser", format: "esm", splitting: true, minify: true, target: ["es2022"], metafile: true, define: { "process.env.NODE_ENV": '"production"' } });
-css.push(await fs.readFile("app/admin/admin-responsive.css", "utf8"));
-css.push('.php-inbox{max-width:1440px;margin:40px auto;padding:32px;background:#fff}.php-inbox article{border-top:1px solid #ddd;padding:24px 0}.php-inbox pre{white-space:pre-wrap;overflow-wrap:anywhere}.php-inbox button{padding:10px 16px;cursor:pointer}.php-loading{padding:80px 32px}.php-nojs{padding:16px;text-align:center}');
-const finalCss = (await transform(css.join("\n"), { loader: "css", minify: true })).code;
-const cssName = `site-${hash(finalCss)}.css`;
-await fs.writeFile(path.join(output, "public_html/bundles", cssName), finalCss);
-const manifest = { css: `/bundles/${cssName}`, images: `/bundles/${imagesName}` };
-for (const [file, meta] of Object.entries(browser.metafile.outputs)) if (meta.entryPoint) manifest[meta.entryPoint.includes("admin.tsx") ? "admin" : "site"] = "/bundles/" + path.basename(file);
+function requiredModules(metafile, entry) {
+  const inputs = metafile.inputs;
+  const visited = new Set();
+  function visit(file) {
+    if (visited.has(file)) return;
+    visited.add(file);
+    for (const item of inputs[file]?.imports || []) if (!item.external) visit(item.path);
+  }
+  visit(entry);
+  return new Set([...visited].filter(file => file.endsWith('.module.css')));
+}
+const publicModules = new Set([...requiredModules(browser.metafile, 'php/frontend/public.tsx'), ...requiredModules(styleBundle.metafile, 'php/frontend/styles.ts')]);
+const adminModules = requiredModules(browser.metafile, 'php/frontend/admin.tsx');
+// Global styles are a source shared with Next. Strip admin-only selectors from
+// the public artifact without modifying that source or changing admin cascade order.
+const publicGlobals = postcss.parse(globalCss);
+publicGlobals.walkRules(rule => {
+  const selectors = rule.selectors.filter(selector => !/[.#]admin[\w-]*/.test(selector));
+  if (selectors.length) rule.selectors = selectors;
+  else rule.remove();
+});
+publicGlobals.walkAtRules(rule => { if (rule.nodes && rule.nodes.length === 0) rule.remove(); });
+const extras = '.php-loading{padding:80px 32px}.php-nojs{padding:16px;text-align:center}';
+async function writeStyles(name, sources) {
+  const source = sources.join('\n')
+    .replaceAll('/assets/figma/image44.png', `/optimized/${textureName}`)
+    .replace(/url\(\s*(["']?)\/(fonts|optimized)\//g, 'url($1/api/assets/$2/');
+  const compiled = (await transform(source, { loader: 'css', minify: true })).code;
+  const file = `${name}-${hash(compiled)}.css`;
+  await fs.writeFile(path.join(output, 'public_html/bundles', file), compiled);
+  return assetUrl('bundles', file);
+}
+const publicCss = await writeStyles('site', [publicGlobals.toString(), fontCss, ...[...moduleCss].filter(([file]) => publicModules.has(file)).map(([, source]) => source), extras]);
+const adminCss = await writeStyles('admin', [globalCss, fontCss, ...[...moduleCss].filter(([file]) => adminModules.has(file)).map(([, source]) => source), await fs.readFile('app/admin/admin-responsive.css', 'utf8'), extras]);
+const manifest = { css: publicCss, adminCss, images: assetUrl('bundles', imagesName), texture: assetUrl('optimized', textureName) };
+for (const [file, meta] of Object.entries(browser.metafile.outputs)) if (meta.entryPoint) manifest[meta.entryPoint.includes("admin.tsx") ? "admin" : "site"] = assetUrl('bundles', path.basename(file));
 await fs.writeFile(path.join(output, "app/generated/assets.json"), JSON.stringify(manifest));
+// Apache and the development server can serve these directly even where the
+// hosting account does not offer runtime compression. Packaging includes them.
+async function precompress(directory) {
+  for (const item of await fs.readdir(directory, { withFileTypes: true })) {
+    const file = path.join(directory, item.name);
+    if (item.isDirectory()) await precompress(file);
+    else if (/\.(?:css|js|json|svg|xml|txt|woff2?)$/i.test(item.name)) {
+      const source = await fs.readFile(file);
+      if (source.length < 256) continue;
+      const gzip = gzipSync(source, { level: 9 });
+      const brotli = brotliCompressSync(source, { params: { [zlibConstants.BROTLI_PARAM_QUALITY]: 11 } });
+      if (gzip.length < source.length) await fs.writeFile(file + '.gz', gzip);
+      if (brotli.length < source.length) await fs.writeFile(file + '.br', brotli);
+    }
+  }
+}
+await precompress(path.join(output, 'public_html'));
 // Include a seed cache for Apache; the first real save invalidates it automatically.
 execFileSync(process.env.PHP_BINARY || "php", [path.join(output, "console.php"), "warm-cache"], { cwd: root, stdio: "inherit" });
 await fs.copyFile("PHP-HOSTING.md", path.join(output, "README.md"));

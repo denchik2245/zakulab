@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { ServicesSection } from "@/components/services-section";
 import { AllProjectsButton, ProjectCard, ProjectRow } from "@/components/portfolio-project";
@@ -15,6 +15,26 @@ type Filter = (typeof filters)[number]["id"];
 export function PortfolioPage({ site, updatedAt }: { site: PortfolioContent; updatedAt?: string }) {
   const [activeFilter, setActiveFilter] = useState<Filter>("all");
   const [showAll, setShowAll] = useState(false);
+  const [filterScrollRequest, setFilterScrollRequest] = useState(0);
+  const filtersRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    if (filterScrollRequest === 0 || !filtersRef.current) return;
+    const headerHeight = document.querySelector<HTMLElement>(".site-header")?.offsetHeight ?? 0;
+    // Align after the list and mobile featured cards update, before the next paint.
+    window.scrollTo({
+      top: Math.max(0, window.scrollY + filtersRef.current.getBoundingClientRect().top - headerHeight - 20),
+      behavior: "instant",
+    });
+  }, [filterScrollRequest]);
+
+  const selectFilter = (filter: Filter) => {
+    setActiveFilter(filter);
+    setShowAll(false);
+    // Repeated clicks on the selected filter should also return to the list's start.
+    setFilterScrollRequest((request) => request + 1);
+  };
+
   const projects = useMemo(() => site.portfolioProjects.filter((project) => project.published).sort((a, b) => a.order - b.order), [site.portfolioProjects]);
   const featuredProjects = projects.filter((project) => project.portfolioPlacement === "featured").slice(0, 6);
   const homeFeaturedProjects = featuredProjects.filter((project) => project.homePlacement === "featured");
@@ -22,10 +42,18 @@ export function PortfolioPage({ site, updatedAt }: { site: PortfolioContent; upd
   const archiveProjects = projects.filter((project) => project.portfolioPlacement === "archive");
   const visibleProjects = activeFilter === "all" ? archiveProjects : archiveProjects.filter((project) => activeFilter === "tilda" ? project.platform.toLowerCase() === "tilda" : project.filters.includes(activeFilter as PortfolioFilter));
 
+  const updatedAtLabel = updatedAt
+    ? new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" })
+      .formatToParts(new Date(updatedAt))
+      .filter((part) => ["day", "month", "year"].includes(part.type))
+      .map((part) => part.value)
+      .join(" ")
+    : "28 августа 2026";
+
   return <div className={`figma-portfolio-page site-mobile-layout ${styles.page} ${showAll ? styles.expanded : ""}`} id="top">
     <section className={styles.intro}>
       <div className={styles.heading}><Breadcrumbs current="Портфолио" /><h1>Сайты и интерфейсы,<br className={styles.desktopBreak} /> которые я спроектировал</h1></div>
-      <div className={styles.updated}><span><small>Последнее обновление</small><strong>{updatedAt ? new Intl.DateTimeFormat("ru-RU", { day: "2-digit", month: "2-digit", year: "numeric", timeZone: "UTC" }).format(new Date(updatedAt)) : "28 августа 2026"}</strong></span><Image className={styles.desktopUpdateIcon} src="/assets/figma/portfolio-update.svg" width={28} height={28} alt="" /><Image className={styles.mobileUpdateIcon} src="/assets/figma/portfolio-update-mobile.svg" width={24} height={24} alt="" /></div>
+      <div className={styles.updated}><span><small>Последнее обновление</small><strong>{updatedAtLabel}</strong></span><Image className={styles.desktopUpdateIcon} src="/assets/figma/portfolio-update.svg" width={28} height={28} alt="" /><Image className={styles.mobileUpdateIcon} src="/assets/figma/portfolio-update-mobile.svg" width={24} height={24} alt="" /></div>
     </section>
 
     <section className={styles.work} aria-labelledby="featured-title">
@@ -35,7 +63,7 @@ export function PortfolioPage({ site, updatedAt }: { site: PortfolioContent; upd
         <div className={styles.featuredGrid} id="featured-projects">{featuredProjects.map((project, index) => <ProjectCard className={`${styles.featuredCard} ${mobileFeaturedIds.has(project.id) ? "" : styles.extraCard}`} project={project} priority={index < 3} sizes="(max-width: 767px) min(640px, calc(100vw - 40px)), (max-width: 1024px) calc((100vw - 80px) / 2), (max-width: 1199px) calc((100vw - 96px) / 2), (max-width: 1919px) min(470px, calc((100vw - 112px) / 3)), 540px" key={project.id} />)}</div>
 
         <h2 className={styles.otherTitle} id="other">Другие проекты</h2>
-        <div className={styles.filters} role="group" aria-label="Фильтр проектов">{filters.map((filter) => <button type="button" key={filter.id} className={activeFilter === filter.id ? styles.activeFilter : ""} aria-pressed={activeFilter === filter.id} onClick={() => { setActiveFilter(filter.id); setShowAll(false); }}>{filter.id === "tilda" && <Image src="/assets/figma/property1-tilda.svg" width={28} height={28} alt="" />}{filter.label}</button>)}</div>
+        <div ref={filtersRef} className={styles.filters} role="group" aria-label="Фильтр проектов">{filters.map((filter) => <button type="button" key={filter.id} className={activeFilter === filter.id ? styles.activeFilter : ""} aria-pressed={activeFilter === filter.id} onClick={() => selectFilter(filter.id)}>{filter.id === "tilda" && <Image src={activeFilter === "tilda" ? "/assets/figma/tilda-filter-active.svg" : "/assets/figma/property1-tilda.svg"} width={28} height={28} alt="" />}{filter.label}</button>)}</div>
         <div className={styles.projectList} id="archive-projects" aria-live="polite">{visibleProjects.map((project) => <ProjectRow className={styles.projectRow} project={project} key={project.id} />)}</div>
         {!showAll && (featuredProjects.length > 4 || visibleProjects.length > 5) && <AllProjectsButton className={styles.allProjects} count={projects.length} onClick={() => setShowAll(true)} expanded={showAll} controls="featured-projects archive-projects" />}
       </div>

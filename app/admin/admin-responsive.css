@@ -181,3 +181,6 @@
   .admin-studio .admin-case-add-buttons,
   .admin-studio .admin-case-gallery-grid { grid-template-columns:minmax(0,1fr); }
 }
+.admin-case-publish-warnings { margin: 20px 0; padding: 16px 20px; border: 1px solid #d5c59d; border-radius: 12px; background: #fffbef; color: #4e432b; }
+.admin-case-publish-warnings ul { margin: 8px 0 0; padding-left: 20px; }
+.admin-case-publish-warnings li + li { margin-top: 6px; }

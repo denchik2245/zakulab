@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { navigation } from "@/lib/navigation";
 import styles from "./site-header.module.css";
 import { SocialLinks } from "./social-links";
@@ -10,19 +10,30 @@ import { MobileMenu } from "./mobile-menu";
 
 export function Header(links: { telegramUrl: string; maxUrl: string; vkUrl: string }) {
   const [isHidden, setIsHidden] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    let lastScrollY = window.scrollY;
+    const getScrollY = () => Math.max(0, Math.min(window.scrollY, document.documentElement.scrollHeight - window.innerHeight));
+    let lastScrollY = getScrollY();
+    let lastDirection = 0;
+    let directionDistance = 0;
 
     const updateScrollDirection = () => {
-      const scrollY = window.scrollY;
-      const direction = scrollY > lastScrollY ? "down" : "up";
-      if (direction !== "down" && scrollY < 10) {
+      // Clamp elastic overscroll so bouncing at either edge cannot reverse the header.
+      const scrollY = getScrollY();
+      const delta = scrollY - lastScrollY;
+      if (delta === 0) return;
+
+      const direction = Math.sign(delta);
+      directionDistance = direction === lastDirection ? directionDistance + Math.abs(delta) : Math.abs(delta);
+
+      if (scrollY <= (headerRef.current?.offsetHeight ?? 88)) {
         setIsHidden(false);
-      } else if (Math.abs(scrollY - lastScrollY) > 5) {
-        setIsHidden(direction === "down" && scrollY > 100);
+      } else if (directionDistance >= 6) {
+        setIsHidden(direction > 0);
       }
-      lastScrollY = scrollY > 0 ? scrollY : 0;
+      lastScrollY = scrollY;
+      lastDirection = direction;
     };
 
     window.addEventListener("scroll", updateScrollDirection, { passive: true });
@@ -32,7 +43,7 @@ export function Header(links: { telegramUrl: string; maxUrl: string; vkUrl: stri
   }, []);
 
   return (
-    <header className={`site-header ${styles.siteHeader} ${isHidden ? styles.hidden : ""}`}>
+    <header ref={headerRef} className={`site-header ${styles.siteHeader} ${isHidden ? styles.hidden : ""}`}>
       <div className={styles.headerInner}>
         <Link href="/" className={styles.logo} aria-label="Zakulab">
           <Image src="/assets/figma/logo.svg" width={48} height={48} alt="" priority />
@@ -43,7 +54,6 @@ export function Header(links: { telegramUrl: string; maxUrl: string; vkUrl: stri
         </nav>
 
         <nav className={styles.secondaryNav} aria-label="Дополнительное">
-          <Link href="/#contact">Обсудить проект</Link>
           <Link href="/style-check">Выбор стиля</Link>
         </nav>
 

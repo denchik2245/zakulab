@@ -1,0 +1,512 @@
+{
+  "pages": [
+    {
+      "url": "https://zakulab.ru/",
+      "status": 200,
+      "title": "Денис Закусилов — сайты для бизнеса под ключ",
+      "h1": [
+        "— Проектирую сайты и цифровые продукты, в которых легко понять главное и сделать следующий шаг"
+      ],
+      "main_words": 709,
+      "error": null
+    },
+    {
+      "url": "https://zakulab.ru/projects",
+      "status": 200,
+      "title": "Портфолио — zakulab",
+      "h1": [
+        "Сайты и интерфейсы, которые я спроектировал"
+      ],
+      "main_words": 457,
+      "error": null
+    },
+    {
+      "url": "https://zakulab.ru/reviews",
+      "status": 200,
+      "title": "Отзывы клиентов — zakulab",
+      "h1": [
+        "Отзывы тех, с кем мы работали"
+      ],
+      "main_words": 303,
+      "error": null
+    },
+    {
+      "url": "https://zakulab.ru/style-check",
+      "status": 200,
+      "title": "Выбор стиля — zakulab",
+      "h1": [
+        "Найдём стиль, который вам подходит"
+      ],
+      "main_words": 199,
+      "error": null
+    },
+    {
+      "url": "https://zakulab.ru/cases/belstudy",
+      "status": 200,
+      "title": "Кейс Belstudy — zakulab",
+      "h1": [
+        "Belstudy"
+      ],
+      "main_words": 304,
+      "error": null
+    },
+    {
+      "url": "https://zakulab.ru/cases/domstroy44",
+      "status": 200,
+      "title": "Кейс СК ДомСтрой 44 — zakulab",
+      "h1": [
+        "СК ДомСтрой 44"
+      ],
+      "main_words": 348,
+      "error": null
+    },
+    {
+      "url": "https://zakulab.ru/cases/liniya-prava",
+      "status": 200,
+      "title": "Кейс Линия Права — zakulab",
+      "h1": [
+        "Линия Права"
+      ],
+      "main_words": 297,
+      "error": null
+    },
+    {
+      "url": "https://zakulab.ru/cases/petpassport",
+      "status": 200,
+      "title": "Кейс PetPassport — zakulab",
+      "h1": [
+        "PetPassport"
+      ],
+      "main_words": 357,
+      "error": null
+    },
+    {
+      "url": "https://zakulab.ru/cases/traktor-event",
+      "status": 200,
+      "title": "Кейс Хоккейный ивент «Трактор» — zakulab",
+      "h1": [
+        "Хоккейный ивент «Трактор»"
+      ],
+      "main_words": 276,
+      "error": null
+    },
+    {
+      "url": "https://zakulab.ru/cases/flabellum",
+      "status": 200,
+      "title": "Кейс ЖК Flabellum — zakulab",
+      "h1": [
+        "ЖК Flabellum"
+      ],
+      "main_words": 236,
+      "error": null
+    },
+    {
+      "url": "https://zakulab.ru/cases/redcross",
+      "status": 200,
+      "title": "Кейс Курсы первой помощи — zakulab",
+      "h1": [
+        "Курсы первой помощи"
+      ],
+      "main_words": 233,
+      "error": null
+    },
+    {
+      "url": "https://zakulab.ru/cases/dunaeff-store",
+      "status": 200,
+      "title": "Кейс Дунаефф Стор — zakulab",
+      "h1": [
+        "Дунаефф Стор"
+      ],
+      "main_words": 194,
+      "error": null
+    },
+    {
+      "url": "https://zakulab.ru/cases/unique-philosophy",
+      "status": 200,
+      "title": "Кейс Unique Philosophy — zakulab",
+      "h1": [
+        "Unique Philosophy"
+      ],
+      "main_words": 161,
+      "error": null
+    },
+    {
+      "url": "https://zakulab.ru/cases/anodfero",
+      "status": 200,
+      "title": "Кейс Альгеба — Anodfero — zakulab",
+      "h1": [
+        "Альгеба — Anodfero"
+      ],
+      "main_words": 135,
+      "error": null
+    },
+    {
+      "url": "https://zakulab.ru/cases/vladkovsky",
+      "status": 200,
+      "title": "Кейс На Вадковском — zakulab",
+      "h1": [
+        "На Вадковском"
+      ],
+      "main_words": 237,
+      "error": null
+    },
+    {
+      "url": "https://zakulab.ru/cases/alts",
+      "status": 200,
+      "title": "Кейс Технологии Ремонта Пути — zakulab",
+      "h1": [
+        "Технологии Ремонта Пути"
+      ],
+      "main_words": 376,
+      "error": null
+    },
+    {
+      "url": "https://zakulab.ru/cases/kuzin-partners",
+      "status": 200,
+      "title": "Кейс Кузин и партнёры — zakulab",
+      "h1": [
+        "Кузин и партнёры"
+      ],
+      "main_words": 337,
+      "error": null
+    },
+    {
+      "url": "https://zakulab.ru/cases/talantum",
+      "status": 200,
+      "title": "Кейс Центр Талантум — zakulab",
+      "h1": [
+        "Центр Талантум"
+      ],
+      "main_words": 569,
+      "error": null
+    },
+    {
+      "url": "https://zakulab.ru/cases/parquet-deco",
+      "status": 200,
+      "title": "Кейс Parquet Deco — zakulab",
+      "h1": [
+        "Parquet Deco"
+      ],
+      "main_words": 373,
+      "error": null
+    },
+    {
+      "url": "https://zakulab.ru/cases/normdev",
+      "status": 200,
+      "title": "Кейс NormDev — zakulab",
+      "h1": [
+        "NormDev"
+      ],
+      "main_words": 334,
+      "error": null
+    },
+    {
+      "url": "https://zakulab.ru/cases/vn-metallgrupp",
+      "status": 200,
+      "title": "Кейс ВН Металл Групп — zakulab",
+      "h1": [
+        "ВН Металл Групп"
+      ],
+      "main_words": 351,
+      "error": null
+    },
+    {
+      "url": "https://zakulab.ru/privacy",
+      "status": 200,
+      "title": "Политика обработки персональных данных — zakulab",
+      "h1": [
+        "Политика обработки персональных данных"
+      ],
+      "main_words": 132,
+      "error": null
+    },
+    {
+      "url": "https://zakulab.ru/consent",
+      "status": 200,
+      "title": "Согласие на обработку персональных данных — zakulab",
+      "h1": [
+        "Согласие на обработку персональных данных"
+      ],
+      "main_words": 154,
+      "error": null
+    },
+    {
+      "url": "https://zakulab.ru/success",
+      "status": 200,
+      "title": "Спасибо — zakulab",
+      "h1": [
+        "Заявка отправлена"
+      ],
+      "main_words": 25,
+      "error": null
+    },
+    {
+      "url": "https://zakulab.ru/success?form=review",
+      "status": 200,
+      "title": "Спасибо — zakulab",
+      "h1": [
+        "Спасибо за отзыв"
+      ],
+      "main_words": 24,
+      "error": null
+    },
+    {
+      "url": "https://zakulab.ru/request",
+      "status": 200,
+      "title": "Обсудить проект — zakulab",
+      "h1": [
+        "Обсудить проект"
+      ],
+      "main_words": 51,
+      "error": null
+    },
+    {
+      "url": "https://zakulab.ru/seo-audit-missing-page-20261023",
+      "status": 404,
+      "title": "Страница не найдена — zakulab",
+      "h1": [
+        "Страница не найдена"
+      ],
+      "main_words": 13,
+      "error": null
+    },
+    {
+      "url": "https://zakulab.ru/cases/ashanti",
+      "status": 404,
+      "title": "Страница не найдена — zakulab",
+      "h1": [
+        "Страница не найдена"
+      ],
+      "main_words": 13,
+      "error": null
+    },
+    {
+      "url": "https://zakulab.ru/cases/seo-roi",
+      "status": 404,
+      "title": "Страница не найдена — zakulab",
+      "h1": [
+        "Страница не найдена"
+      ],
+      "main_words": 13,
+      "error": null
+    },
+    {
+      "url": "https://zakulab.ru/cases/seo-audit-missing-case",
+      "status": 404,
+      "title": "Страница не найдена — zakulab",
+      "h1": [
+        "Страница не найдена"
+      ],
+      "main_words": 13,
+      "error": null
+    }
+  ],
+  "sitemap_urls": [
+    "https://zakulab.ru/",
+    "https://zakulab.ru/projects",
+    "https://zakulab.ru/reviews",
+    "https://zakulab.ru/style-check",
+    "https://zakulab.ru/cases/belstudy",
+    "https://zakulab.ru/cases/domstroy44",
+    "https://zakulab.ru/cases/liniya-prava",
+    "https://zakulab.ru/cases/petpassport",
+    "https://zakulab.ru/cases/traktor-event",
+    "https://zakulab.ru/cases/flabellum",
+    "https://zakulab.ru/cases/redcross",
+    "https://zakulab.ru/cases/dunaeff-store",
+    "https://zakulab.ru/cases/unique-philosophy",
+    "https://zakulab.ru/cases/anodfero",
+    "https://zakulab.ru/cases/vladkovsky",
+    "https://zakulab.ru/cases/alts",
+    "https://zakulab.ru/cases/kuzin-partners",
+    "https://zakulab.ru/cases/talantum",
+    "https://zakulab.ru/cases/parquet-deco",
+    "https://zakulab.ru/cases/normdev",
+    "https://zakulab.ru/cases/vn-metallgrupp"
+  ],
+  "variants": [
+    {
+      "url": "http://zakulab.ru/",
+      "final_url": "https://zakulab.ru/",
+      "status": 200,
+      "headers": {
+        "Server": "nginx",
+        "Date": "Sat, 24 Oct 2026 07:43:37 GMT",
+        "Content-Type": "text/html; charset=UTF-8",
+        "Content-Length": "98680",
+        "Connection": "close",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Referrer-Policy": "strict-origin-when-cross-origin",
+        "Last-Modified": "Sat, 24 Oct 2026 07:42:52 GMT",
+        "ETag": "\"18178-65e913e88a12c\"",
+        "Accept-Ranges": "bytes",
+        "Vary": "Accept-Encoding",
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "Strict-Transport-Security": "max-age=31536000;"
+      },
+      "elapsed_s": 0.415,
+      "bytes": 98680
+    },
+    {
+      "url": "https://www.zakulab.ru/",
+      "final_url": "https://zakulab.ru/",
+      "status": 200,
+      "headers": {
+        "Server": "nginx",
+        "Date": "Sat, 24 Oct 2026 07:43:37 GMT",
+        "Content-Type": "text/html; charset=UTF-8",
+        "Content-Length": "98680",
+        "Connection": "close",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Referrer-Policy": "strict-origin-when-cross-origin",
+        "Last-Modified": "Sat, 24 Oct 2026 07:42:52 GMT",
+        "ETag": "\"18178-65e913e88a12c\"",
+        "Accept-Ranges": "bytes",
+        "Vary": "Accept-Encoding",
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "Strict-Transport-Security": "max-age=31536000;"
+      },
+      "elapsed_s": 0.679,
+      "bytes": 98680
+    },
+    {
+      "url": "http://www.zakulab.ru/",
+      "final_url": "https://zakulab.ru/",
+      "status": 200,
+      "headers": {
+        "Server": "nginx",
+        "Date": "Sat, 24 Oct 2026 07:43:38 GMT",
+        "Content-Type": "text/html; charset=UTF-8",
+        "Content-Length": "98680",
+        "Connection": "close",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Referrer-Policy": "strict-origin-when-cross-origin",
+        "Last-Modified": "Sat, 24 Oct 2026 07:42:52 GMT",
+        "ETag": "\"18178-65e913e88a12c\"",
+        "Accept-Ranges": "bytes",
+        "Vary": "Accept-Encoding",
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "Strict-Transport-Security": "max-age=31536000;"
+      },
+      "elapsed_s": 0.695,
+      "bytes": 98680
+    },
+    {
+      "url": "https://zakulab.netlify.app/",
+      "final_url": "https://zakulab.ru/",
+      "status": 200,
+      "headers": {
+        "Server": "nginx",
+        "Date": "Sat, 24 Oct 2026 07:43:38 GMT",
+        "Content-Type": "text/html; charset=UTF-8",
+        "Content-Length": "98680",
+        "Connection": "close",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Referrer-Policy": "strict-origin-when-cross-origin",
+        "Last-Modified": "Sat, 24 Oct 2026 07:42:52 GMT",
+        "ETag": "\"18178-65e913e88a12c\"",
+        "Accept-Ranges": "bytes",
+        "Vary": "Accept-Encoding",
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "Strict-Transport-Security": "max-age=31536000;"
+      },
+      "elapsed_s": 1.186,
+      "bytes": 98680
+    },
+    {
+      "url": "https://zakulab.netlify.app/projects",
+      "final_url": "https://zakulab.ru/projects",
+      "status": 200,
+      "headers": {
+        "Server": "nginx",
+        "Date": "Sat, 24 Oct 2026 07:43:38 GMT",
+        "Content-Type": "text/html; charset=UTF-8",
+        "Content-Length": "88746",
+        "Connection": "close",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Referrer-Policy": "strict-origin-when-cross-origin",
+        "Last-Modified": "Sat, 24 Oct 2026 07:42:53 GMT",
+        "ETag": "\"15aaa-65e913e8eb7c8\"",
+        "Accept-Ranges": "bytes",
+        "Vary": "Accept-Encoding",
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "Strict-Transport-Security": "max-age=31536000;"
+      },
+      "elapsed_s": 0.92,
+      "bytes": 88746
+    },
+    {
+      "url": "https://zakulab.ru/projects/",
+      "final_url": "https://zakulab.ru/projects",
+      "status": 200,
+      "headers": {
+        "Server": "nginx",
+        "Date": "Sat, 24 Oct 2026 07:43:38 GMT",
+        "Content-Type": "text/html; charset=UTF-8",
+        "Content-Length": "88746",
+        "Connection": "close",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Referrer-Policy": "strict-origin-when-cross-origin",
+        "Last-Modified": "Sat, 24 Oct 2026 07:42:53 GMT",
+        "ETag": "\"15aaa-65e913e8eb7c8\"",
+        "Accept-Ranges": "bytes",
+        "Vary": "Accept-Encoding",
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "Strict-Transport-Security": "max-age=31536000;"
+      },
+      "elapsed_s": 0.572,
+      "bytes": 88746
+    },
+    {
+      "url": "https://zakulab.ru/?utm_source=seo-audit",
+      "final_url": "https://zakulab.ru/?utm_source=seo-audit",
+      "status": 200,
+      "headers": {
+        "Server": "nginx",
+        "Date": "Sat, 24 Oct 2026 07:43:38 GMT",
+        "Content-Type": "text/html; charset=UTF-8",
+        "Content-Length": "98680",
+        "Connection": "close",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Referrer-Policy": "strict-origin-when-cross-origin",
+        "Last-Modified": "Sat, 24 Oct 2026 07:42:52 GMT",
+        "ETag": "\"18178-65e913e88a12c\"",
+        "Accept-Ranges": "bytes",
+        "Vary": "Accept-Encoding",
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "Strict-Transport-Security": "max-age=31536000;"
+      },
+      "elapsed_s": 0.241,
+      "bytes": 98680
+    },
+    {
+      "url": "https://zakulab.ru/opengraph-image",
+      "final_url": "https://zakulab.ru/opengraph-image",
+      "status": 404,
+      "headers": {
+        "Server": "nginx",
+        "Date": "Sat, 24 Oct 2026 07:43:39 GMT",
+        "Content-Type": "text/html; charset=utf-8",
+        "Transfer-Encoding": "chunked",
+        "Connection": "close",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Referrer-Policy": "strict-origin-when-cross-origin",
+        "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+        "Cache-Control": "no-store",
+        "X-Robots-Tag": "noindex"
+      },
+      "elapsed_s": 0.338,
+      "bytes": 62603
+    }
+  ],
+  "asset_count": 246,
+  "bad_assets": []
+}

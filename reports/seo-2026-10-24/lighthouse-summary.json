@@ -1,0 +1,52 @@
+[
+  {
+    "path": "/projects",
+    "performance": 87,
+    "seo": 100,
+    "lcp_ms": 3332,
+    "cls": 0,
+    "tbt_ms": 125,
+    "bytes": 648664,
+    "runtime_error": null
+  },
+  {
+    "path": "/",
+    "performance": 98,
+    "seo": 100,
+    "lcp_ms": 2253,
+    "cls": 0.002712754340159685,
+    "tbt_ms": 37,
+    "bytes": 642904,
+    "runtime_error": null
+  },
+  {
+    "path": "/cases/unique-philosophy",
+    "performance": 77,
+    "seo": 100,
+    "lcp_ms": 2042,
+    "cls": 0.0001639650043438041,
+    "tbt_ms": 794,
+    "bytes": 740115,
+    "runtime_error": null
+  },
+  {
+    "path": "/style-check",
+    "performance": 99,
+    "seo": 100,
+    "lcp_ms": 1617,
+    "cls": 0.0006946850641354871,
+    "tbt_ms": 77.5,
+    "bytes": 3853175,
+    "runtime_error": null
+  },
+  {
+    "path": "/reviews",
+    "performance": 99,
+    "seo": 100,
+    "lcp_ms": 2098,
+    "cls": 0.0029175708404716545,
+    "tbt_ms": 34.5,
+    "bytes": 571782,
+    "runtime_error": null
+  }
+]

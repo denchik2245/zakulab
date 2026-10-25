@@ -21,6 +21,7 @@ try {
         if (!in_array($method, ['GET', 'HEAD'], true)) fail(404, 'Страница не найдена.');
         header('Location: ' . rtrim($path, '/') . (isset($_SERVER['QUERY_STRING']) && $_SERVER['QUERY_STRING'] !== '' ? '?' . $_SERVER['QUERY_STRING'] : ''), true, 308); exit;
     }
+    if (str_starts_with($path, '/api/assets/')) { require __DIR__ . '/../app/src/assets.php'; serve_asset($path, $method); }
     if (str_starts_with($path, '/api/')) { require __DIR__ . '/../app/src/api.php'; handle_api($path, $method); }
     if (!in_array($method, ['GET', 'HEAD'], true)) { header('Allow: GET, HEAD'); fail(405, 'Метод не поддерживается.'); }
     require __DIR__ . '/../app/src/render.php';
@@ -34,7 +35,8 @@ try {
         echo '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
         $paths = ['/', '/projects', '/reviews', '/style-check'];
         foreach (published_cases($content) as $case) $paths[] = '/cases/' . $case['slug'];
-        foreach ($paths as $url) echo '<url><loc>' . h(config()['site_url'] . $url) . '</loc><lastmod>' . h($content['updatedAt']) . '</lastmod></url>';
+        // CMS saves affect the whole document; they are not a reliable modification date for each URL.
+        foreach ($paths as $url) echo '<url><loc>' . h(config()['site_url'] . $url) . '</loc></url>';
         echo '</urlset>'; exit;
     }
     if ($path === '/manifest.webmanifest') { header('Content-Type: application/manifest+json'); echo json_encode_safe(['name' => 'zakulab', 'short_name' => 'zakulab', 'start_url' => '/', 'display' => 'browser', 'background_color' => '#fefefe', 'theme_color' => '#304e41']); exit; }
@@ -43,7 +45,7 @@ try {
     if (in_array($page, ['admin', 'success', '404', 'request'], true)) header('Cache-Control: no-store');
     else header('Cache-Control: public, max-age=0, must-revalidate');
     header('Content-Type: text/html; charset=utf-8');
-    if (in_array($page, ['admin', 'success', '404', 'privacy', 'consent'], true)) header('X-Robots-Tag: noindex');
+    if (in_array($page, ['admin', 'success', '404', 'privacy', 'consent', 'request'], true)) header('X-Robots-Tag: noindex');
     $key = cache_key($page, $case);
     $cached = $key ? cache_directory() . '/' . $key . '.html' : null;
     if ($cached && is_file($cached)) { if ($method !== 'HEAD') readfile($cached); exit; }

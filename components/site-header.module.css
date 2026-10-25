@@ -8,16 +8,21 @@
   position: sticky;
   top: 0;
   z-index: 20;
+  pointer-events: auto;
   height: 88px;
   color: var(--header-ink);
   background: var(--header-bg);
   border: 0;
   font-family: "Manrope Variable", "Manrope", sans-serif;
-  transition: transform 0.4s ease !important;
+  transition: transform 0.4s ease;
 }
 
 .siteHeader.hidden {
   transform: translateY(-100%);
+}
+
+.siteHeader:has(:focus-visible) {
+  transform: none;
 }
 
 .headerInner {
@@ -54,6 +59,7 @@
 :global(body:has(.style-check-page)) .headerInner { top: 24px; }
 
 @media (prefers-reduced-motion: reduce) {
+  .siteHeader { transition: none; }
   .primaryNav a, .secondaryNav a { transition-duration: var(--header-hover-speed) !important; }
 }
 

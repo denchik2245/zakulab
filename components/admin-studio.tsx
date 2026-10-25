@@ -174,7 +174,6 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
     if (!contentResponse.ok) { setLoginError("Вход выполнен, но данные не загрузились. Обновите страницу."); return; }
     setContent(await contentResponse.json());
     setIsAuthenticated(true);
-    window.dispatchEvent(new Event("zakulab-auth"));
   }
 
   async function logout() {
@@ -182,7 +181,6 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
     if (!response.ok) { setNotice("Не удалось выйти. Проверьте соединение."); return; }
     setIsAuthenticated(false);
     setContent(null);
-    window.dispatchEvent(new Event("zakulab-auth"));
   }
 
   async function persist(next: AdminContent, message: string) {
@@ -577,6 +575,7 @@ export function AdminStudio({ authenticated, initialContent }: { authenticated: 
                   {activePortfolio.caseStudy && <details className="admin-case-settings"><summary>Содержимое страницы кейса</summary><div>
                     <div className="admin-case-settings-head"><div><span>CASE / INNER PAGE</span><h3>Внутренняя страница кейса</h3><p>Контент кейса хранится внутри этой же работы — отдельной записи больше нет.</p></div><label><input type="checkbox" checked={Boolean(activePortfolio.caseStudy)} onChange={(event) => toggleCaseStudy(activePortfolio.id, event.target.checked)} /><span>{activePortfolio.caseStudy ? "Подключена" : "Не подключена"}</span></label></div>
                       <div className="admin-publish-row"><label><input type="checkbox" checked={activePortfolio.caseStudy.status === "published"} onChange={(event) => patchCaseStudy(activePortfolio.id, { status: event.target.checked ? "published" : "draft" })} /><span>Опубликовать внутреннюю страницу</span></label></div>
+                      <CasePublishingWarnings project={activePortfolio} />
                       <div className="admin-fields">
                         <Field label="URL-адрес"><input value={activePortfolio.caseStudy.slug} onChange={(event) => { const slug = event.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-"); patchCaseStudy(activePortfolio.id, { slug }); }} /></Field>
                         <Field label="Номер"><input value={activePortfolio.caseStudy.index} onChange={(event) => patchCaseStudy(activePortfolio.id, { index: event.target.value })} /></Field>
@@ -817,6 +816,20 @@ function CaseBuilder({
       </div>
     </section>
   );
+}
+
+function CasePublishingWarnings({ project }: { project: PortfolioProject }) {
+  const caseStudy = project.caseStudy;
+  if (!caseStudy) return null;
+  const images = (caseStudy.blocks ?? []).flatMap(block => block.type === "image" ? [{ image: block.image, alt: block.alt }] : block.type === "gallery" ? block.images : []);
+  const warnings = [
+    ...(!images.some(image => image.image.trim()) ? ["В кейсе пока нет изображений результата."] : []),
+    ...(images.some(image => !image.image.trim()) ? ["Есть незаполненные изображения. Загрузите материалы или удалите пустые блоки."] : []),
+    ...(images.some(image => image.image.trim() && !image.alt.trim()) ? ["У части изображений не заполнен alt-текст."] : []),
+    ...(caseStudy.status === "published" && project.portfolioPlacement === "hidden" ? ["Кейс опубликован, но скрыт в портфолио. Проверьте, есть ли на него ссылка с другой страницы."] : []),
+  ];
+  if (!warnings.length) return null;
+  return <aside className="admin-case-publish-warnings" role="status" aria-label="Проверка готовности кейса"><strong>Перед публикацией</strong><ul>{warnings.map(warning => <li key={warning}>{warning}</li>)}</ul></aside>;
 }
 
 function OrderField({ value, max, onChange }: { value: number; max: number; onChange: (position: number) => void }) {

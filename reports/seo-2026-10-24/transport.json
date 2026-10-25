@@ -1,0 +1,46 @@
+[
+  {
+    "path": "/api/assets/bundles/site-bb8d92267b.css",
+    "status": 200,
+    "Content-Type": "text/css; charset=utf-8",
+    "Content-Encoding": "gzip",
+    "Cache-Control": "public, max-age=31536000, immutable",
+    "Vary": "Accept-Encoding",
+    "ETag": "W/\"96d954383032d8cb34d862fb11746cabfc4da747131d1932ed955c088b3f1956\"",
+    "Content-Length": null,
+    "revalidation_status": 304
+  },
+  {
+    "path": "/api/assets/bundles/site-CDJ2HE3R.js",
+    "status": 200,
+    "Content-Type": "application/javascript; charset=utf-8",
+    "Content-Encoding": "gzip",
+    "Cache-Control": "public, max-age=31536000, immutable",
+    "Vary": "Accept-Encoding",
+    "ETag": "W/\"151eea153a72d916a3b6da9a2b93fcb793a8db47aba724cb4de23ef2debd171e\"",
+    "Content-Length": null,
+    "revalidation_status": 304
+  },
+  {
+    "path": "/api/assets/optimized/213121dc3b-texture-567.webp",
+    "status": 200,
+    "Content-Type": "image/webp",
+    "Content-Encoding": null,
+    "Cache-Control": "public, max-age=31536000, immutable",
+    "Vary": "Accept-Encoding",
+    "ETag": "\"a2f13a80245954f8e8190c60826e4590b3feb2b5d22f6c96d88981697d2d8fd6\"",
+    "Content-Length": "39414",
+    "revalidation_status": 304
+  },
+  {
+    "path": "/api/assets/fonts/2fe89d53234c61d4-s.1u30mmyq6lnsd.woff2",
+    "status": 200,
+    "Content-Type": "font/woff2",
+    "Content-Encoding": null,
+    "Cache-Control": "public, max-age=604800, must-revalidate",
+    "Vary": "Accept-Encoding",
+    "ETag": "\"f4af600cd68bdef61a3e3360c1f92580ce0d1d59cd8e39c89de7897f356a228b\"",
+    "Content-Length": "8860",
+    "revalidation_status": 304
+  }
+]

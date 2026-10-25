@@ -13,17 +13,21 @@ function media_image_variants(string $src): ?array {
     if (!preg_match('~^/api/media/([a-f0-9-]{16,64}\.(?:png|jpg|webp|gif))$~D', $src, $match)) return null;
     $file = storage_path('media/' . $match[1]);
     $metadata = read_json_file($file . '.json', []);
-    $originalWidth = $metadata['width'] ?? 0;
-    if (!$originalWidth) return $cache[$src] = null;
-    $variants = []; $fallback = $src;
+    $originalWidth = (int)($metadata['width'] ?? 0);
+    $originalHeight = (int)($metadata['height'] ?? 0);
+    if ($originalWidth <= 0 || $originalHeight <= 0) return $cache[$src] = null;
+    $full = preg_match('/\.(?:png|jpg)$/D', $match[1]) && is_file($file . '.full.webp') ? $src . '?w=full' : $src;
+    $variants = []; $fallback = $full;
     foreach ([320, 640, 1280, 1920] as $width) {
         if ($width >= $originalWidth || !is_file($file . '.' . $width . '.webp')) continue;
-        $fallback = $src . '?w=' . $width;
-        $variants[] = $fallback . ' ' . $width . 'w';
+        $variant = $src . '?w=' . $width;
+        if ($width <= 960) $fallback = $variant;
+        $variants[] = $variant . ' ' . $width . 'w';
     }
-    if (!$variants) return $cache[$src] = null;
-    $variants[] = $src . ' ' . $originalWidth . 'w';
-    return $cache[$src] = ['src' => $fallback, 'srcset' => implode(', ', $variants)];
+    $dimensions = ['width' => $originalWidth, 'height' => $originalHeight];
+    if (!$variants) return $cache[$src] = ['src' => $full] + $dimensions;
+    $variants[] = $full . ' ' . $originalWidth . 'w';
+    return $cache[$src] = ['src' => $fallback, 'srcset' => implode(', ', $variants)] + $dimensions;
 }
 function collect_public_images(array $value, array &$images): void {
     foreach ($value as $item) {
@@ -37,9 +41,21 @@ function image(string $src, string $alt = '', array $attributes = [], bool $fill
     if ($fill) $attributes['style'] = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;' . ($attributes['style'] ?? '');
     $optimized = generated('images')[$src] ?? media_image_variants($src);
     if ($optimized) {
-        $attributes['src'] = $optimized['src'];
-        $attributes['srcset'] = $optimized['srcset'];
-        $attributes['sizes'] ??= '(max-width: 767px) 100vw, 50vw';
+        $attributes['src'] = $optimized['src'] ?? $src;
+        if (!empty($optimized['srcset'])) {
+            $attributes['srcset'] = $optimized['srcset'];
+            $attributes['sizes'] ??= '(max-width: 767px) 100vw, 50vw';
+        }
+        if (!empty($optimized['width']) && !empty($optimized['height'])) {
+            if (!isset($attributes['width']) && !isset($attributes['height'])) {
+                $attributes['width'] = $optimized['width'];
+                $attributes['height'] = $optimized['height'];
+            } elseif (isset($attributes['width']) && !isset($attributes['height'])) {
+                $attributes['height'] = max(1, (int)round((int)$attributes['width'] * $optimized['height'] / $optimized['width']));
+            } elseif (isset($attributes['height']) && !isset($attributes['width'])) {
+                $attributes['width'] = max(1, (int)round((int)$attributes['height'] * $optimized['width'] / $optimized['height']));
+            }
+        }
     }
     echo '<img' . attrs($attributes) . '>';
 }
@@ -54,17 +70,17 @@ function breadcrumbs(string $current): void { ?>
 <?php }
 function section_title(string $eyebrow, string $title, string $id = ''): void { ?><div class="<?= c('home', 'sectionTitle') ?>"><span>{<?= h($eyebrow) ?>}</span><h2<?= attrs(['id' => $id ?: null]) ?>><?= t($title) ?></h2></div><?php }
 function project_arrow(): void { ?><span class="<?= c('project', 'arrow') ?>" aria-hidden="true"><?php image('/assets/figma/arrow.svg', '', ['width' => 20, 'height' => 20]); ?></span><?php }
-function project_card(array $project, string $class = '', bool $priority = false): void {
+function project_card(array $project, string $class = '', bool $priority = false, string $sizes = '(max-width: 767px) 100vw, 50vw'): void {
     $url = $project['url']; $tag = $url && $url !== '#' ? 'a' : 'div';
     echo '<' . $tag . attrs(['class' => c('project', 'card') . ' ' . $class, 'href' => $tag === 'a' ? $url : null, 'target' => str_starts_with($url, 'http') ? '_blank' : null, 'rel' => str_starts_with($url, 'http') ? 'noreferrer' : null]) . '>';
-    image($project['image'], 'Превью проекта ' . $project['title'], [], true, $priority); ?>
+    image($project['image'], 'Превью проекта ' . $project['title'], ['sizes' => $sizes], true, $priority); ?>
     <span class="<?= c('project', 'shade') ?>" aria-hidden="true"></span><span class="<?= c('project', 'label') ?>"><span class="<?= c('project', 'desktopCopy') ?>"><?= t($project['title']) ?></span><span class="<?= c('project', 'mobileCopy') ?>"><?= t($project['title']) ?></span></span>
     <span class="<?= c('project', 'tags') ?>"><?php foreach (['desktopCopy', 'mobileCopy'] as $copy) foreach (array_filter($project['tags']) as $tagText): ?><small class="<?= c('project', $copy) ?>"><?= t($tagText) ?></small><?php endforeach; ?></span><span class="<?= c('project', 'cardArrow') ?>"><?php project_arrow(); ?></span>
     <?php echo '</' . $tag . '>';
 }
 function project_row(array $project, string $class = ''): void {
     $url = $project['url']; $tag = $url && $url !== '#' ? 'a' : 'div';
-    echo '<' . $tag . attrs(['class' => c('project', 'row') . ' ' . $class, 'href' => $tag === 'a' ? $url : null, 'target' => str_starts_with($url, 'http') ? '_blank' : null, 'rel' => str_starts_with($url, 'http') ? 'noreferrer' : null]) . '>'; ?>
+    echo '<' . $tag . attrs(['class' => c('project', 'row') . ' ' . $class, 'data-project-id' => $project['id'], 'href' => $tag === 'a' ? $url : null, 'target' => str_starts_with($url, 'http') ? '_blank' : null, 'rel' => str_starts_with($url, 'http') ? 'noreferrer' : null]) . '>'; ?>
     <strong class="<?= c('project', 'name') ?>"><?= t($project['title']) ?><?php project_arrow(); ?></strong><span class="<?= c('project', 'description') ?>"><span class="<?= c('project', 'desktopCopy') ?>"><?= t($project['description']) ?></span><span class="<?= c('project', 'mobileCopy') ?>"><?= t($project['description']) ?></span></span>
     <span class="<?= c('project', 'platform') ?>"><?php $platform = strtolower(trim($project['platform'])); if (in_array($platform, ['tilda', 'wp', 'wordpress', 'word press'], true)) image('/assets/figma/property1-' . ($platform === 'tilda' ? 'tilda' : 'wordpress') . '.svg', $project['platform'], ['width' => 36, 'height' => 36]); ?></span>
     <?php echo '</' . $tag . '>';
@@ -104,7 +120,39 @@ function page_meta(string $page, ?array $case = null): array {
     $title = match($page) { 'home' => 'Денис Закусилов — сайты для бизнеса под ключ', 'projects' => 'Портфолио — zakulab', 'reviews' => 'Отзывы клиентов — zakulab', 'style-check' => 'Выбор стиля — zakulab', 'case' => 'Кейс ' . ($case['title'] ?? '') . ' — zakulab', 'admin' => 'Панель управления — zakulab', 'privacy' => 'Политика обработки персональных данных — zakulab', 'consent' => 'Согласие на обработку персональных данных — zakulab', 'success' => 'Спасибо — zakulab', 'request' => 'Обсудить проект — zakulab', default => 'Страница не найдена — zakulab' };
     $description = match($page) { 'projects' => 'Сайты и интерфейсы, спроектированные Денисом Закусиловым.', 'reviews' => 'Отзывы клиентов о совместной работе с Денисом Закусиловым.', 'style-check' => 'Выберите визуальные направления, которые подходят для будущего сайта.', 'case' => $case['summary'] ?? '', default => 'Проектирую и запускаю понятные сайты для бизнеса: лендинги, многостраничные сайты и интернет-магазины.' };
     $path = match($page) { 'home' => '/', 'case' => '/cases/' . ($case['slug'] ?? ''), '404' => '/404', default => '/' . $page };
-    return ['title' => $title, 'description' => $description, 'canonical' => config()['site_url'] . $path, 'robots' => in_array($page, ['admin', 'privacy', 'consent', 'success', '404'], true) ? 'noindex, follow' : 'index, follow'];
+    return ['title' => $title, 'description' => $description, 'canonical' => config()['site_url'] . $path, 'robots' => in_array($page, ['admin', 'privacy', 'consent', 'success', 'request', '404'], true) ? 'noindex, follow' : 'index, follow'];
+}
+function page_structured_data(string $page, array $site, array $meta, ?array $case = null): array {
+    $origin = config()['site_url'];
+    $personId = $origin . '/#person';
+    $person = ['@type' => 'Person', '@id' => $personId, 'name' => 'Денис Закусилов', 'url' => $origin . '/', 'jobTitle' => 'Веб-дизайнер и руководитель проектов', 'knowsAbout' => ['Веб-дизайн', 'UX/UI', 'Tilda', 'Интернет-магазины']];
+    $profiles = [];
+    foreach (['telegramUrl', 'maxUrl', 'vkUrl', 'kworkUrl', 'flUrl'] as $key) {
+        $url = $site[$key] ?? '';
+        $parts = parse_url($url);
+        // Generic network home pages do not identify this person.
+        if ($parts && in_array($parts['scheme'] ?? '', ['http', 'https'], true) && trim($parts['path'] ?? '', '/') !== '') $profiles[] = $url;
+    }
+    if ($profiles) $person['sameAs'] = array_values(array_unique($profiles));
+    $graph = [$person];
+    $label = match ($page) { 'projects' => 'Портфолио', 'reviews' => 'Отзывы', 'style-check' => 'Выбрать стиль', 'case' => $case['title'] ?? '', default => '' };
+    if ($label !== '') {
+        $items = [['@type' => 'ListItem', 'position' => 1, 'name' => 'Главная', 'item' => $origin . '/']];
+        if ($page === 'case') $items[] = ['@type' => 'ListItem', 'position' => 2, 'name' => 'Портфолио', 'item' => $origin . '/projects'];
+        $items[] = ['@type' => 'ListItem', 'position' => count($items) + 1, 'name' => $label, 'item' => $meta['canonical']];
+        $graph[] = ['@type' => 'BreadcrumbList', '@id' => $meta['canonical'] . '#breadcrumbs', 'itemListElement' => $items];
+    }
+    if ($page === 'case' && $case) {
+        $work = ['@type' => 'CreativeWork', '@id' => $meta['canonical'] . '#work', 'url' => $meta['canonical'], 'name' => $case['title'], 'description' => $case['summary'], 'author' => ['@id' => $personId], 'inLanguage' => 'ru'];
+        foreach ($case['blocks'] ?? [] as $block) {
+            $image = $block['type'] === 'image' ? ($block['image'] ?? '') : ($block['type'] === 'gallery' ? ($block['images'][0]['image'] ?? '') : '');
+            if ($image === '') continue;
+            $work['image'] = str_starts_with($image, '/') ? $origin . $image : $image;
+            break;
+        }
+        $graph[] = $work;
+    }
+    return ['@context' => 'https://schema.org', '@graph' => $graph];
 }
 function page_route(string $path, array $content): array {
     $known = ['/' => 'home', '/projects' => 'projects', '/reviews' => 'reviews', '/style-check' => 'style-check', '/privacy' => 'privacy', '/consent' => 'consent', '/success' => 'success', '/request' => 'request', '/admin' => 'admin'];

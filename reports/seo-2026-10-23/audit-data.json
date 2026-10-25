@@ -1,0 +1,199 @@
+{
+  "summary": {
+    "health_score": null,
+    "health_score_reason": "Overall score not calculated: no fresh CWV, search-account or backlink evidence; unknowns are not zero scores.",
+    "business_type": "Freelance web design / service portfolio",
+    "audit_date_local": "2026-10-23",
+    "timezone": "Asia/Yekaterinburg",
+    "observed_at_utc": "2026-10-23T18:00:10.254681+00:00",
+    "checks": {
+      "sitemap_urls": 21,
+      "pages_checked": 30,
+      "resources_checked": 246,
+      "broken_resources": 0,
+      "sitemap_http_200": 21,
+      "matching_canonicals": 21,
+      "unique_titles": 21,
+      "case_images_without_dimensions": 198
+    },
+    "top_findings": [
+      "Demo reviews publicly presented",
+      "Static compression and cache headers missing",
+      "Case images lack reserved dimensions"
+    ],
+    "quick_wins": [
+      "Remove demo social proof",
+      "Enable compression",
+      "Reserve intrinsic image sizes"
+    ]
+  },
+  "categories": [
+    {
+      "name": "Technical SEO",
+      "score": null,
+      "what_works": [
+        "21/21 sitemap URLs return 200 with matching canonical",
+        "301 HTTP/www/Netlify; 308 trailing slash; real 404"
+      ],
+      "findings": [
+        {
+          "title": "Static responses lack compression and explicit cache policy",
+          "severity": "High",
+          "description": "CSS 246561 bytes and site entry JS 77026 bytes lack Content-Encoding despite Accept-Encoding gzip, br; checked static responses lack Cache-Control.",
+          "recommendation": "Enable compression on serving host and long-lived cache for hashed assets."
+        },
+        {
+          "title": "Sitemap lastmod uses global content save date",
+          "severity": "Low",
+          "description": "All 21 dates equal global updatedAt, not per-page significant update.",
+          "recommendation": "Use truthful per-page update times or omit lastmod."
+        }
+      ]
+    },
+    {
+      "name": "Content Quality",
+      "score": null,
+      "what_works": [
+        "Server-rendered cases with project images and specific descriptions"
+      ],
+      "findings": [
+        {
+          "title": "Demo reviews presented as published clients",
+          "severity": "High",
+          "description": "Home and reviews contain example.com demo profiles; first three demo entries lack demo badge.",
+          "recommendation": "Hide demo entries and publish verified author/project pairs."
+        },
+        {
+          "title": "Outcome percentages lack supporting context",
+          "severity": "Medium",
+          "description": "Unique Philosophy and Vladkovsky claim percentage growth without period, baseline or data source.",
+          "recommendation": "Substantiate results or replace with verifiable delivered scope."
+        }
+      ]
+    },
+    {
+      "name": "On-Page SEO",
+      "score": null,
+      "what_works": [
+        "21 unique titles and descriptions; H1 in initial HTML",
+        "All 17 published cases linked from portfolio"
+      ],
+      "findings": [
+        {
+          "title": "Services lack dedicated landing pages",
+          "severity": "Medium",
+          "description": "Three core service offerings appear as cards rather than independently addressable pages. Demand not measured.",
+          "recommendation": "Validate search demand then create distinct, useful service pages and link relevant cases."
+        },
+        {
+          "title": "Case articles have no links to related cases or live project",
+          "severity": "Medium",
+          "description": "Article anchors only link home and portfolio; common contact CTA exists in footer.",
+          "recommendation": "Add validated project URL, role/year, related work and service links."
+        }
+      ]
+    },
+    {
+      "name": "Schema / Structured Data",
+      "score": null,
+      "what_works": [
+        "Valid Person JSON-LD present"
+      ],
+      "findings": [
+        {
+          "title": "Page-specific structured context can be expanded",
+          "severity": "Low",
+          "description": "Only a common Person entity describes pages despite visible breadcrumb navigation.",
+          "recommendation": "Add accurate BreadcrumbList, stable Person @id/sameAs and optional CreativeWork."
+        }
+      ]
+    },
+    {
+      "name": "Performance (CWV)",
+      "score": null,
+      "what_works": [],
+      "findings": [
+        {
+          "title": "Fresh CWV unavailable",
+          "severity": "Info",
+          "description": "PageSpeed API returned HTTP 429 RESOURCE_EXHAUSTED. No current mobile CWV claimed.",
+          "recommendation": "Obtain fresh mobile lab and field measurements after runtime setup or through configured PSI."
+        }
+      ]
+    },
+    {
+      "name": "AI Search Readiness",
+      "score": null,
+      "what_works": [
+        "Public content and anchors are server-rendered; public crawling allowed"
+      ],
+      "findings": [
+        {
+          "title": "Citability and brand evidence not measured",
+          "severity": "Info",
+          "description": "No AI answer-engine citation or brand-presence survey performed.",
+          "recommendation": "Prioritize verifiable reviews/results; evaluate AI mentions separately if required."
+        }
+      ]
+    },
+    {
+      "name": "Images",
+      "score": null,
+      "what_works": [
+        "All checked img elements have alt attributes; responsive variants exist; case image content populated"
+      ],
+      "findings": [
+        {
+          "title": "Case images do not reserve space and cover is lazy",
+          "severity": "Medium",
+          "description": "Media images lack width/height and CSS aspect ratio. Browser confirmed unloaded lower images have zero height. CWV impact not measured.",
+          "recommendation": "Emit intrinsic dimensions and prioritize above-fold cover only."
+        }
+      ]
+    }
+  ],
+  "action_plan": {
+    "phases": [
+      {
+        "name": "Trust and delivery",
+        "timeframe": "Next release",
+        "items": [
+          "Hide demo reviews",
+          "Enable compression and static caching",
+          "Fix case image dimensions"
+        ]
+      },
+      {
+        "name": "Evidence and conversion",
+        "timeframe": "Following editorial pass",
+        "items": [
+          "Substantiate case outcomes",
+          "Expose project links and role/year",
+          "Link related work"
+        ]
+      },
+      {
+        "name": "Organic acquisition",
+        "timeframe": "After demand validation",
+        "items": [
+          "Validate service keyword groups",
+          "Create selected service pages",
+          "Check indexing and conversions in webmaster tools"
+        ]
+      }
+    ]
+  },
+  "artifacts": {
+    "findings_dir": "findings/",
+    "raw_crawl": "crawl.json",
+    "verification": "verification.json"
+  },
+  "limitations": [
+    "No authenticated webmaster tools or analytics",
+    "No field CWV; PSI returned 429",
+    "No fresh mobile lab measurement",
+    "No backlink or AI citation survey",
+    "Desktop browser spot-check at 1280px only",
+    "No site changes made"
+  ]
+}

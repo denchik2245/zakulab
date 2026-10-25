@@ -91,6 +91,24 @@ function published_cases(array $content): array {
     uasort($cases, fn(array $a, array $b): int => strcmp($a['index'], $b['index']));
     return $cases;
 }
+function related_cases(array $content, array $current, int $limit = 3): array {
+    $published = published_cases($content);
+    $currentPlatform = '';
+    foreach ($content['site']['portfolioProjects'] as $project) {
+        if (($project['caseStudy']['slug'] ?? '') === $current['slug']) $currentPlatform = strtolower(trim($project['platform']));
+    }
+    $related = [];
+    foreach ($content['site']['portfolioProjects'] as $project) {
+        $slug = $project['caseStudy']['slug'] ?? '';
+        if ($slug === $current['slug'] || !isset($published[$slug]) || $project['portfolioPlacement'] === 'hidden') continue;
+        $case = $published[$slug];
+        $platform = strtolower(trim($project['platform']));
+        $score = (int)($case['category'] === $current['category']) * 2 + (int)($currentPlatform !== '' && $platform === $currentPlatform);
+        $related[] = ['case' => $case, 'score' => $score];
+    }
+    usort($related, fn(array $a, array $b): int => ($b['score'] <=> $a['score']) ?: strcmp($a['case']['index'], $b['case']['index']) ?: strcmp($a['case']['slug'], $b['case']['slug']));
+    return array_column(array_slice($related, 0, $limit), 'case');
+}
 function public_content(array $content, string $page): array {
     $site = $content['site'];
     $site['portfolioProjects'] = array_values(array_filter($site['portfolioProjects'], fn(array $project): bool => $project['published']));
