@@ -17,8 +17,8 @@
 .page button { transition-property: color, background-color, border-color, opacity, transform; transition-duration: .35s; transition-timing-function: cubic-bezier(.22, .72, .24, 1); }
 .page button:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
 
-:global(body:has(.style-check-page)) { background: var(--style-bg, #fefefe); }
-:global(body:has(.style-check-page))::before { display: none; }
+:global(body:has(.style-check-page, .project-calculator-page)) { background: var(--style-bg, #fefefe); }
+:global(body:has(.style-check-page, .project-calculator-page))::before { display: none; }
 
 .intro { width: min(1660px, calc(100% - 260px)); min-height: 760px; margin-inline: auto; padding-top: 104px; }
 .introTop { display: grid; grid-template-columns: 680px 680px; justify-content: space-between; align-items: end; }

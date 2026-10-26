@@ -24,7 +24,7 @@ const caseStudyFields = z.object({
   slug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).max(120), index: text, title: text, eyebrow: text,
   summary: text, role: text, year: text, url: link, accent: z.enum(["green", "orange", "coral"]),
   category: z.enum(["corporate", "commerce"]), catalogTask: text, status: z.enum(["published", "draft"]),
-  featured: z.boolean(), createdAt: z.iso.datetime(), updatedAt: z.iso.datetime(), whatDone: text.optional(),
+  featured: z.boolean(), createdAt: z.iso.datetime(), updatedAt: z.iso.datetime(), whatDone: text.optional(), relatedImage: image.optional(),
   blocks: list(block, 100).optional(), verified: z.array(text).max(100),
   draft: z.object({ challenge: text, approach: text, decisions: z.array(z.object({ title: text, text })).max(100), result: text }),
 });
@@ -60,7 +60,7 @@ const site = z.object({
     (items) => items.filter((item) => item.homePlacement === "list").length <= MAX_HOME_ADDITIONAL_PROJECTS,
     `На главной можно разместить не более ${MAX_HOME_ADDITIONAL_PROJECTS} дополнительных работ. Уберите одну из главной, чтобы добавить другую.`,
   ),
-  processTitle: text, process: list(z.object({ id, title: text, text, image, secondaryTitle: text.optional(), secondaryText: text.optional(), secondaryImage: image.optional() })),
+  processTitle: text, process: list(z.object({ id, title: text, text, result: text.optional(), image, secondaryTitle: text.optional(), secondaryText: text.optional(), secondaryImage: image.optional() })),
   reviewsTitle: text, reviewsText: text, reviewImage: image,
   servicesTitle: text, servicesText: text, services: list(z.object({ id, title: text, text, price: text, priceSecondary: text, time: text })),
   smallTasksTitle: text, smallTasks: list(z.object({ id, title: text, text, deliverable: text, time: text, price: text })),

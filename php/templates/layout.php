@@ -7,7 +7,7 @@
 <div id="admin-app"><p class="php-loading">Загружаю панель управления…</p></div><noscript><p class="php-nojs">Для работы админки включите JavaScript.</p></noscript><script type="module" src="<?= h($assets['admin']) ?>"></script>
 <?php else: ?>
 <div id="site-header"><?php require __DIR__ . '/header.php'; ?></div>
-<main><?php $template = in_array($page, ['home', 'projects', 'reviews', 'style-check', 'case', 'request'], true) ? $page : 'document'; require __DIR__ . '/' . $template . '.php'; ?></main>
+<main><?php $template = in_array($page, ['home', 'projects', 'reviews', 'style-check', 'calculator', 'case', 'request'], true) ? $page : 'document'; require __DIR__ . '/' . $template . '.php'; ?></main>
 <?php require __DIR__ . '/footer.php'; ?>
 <script id="site-data" type="application/json"><?= json_script($public) ?></script><script type="module" src="<?= h($assets['site']) ?>"></script>
 <?php endif; ?>

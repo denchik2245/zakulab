@@ -33,7 +33,7 @@ try {
     if ($path === '/sitemap.xml') {
         header('Content-Type: application/xml; charset=utf-8');
         echo '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
-        $paths = ['/', '/projects', '/reviews', '/style-check'];
+        $paths = ['/', '/projects', '/reviews', '/style-check', '/calculator'];
         foreach (published_cases($content) as $case) $paths[] = '/cases/' . $case['slug'];
         // CMS saves affect the whole document; they are not a reliable modification date for each URL.
         foreach ($paths as $url) echo '<url><loc>' . h(config()['site_url'] . $url) . '</loc></url>';

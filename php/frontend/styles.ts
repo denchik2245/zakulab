@@ -10,8 +10,9 @@ import services from "@/php/styles/services-section.module.css";
 import social from "@/components/social-links.module.css";
 import breadcrumbs from "@/php/styles/breadcrumbs.module.css";
 import style from "@/components/style-check.module.css";
+import calculator from "@/components/project-calculator.module.css";
 import legal from "@/php/styles/legal-document.module.css";
 import casePage from "@/php/styles/case-page.module.css";
 import popup from "@/components/service-order-button.module.css";
 
-export const styles = { header, footer, home, portfolio, project, reviews, review, services, social, breadcrumbs, style, legal, case: casePage, popup };
+export const styles = { header, footer, home, portfolio, project, reviews, review, services, social, breadcrumbs, style, calculator, legal, case: casePage, popup };

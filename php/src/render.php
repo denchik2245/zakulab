@@ -117,8 +117,8 @@ function render_page(string $page, array $content, ?array $case = null, array $q
     return ob_get_clean();
 }
 function page_meta(string $page, ?array $case = null): array {
-    $title = match($page) { 'home' => 'Денис Закусилов — сайты для бизнеса под ключ', 'projects' => 'Портфолио — zakulab', 'reviews' => 'Отзывы клиентов — zakulab', 'style-check' => 'Выбор стиля — zakulab', 'case' => 'Кейс ' . ($case['title'] ?? '') . ' — zakulab', 'admin' => 'Панель управления — zakulab', 'privacy' => 'Политика обработки персональных данных — zakulab', 'consent' => 'Согласие на обработку персональных данных — zakulab', 'success' => 'Спасибо — zakulab', 'request' => 'Обсудить проект — zakulab', default => 'Страница не найдена — zakulab' };
-    $description = match($page) { 'projects' => 'Сайты и интерфейсы, спроектированные Денисом Закусиловым.', 'reviews' => 'Отзывы клиентов о совместной работе с Денисом Закусиловым.', 'style-check' => 'Выберите визуальные направления, которые подходят для будущего сайта.', 'case' => $case['summary'] ?? '', default => 'Проектирую и запускаю понятные сайты для бизнеса: лендинги, многостраничные сайты и интернет-магазины.' };
+    $title = match($page) { 'home' => 'Денис Закусилов — сайты для бизнеса под ключ', 'projects' => 'Портфолио — zakulab', 'reviews' => 'Отзывы клиентов — zakulab', 'style-check' => 'Выбор стиля — zakulab', 'calculator' => 'Калькулятор стоимости сайта — zakulab', 'case' => 'Кейс ' . ($case['title'] ?? '') . ' — zakulab', 'admin' => 'Панель управления — zakulab', 'privacy' => 'Политика обработки персональных данных — zakulab', 'consent' => 'Согласие на обработку персональных данных — zakulab', 'success' => 'Спасибо — zakulab', 'request' => 'Обсудить проект — zakulab', default => 'Страница не найдена — zakulab' };
+    $description = match($page) { 'projects' => 'Сайты и интерфейсы, спроектированные Денисом Закусиловым.', 'reviews' => 'Отзывы клиентов о совместной работе с Денисом Закусиловым.', 'style-check' => 'Выберите визуальные направления, которые подходят для будущего сайта.', 'calculator' => 'Рассчитайте ориентировочную стоимость и срок разработки лендинга, многостраничного сайта или интернет-магазина.', 'case' => $case['summary'] ?? '', default => 'Проектирую и запускаю понятные сайты для бизнеса: лендинги, многостраничные сайты и интернет-магазины.' };
     $path = match($page) { 'home' => '/', 'case' => '/cases/' . ($case['slug'] ?? ''), '404' => '/404', default => '/' . $page };
     return ['title' => $title, 'description' => $description, 'canonical' => config()['site_url'] . $path, 'robots' => in_array($page, ['admin', 'privacy', 'consent', 'success', 'request', '404'], true) ? 'noindex, follow' : 'index, follow'];
 }
@@ -135,7 +135,7 @@ function page_structured_data(string $page, array $site, array $meta, ?array $ca
     }
     if ($profiles) $person['sameAs'] = array_values(array_unique($profiles));
     $graph = [$person];
-    $label = match ($page) { 'projects' => 'Портфолио', 'reviews' => 'Отзывы', 'style-check' => 'Выбрать стиль', 'case' => $case['title'] ?? '', default => '' };
+    $label = match ($page) { 'projects' => 'Портфолио', 'reviews' => 'Отзывы', 'style-check' => 'Выбрать стиль', 'calculator' => 'Калькулятор проекта', 'case' => $case['title'] ?? '', default => '' };
     if ($label !== '') {
         $items = [['@type' => 'ListItem', 'position' => 1, 'name' => 'Главная', 'item' => $origin . '/']];
         if ($page === 'case') $items[] = ['@type' => 'ListItem', 'position' => 2, 'name' => 'Портфолио', 'item' => $origin . '/projects'];
@@ -155,7 +155,7 @@ function page_structured_data(string $page, array $site, array $meta, ?array $ca
     return ['@context' => 'https://schema.org', '@graph' => $graph];
 }
 function page_route(string $path, array $content): array {
-    $known = ['/' => 'home', '/projects' => 'projects', '/reviews' => 'reviews', '/style-check' => 'style-check', '/privacy' => 'privacy', '/consent' => 'consent', '/success' => 'success', '/request' => 'request', '/admin' => 'admin'];
+    $known = ['/' => 'home', '/projects' => 'projects', '/reviews' => 'reviews', '/style-check' => 'style-check', '/calculator' => 'calculator', '/privacy' => 'privacy', '/consent' => 'consent', '/success' => 'success', '/request' => 'request', '/admin' => 'admin'];
     if (isset($known[$path])) return [$known[$path], null];
     if (preg_match('~^/cases/([a-z0-9]+(?:-[a-z0-9]+)*)$~D', $path, $match)) {
         $case = published_cases($content)[$match[1]] ?? null;
@@ -164,7 +164,7 @@ function page_route(string $path, array $content): array {
     return ['404', null];
 }
 function cache_key(string $page, ?array $case = null): ?string {
-    return in_array($page, ['home', 'projects', 'reviews', 'style-check', 'privacy', 'consent'], true) ? $page : ($page === 'case' ? 'case-' . $case['slug'] : null);
+    return in_array($page, ['home', 'projects', 'reviews', 'style-check', 'calculator', 'privacy', 'consent'], true) ? $page : ($page === 'case' ? 'case-' . $case['slug'] : null);
 }
 function publish_cache(string $key, string $html, string $revision): void {
     store()->transaction(function() use ($key, $html, $revision): void {

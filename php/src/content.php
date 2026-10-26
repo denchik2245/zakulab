@@ -104,7 +104,7 @@ function related_cases(array $content, array $current, int $limit = 3): array {
         $case = $published[$slug];
         $platform = strtolower(trim($project['platform']));
         $score = (int)($case['category'] === $current['category']) * 2 + (int)($currentPlatform !== '' && $platform === $currentPlatform);
-        $related[] = ['case' => $case, 'score' => $score];
+        $related[] = ['case' => $case + ['preview' => ($case['relatedImage'] ?? '') ?: $project['image'], 'description' => $project['description']], 'score' => $score];
     }
     usort($related, fn(array $a, array $b): int => ($b['score'] <=> $a['score']) ?: strcmp($a['case']['index'], $b['case']['index']) ?: strcmp($a['case']['slug'], $b['case']['slug']));
     return array_column(array_slice($related, 0, $limit), 'case');

@@ -56,7 +56,7 @@
 .primaryNav a:focus-visible, .secondaryNav a:focus-visible, .logo:focus-visible, .socials:focus-visible { outline: 2px solid var(--header-hover); outline-offset: 4px; }
 .mobileMenu { display: none; }
 
-:global(body:has(.style-check-page)) .headerInner { top: 24px; }
+:global(body:has(.style-check-page, .project-calculator-page)) .headerInner { top: 24px; }
 
 @media (prefers-reduced-motion: reduce) {
   .siteHeader { transition: none; }

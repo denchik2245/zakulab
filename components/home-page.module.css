@@ -169,7 +169,7 @@
 
 .processSection { padding-top: 150px; padding-bottom: 150px; background: var(--background-primary); }
 .processSection .sectionTitle { height: 100px; width: 769px; }
-.processBoard { height: 2615px; margin-top: 80px; padding-inline: 50px; overflow: hidden; border-radius: var(--radius-sm); background: var(--surface-card); }
+.processBoard { margin-top: 80px; padding-inline: 50px; overflow: hidden; border-radius: var(--radius-sm); background: var(--surface-card); }
 .processStep {
   position: relative;
   padding-block: 50px;
@@ -178,17 +178,17 @@
   column-gap: 50px;
   border-bottom: 1px solid var(--border-on-card);
 }
-.processStep:nth-child(1) { height: 546px; }
-.processStep:nth-child(2) { height: 467px; }
-.processStep:nth-child(3) { height: 517px; }
-.processStep:nth-child(4) { height: 522px; }
-.processStep:nth-child(5) { height: 563px; }
+.processStep:nth-child(1) { min-height: 546px; }
+.processStep:nth-child(2) { min-height: 467px; }
+.processStep:nth-child(3) { min-height: 517px; }
+.processStep:nth-child(4) { min-height: 522px; }
+.processStep:nth-child(5) { min-height: 563px; }
 .processStep:last-child { border-bottom: 0; }
 .stepNumber { padding-top: 6px; color: var(--text-on-card); font-size: 16px; }
 .processStep:not(:last-child) .stepCopy { width: 550px; }
 .processStep:not(:last-child) .stepCopy > p { max-width: 550px; }
 .stepCopy h3 { margin: 0 0 28px; font-size: 28px; font-weight: 500; line-height: 1.2; }
-.stepCopy p { margin: 0; max-width: 572px; color: var(--text-on-card); font-size: 16px; line-height: 1.4; }
+.stepCopy p { margin: 0; max-width: 572px; color: var(--text-on-card); font-size: 18px; line-height: 1.45; }
 .stepMedia { min-width: 0; margin-left: 36px; display: grid; grid-template-columns: 1fr; gap: 10px; }
 .stepMedia:has(> div + div) { grid-template-columns: repeat(2, 1fr); }
 .stepMedia > div { position: relative; overflow: hidden; border-radius: var(--radius-sm); background: #ddd; }
@@ -200,14 +200,15 @@
 .processStep:nth-child(3) .stepMedia { height: 417px; }
 .processStep:nth-child(4) .stepMedia { height: 229px; align-self: start; }
 .processStep:nth-child(5) .stepMedia { height: 463px; }
-.processOptions { position: absolute; top: 214px; left: 132px; width: 572px; }
-.processOption { position: absolute; left: 0; width: 100%; }
-.processOption:first-child { top: 0; width: 550px; }
-.processOption:last-child { top: 147px; }
+.processOptions { margin-top: 36px; display: grid; gap: 28px; }
 .processOption h4 { margin: 0 0 16px; display: flex; align-items: center; gap: 12px; font-size: 24px; font-weight: 500; line-height: 1.2; }
 .processOption h4 img { flex: 0 0 28px; }
 .processOption p { color: var(--text-on-card); }
 .stepParagraphs { display: grid; gap: 12px; }
+/* The step result reads as the takeaway: darker and heavier than the description. */
+.stepResult { margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--border-on-card); }
+.stepResult span { display: block; margin-bottom: 10px; color: var(--brand-primary); font-size: 16px; font-weight: 600; line-height: 1.2; }
+.stepCopy .stepResult p { color: var(--text-primary); font-size: 20px; font-weight: 500; line-height: 1.4; }
 
 .reviews { height: 900px; padding: 150px 130px; position: relative; overflow: hidden; display: grid; grid-template-columns: 600px minmax(0, 960px); gap: 100px; color: var(--text-secondary); background: var(--brand-primary); }
 .reviewsTexture { position: absolute; left: 0; right: 0; bottom: 0; height: 531px; pointer-events: none; opacity: .2; mix-blend-mode: multiply; background: url("/assets/figma/image44.png") top left / 567px 567px repeat; transform: scaleY(-1); }
@@ -268,7 +269,7 @@
   .about h2, .sectionTitle h2, .reviews .sectionTitle h2 { font-size: 40px; }
   .about > p { margin: 0; font-size: 18px; }
   .stats { grid-row: 3; margin-top: 32px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .stats article { min-height: 154px; padding-bottom: 28px; }
+  .stats article { min-height: 0; padding-bottom: 28px; }
   .stats article:not(:first-child) { padding-left: 28px; }
   .stats strong { font-size: 64px; }
   .stats > article > span, .stats article:last-child > span { position: static; display: block; margin-top: 16px; font-size: 18px; white-space: normal; }
@@ -371,7 +372,7 @@
   .stepNumber { padding: 0; font-size: 14px; font-weight: 600; line-height: 19px; }
   .processStep:not(:last-child) .stepCopy, .processStep:not(:last-child) .stepCopy > p { width: auto; max-width: none; }
   .stepCopy h3 { margin: 12px 0; font-size: 20px; line-height: 1.2; }
-  .stepCopy p, .processOption p { max-width: none; font-size: 14px; line-height: 20px; }
+  .stepCopy p, .processOption p { max-width: none; font-size: 16px; line-height: 22px; }
   .stepMedia, .processStep:nth-child(n) .stepMedia { width: 100%; height: auto !important; margin: 20px 0 0; display: grid; grid-template-columns: 1fr; gap: 10px; }
   .stepMedia > div { width: 100%; height: auto; aspect-ratio: 280 / 162; }
   .processStep:nth-child(2) .stepMedia > div { aspect-ratio: 280 / 133; }
@@ -436,7 +437,7 @@
   .sectionTitle h2,.reviews .sectionTitle h2 { margin-top:14px; }
   .about > p { grid-column:2; grid-row:2; margin:0; font-size:18px; line-height:1.5; }
   .stats { margin-top:24px; grid-column:1 / -1; grid-row:3; grid-template-columns:repeat(3,minmax(0,1fr)); border-bottom:1px solid var(--border-on-bg); }
-  .stats article { height:auto; min-height:142px; padding:0 20px 24px 0; border:0; border-right:1px solid var(--border-on-bg); }
+  .stats article { height:auto; min-height:0; padding:0 20px 20px 0; border:0; border-right:1px solid var(--border-on-bg); }
   .stats article:not(:first-child) { padding-left:20px; }
   .stats article:last-child { height:auto; padding-right:0; border-right:0; }
   .stats article::after { content:none; }
@@ -466,7 +467,7 @@
   .stepCopy { grid-column:1; min-width:0; }
   .processStep:not(:last-child) .stepCopy,.processStep:not(:last-child) .stepCopy > p { width:auto; max-width:none; }
   .stepCopy h3 { margin:0 0 16px; font-size:22px; }
-  .stepCopy p,.processOption p { max-width:none; font-size:16px; line-height:1.5; }
+  .stepCopy p,.processOption p { max-width:none; font-size:17px; line-height:1.5; }
   .stepMedia,.processStep:nth-child(n) .stepMedia { grid-column:2; width:100%; height:auto; margin:0; grid-template-columns:minmax(0,1fr); gap:12px; align-self:start; }
   .processStep:nth-child(n) .stepMedia > div { width:100%; height:auto; aspect-ratio:1.2; }
   .processStep:nth-child(4) .stepMedia > div { aspect-ratio:1.7; }
@@ -488,4 +489,19 @@
   .reviewControls { position:relative; left:auto; right:auto; bottom:auto; grid-row:4; margin-top:24px; padding-top:0; }
   .reviewControls strong { font-size:24px; }
   .reviewButton { position:relative; left:auto; right:auto; bottom:auto; grid-row:5; width:fit-content; min-width:240px; height:56px; margin:24px auto 0; font-size:16px; }
+}
+
+@media (960px < width < 1920px) {
+  .stepResult { margin-top: 28px; padding-top: 20px; }
+  .stepCopy .stepResult p { font-size: 18px; }
+}
+@media (max-width: 960px) {
+  .stepResult { margin-top: 20px; padding-top: 16px; }
+  .stepResult span { margin-bottom: 8px; font-size: 14px; }
+  .stepCopy .stepResult p { font-size: 16px; line-height: 22px; }
+}
+@media (768px <= width <= 1024px) {
+  .stepResult { margin-top: 24px; padding-top: 20px; }
+  .stepResult span { font-size: 15px; }
+  .stepCopy .stepResult p { font-size: 18px; line-height: 1.45; }
 }

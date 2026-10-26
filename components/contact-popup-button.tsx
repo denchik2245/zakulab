@@ -15,13 +15,15 @@ type ContactPopupButtonProps = {
   triggerClassName?: string;
   onOpen?: () => void;
   message?: string;
+  messageLabel?: string;
+  fileName?: string;
 };
 
 function getPopupScale() {
   return window.innerWidth > 1024 && window.innerWidth < 1920 ? window.innerWidth / 1920 : 1;
 }
 
-export function ContactPopupButton({ children, title, description, telegramUrl, maxUrl, vkUrl, triggerClassName, onOpen, message }: ContactPopupButtonProps) {
+export function ContactPopupButton({ children, title, description, telegramUrl, maxUrl, vkUrl, triggerClassName, onOpen, message, messageLabel = "Результат выбора стиля", fileName = "zakulab-style-result.txt" }: ContactPopupButtonProps) {
   const [copyStatus, setCopyStatus] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
@@ -63,7 +65,7 @@ export function ContactPopupButton({ children, title, description, telegramUrl, 
     const previousPaddingRight = document.body.style.paddingRight;
     const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
     const bodyPaddingRight = Number.parseFloat(window.getComputedStyle(document.body).paddingRight) || 0;
-    const page = document.querySelector<HTMLElement>(".figma-home-page, .figma-portfolio-page, .style-check-page");
+    const page = document.querySelector<HTMLElement>(".figma-home-page, .figma-portfolio-page, .style-check-page, .project-calculator-page");
     const pageWasInert = page?.inert ?? false;
     document.body.style.overflow = "hidden";
     if (scrollbarWidth > 0) document.body.style.paddingRight = `${bodyPaddingRight + scrollbarWidth}px`;
@@ -106,14 +108,14 @@ export function ContactPopupButton({ children, title, description, telegramUrl, 
           <p id={descriptionId}>{description}</p>
         </div>
         {message && <div className={styles.resultTransfer}>
-          <textarea aria-label="Результат выбора стиля" readOnly value={message} />
+          <textarea aria-label={messageLabel} readOnly value={message} />
           <button type="button" onClick={async () => {
             try { await navigator.clipboard.writeText(message); setCopyStatus("Результат скопирован. Вставьте его в сообщение."); }
             catch { setCopyStatus("Выделите текст и скопируйте вручную или скачайте файл."); }
           }}>Скопировать результат</button>
           <button type="button" onClick={() => {
             const url = URL.createObjectURL(new Blob([message], { type: "text/plain;charset=utf-8" }));
-            const anchor = document.createElement("a"); anchor.href = url; anchor.download = "zakulab-style-result.txt";
+            const anchor = document.createElement("a"); anchor.href = url; anchor.download = fileName;
             anchor.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
           }}>Скачать .txt</button>
           <p role="status">{copyStatus}</p>

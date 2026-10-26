@@ -127,7 +127,7 @@ with tempfile.TemporaryDirectory(prefix='zakulab-php-test-') as temporary:
             except (urllib.error.URLError, ConnectionError):
                 time.sleep(.1)
         check(server.poll() is None, 'PHP server starts at a 96M limit')
-        for path in ['/', '/projects', '/reviews', '/style-check', '/privacy', '/consent', '/success', '/request']:
+        for path in ['/', '/projects', '/reviews', '/style-check', '/calculator', '/privacy', '/consent', '/success', '/request']:
             status, data, headers, raw = request(path, authenticated=False)
             check(status == 200 and '<h1' in data, f'{path}: complete HTML without JavaScript' + (f' (status={status}, body={str(data)[:600]})' if status != 200 or '<h1' not in data else ''))
             check('/_next/' not in data and 'fonts.googleapis.com' not in data, f'{path}: no Next.js runtime or external fonts')
@@ -220,7 +220,7 @@ with tempfile.TemporaryDirectory(prefix='zakulab-php-test-') as temporary:
         saved['site']['portfolioProjects'].append(draft)
         check(request('/api/admin/content', 'PUT', saved, csrf)[0] == 200, 'Moderation and private draft save succeed')
         check(not (directory / 'public_html/page-cache/home.html').exists(), 'Content save invalidates static cache')
-        for path in ['/', '/projects', '/reviews', '/style-check', '/sitemap.xml']:
+        for path in ['/', '/projects', '/reviews', '/style-check', '/calculator', '/sitemap.xml']:
             data = request(path, authenticated=False)[1]
             check('PRIVATE_DRAFT_SENTINEL' not in data, f'{path}: draft absent from HTML and boot data')
         check('PRIVATE_PENDING_SENTINEL' in request('/reviews', authenticated=False)[1], 'Approved review appears in public HTML')

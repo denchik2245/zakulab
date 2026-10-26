@@ -125,7 +125,7 @@ export function MobileMenu({ className, telegramUrl, maxUrl, vkUrl }: MobileMenu
           </div>
 
           <nav className={styles.nav} aria-label="Мобильное меню">
-            {[...navigation, ["Выбор стиля", "/style-check"]].map(([label, href]) => (
+            {[...navigation, ["Выбор стиля", "/style-check"], ["Калькулятор проекта", "/calculator"]].map(([label, href]) => (
               <a className={styles.menuLink} href={href} key={href} aria-current={pathname === href ? "page" : undefined} onClick={finishClose}><span>{label}</span><MenuArrow /></a>
             ))}
           </nav>

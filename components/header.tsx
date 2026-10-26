@@ -40,6 +40,11 @@ export function Header(links: { telegramUrl: string; maxUrl: string; vkUrl: stri
     };
   }, []);
 
+  useEffect(() => {
+    // Sticky page blocks read this to follow the header off screen.
+    document.documentElement.dataset.headerHidden = String(isHidden);
+  }, [isHidden]);
+
   return (
     <header ref={headerRef} className={`site-header ${styles.siteHeader} ${isHidden ? styles.hidden : ""}`}>
       <div className={styles.headerInner}>
@@ -53,6 +58,7 @@ export function Header(links: { telegramUrl: string; maxUrl: string; vkUrl: stri
 
         <nav className={styles.secondaryNav} aria-label="Дополнительное">
           <a href="/style-check">Выбор стиля</a>
+          <a href="/calculator">Калькулятор проекта</a>
         </nav>
 
         <SocialLinks className={styles.socials} {...links} />

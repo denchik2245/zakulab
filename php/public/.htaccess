@@ -33,7 +33,7 @@ DirectoryIndex index.php
   RewriteRule ^$ page-cache/home.html [L]
   RewriteCond %{REQUEST_METHOD} ^(?:GET|HEAD)$
   RewriteCond %{DOCUMENT_ROOT}/page-cache/$1.html -f
-  RewriteRule ^(projects|reviews|style-check|privacy|consent)$ page-cache/$1.html [L]
+  RewriteRule ^(projects|reviews|style-check|calculator|privacy|consent)$ page-cache/$1.html [L]
   RewriteCond %{REQUEST_METHOD} ^(?:GET|HEAD)$
   RewriteCond %{DOCUMENT_ROOT}/page-cache/case-$1.html -f
   RewriteRule ^cases/([a-z0-9]+(?:-[a-z0-9]+)*)$ page-cache/case-$1.html [L]

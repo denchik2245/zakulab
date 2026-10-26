@@ -15,7 +15,7 @@ try {
         case 'warm-cache':
             $content = read_content();
             $revision = $content['revision'];
-            foreach (['home', 'projects', 'reviews', 'style-check', 'privacy', 'consent'] as $page) publish_cache($page, render_page($page, $content), $revision);
+            foreach (['home', 'projects', 'reviews', 'style-check', 'calculator', 'privacy', 'consent'] as $page) publish_cache($page, render_page($page, $content), $revision);
             foreach (published_cases($content) as $case) publish_cache('case-' . $case['slug'], render_page('case', $content, $case), $revision);
             echo "Public HTML cache generated.\n"; break;
         case 'export':

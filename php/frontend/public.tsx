@@ -5,6 +5,7 @@ import { ReviewsSlider } from "@/components/reviews-slider";
 import { ReviewForm } from "@/components/review-form";
 import { ServiceOrderButton } from "@/components/service-order-button";
 import { StyleQuiz } from "@/components/style-quiz";
+import { ProjectCalculator } from "@/components/project-calculator";
 import type { SiteSettings, VerifiedReview } from "@/lib/content-schema";
 
 const boot = JSON.parse(document.getElementById("site-data")?.textContent || "{}");
@@ -23,6 +24,7 @@ if (site) {
   if (boot.page === "home") mount("reviews-slider", <ReviewsSlider reviews={boot.reviews as VerifiedReview[]} title={site.reviewsTitle} text={site.reviewsText} fallbackImage={site.reviewImage} />);
   if (boot.page === "reviews") mount("review-form", <ReviewForm title={site.popups.reviewFormTitle} description={site.popups.reviewFormDescription} />);
   if (boot.page === "style-check") mount("style-quiz", <StyleQuiz settings={site.styleChoice} popups={site.popups} socialLinks={links} />);
+  if (boot.page === "calculator") mount("project-calculator", <ProjectCalculator socialLinks={links} />);
   document.querySelectorAll<HTMLElement>("[data-service-id]").forEach((element) => {
     const item = [...site.services, ...site.smallTasks].find(item => item.id === element.dataset.serviceId);
     if (item) createRoot(element).render(<ServiceOrderButton serviceTitle={item.title} {...links} popupTitlePrefix={site.popups.serviceTitlePrefix} popupTitle={site.popups.services[item.id]?.title} popupDescription={site.popups.services[item.id]?.description || site.popups.serviceDescription} />);

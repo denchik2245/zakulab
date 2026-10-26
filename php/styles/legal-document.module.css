@@ -17,7 +17,8 @@
 .intro {
   min-width: 0;
   position: sticky;
-  top: 112px;
+  top: calc(112px - var(--header-hidden-offset, 0px));
+  transition: top .4s ease;
   display: grid;
   gap: 28px;
 }
